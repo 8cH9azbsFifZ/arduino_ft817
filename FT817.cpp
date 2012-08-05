@@ -4,7 +4,7 @@
 
 #define DEBUG false
 
-extern SoftwareSerial rigSoftSerial(16,17);
+extern SoftwareSerial rigSoftSerial(16,17); // RX, TX pins
 
 FT817::FT817()
 {
@@ -13,8 +13,9 @@ FT817::FT817()
 
 }
 
-void FT817::assignSerial(SoftwareSerial s) {
-  rigSoftSerial = s;
+void FT817::assignSerial(int rx, int tx) {
+  // set pins and return rigSoftSerial
+  // // TBD
 }
 
 void FT817::begin(int baud) {

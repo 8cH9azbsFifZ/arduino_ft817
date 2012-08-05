@@ -39,6 +39,7 @@
 #define FT817_SET_CTCSS_FREQ 0x0B
 #define FT817_LOCK_OFF 0x80
 #define FT817_SERIAL_TIMEOUT_MILLIS 8000
+#define FT817_GET_SWR 0xBD
 #define COMMAND_DELAY_FREQ_CHANGE 0
 #define COMMAND_DELAY 0
 
@@ -66,7 +67,7 @@ class FT817
 	void setLockOff();
 	void off();
 	void on();
-   void assignSerial(SoftwareSerial s);
+   void assignSerial(int rx, int tx);
    void begin(int baud);
 
   private:
