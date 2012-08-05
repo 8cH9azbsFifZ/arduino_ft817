@@ -1,0 +1,2801 @@
+<!DOCTYPE HTML PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=ISO-8859-1">
+  <meta name="Author" content="Clint Turner, KA7OEI">
+  <meta name="GENERATOR"
+ content="Mozilla/4.7 [en] (WinNT; I) [Netscape]">
+  <meta name="Description"
+ content="The KA7OEI FT-817 page - CAT (tm) interface programming using the FT_817 (Using the serial interface)">
+  <meta name="KeyWords"
+ content="FT-817, yaesu, serial, CAT, meow, 817, receiver,  modification, power supply, switching, switcher, battery, all-mode, transceiver">
+  <title>The KA7OEI FT-817 pages - CAT (tm) interface programming using
+the FT-817 (Using the serial interface)</title>
+  <base href="http://www.ka7oei.com/ft817_meow.html">
+</head>
+<body background="817_fp1.jpg">
+<center><b><i><font face="Comic Sans MS"><font size="+3">The KA7OEI
+FT-817
+pages</font></font></i></b>
+<br>
+<b><i><font face="Comic Sans MS"><font size="+2">CAT (tm) Interface
+Programming
+using the FT-817</font></font></i></b><br>
+</center>
+<p>
+&nbsp;
+<table align="left" border="1" cellpadding="4" cellspacing="4">
+  <tbody>
+    <tr>
+      <td><img src="817_fp2.jpg" alt="Front panel view of my FT-817"
+ width="411" border="0" height="225"></td>
+    </tr>
+  </tbody><caption align="bottom"><i>A Front-panel view of my
+FT-817.&nbsp;</i> </caption>
+</table>
+</p>
+<p><b><i><font size="+2">Notes:</font></i></b>
+</p>
+<p><b><i>- For a program that utilizes the CAT commands (both
+documented
+<u>and</u>
+undocumented) to a very large extent, look at HB9DRV's FT-817 Commander
+program - see the <a href="#commander">link</a> below.</i></b>
+<br>
+&nbsp;
+<br>
+<i><b>- Also note that I do NOT own an FT-817ND and have not had the
+opportunity
+to examine one carefully to note the subtle differences between it and
+the original '817, especially when it comes to CAT programming and
+memory locations.</b></i><br>
+</p>
+<p><b>Note:&nbsp; </b>The EEPROM memory map has been moved to a
+separate
+page - refer to the link near the bottom of the page.
+</p>
+<p><b><i><font size="+1">Important notice:</font>&nbsp; This document
+details
+aspects of CAT interface commands that are <u>specific to the FT-817</u>.&nbsp;
+Furthermore,
+some
+of these parameters (specifically memory locations)
+may
+be pertinent <u>only</u> to the version of the software in my radio
+and
+may not apply to other software versions!&nbsp; Finally, careless use
+of
+these commands may result in an <u>unusable</u> radio, requiring
+complete
+recalibration!&nbsp; <u>You have been warned!</u></i></b>
+</p>
+<p><i><b>Comment:</b>&nbsp; The Japanese domestic version of the FT-817
+apparently has a <b>different</b> CPU which is "hardcoded" to limit
+its
+frequency coverage.&nbsp; It would be interesting to know if the EEPROM
+addresses below are the same for this (and other) versions.</i>
+</p>
+<p><b><font size="+1">Note:</font>&nbsp;&nbsp; </b>For reference, the
+first
+four characters of the serial number on my '817 are:<b>&nbsp; 1D21</b>
+</p>
+<p>Most modern HF transceivers are capable of remote control via the
+serial
+interface (called the <b><i>CAT</i></b> interface by Yaesu) and the
+FT-817
+is no exception.&nbsp; Ideally, it should be possible to glean enough
+information
+to do everything remotely that it is possible to do from the radio's
+front
+panel.&nbsp; Unfortunately, this isn't always the case:&nbsp; Almost
+inevitably,
+some minor feature or piece of information is omitted and a "remote
+simulation"
+just is not possible.
+<br>
+&nbsp;
+<table width="45%" align="right" bgcolor="#cccccc" border="1" cols="1">
+  <tbody>
+    <tr>
+      <td>
+      <center><b><i>"Why is this page here?"</i></b></center>
+      <p>The simple answer:&nbsp; Because the '817 has a serial
+port.&nbsp; </p>
+      <p>It occurred to me that there <b><i>must</i></b> be a few <i>undocumented</i>
+commands in the interface protocol to allow Yaesu to perform a
+semi-automated
+calibration of the radio, so I began to poke around in the
+interface.&nbsp;
+After a few minutes, I was able to discern the presence of several
+heretofore
+undocumented commands.&nbsp; Soon after this (and after throwing
+together
+some "sniffer" software) I was accumulating a large pile of notes as to
+which address did what.&nbsp; </p>
+      <p>The <b><i>real</i></b> reason why I did this was to be able
+to interface
+the '817 to a computer to do some field strength measurements
+(documented <b><i><a href="ft817_rptmon.html">here</a></i></b>)
+- and I needed the '817 to do more than it could "officially" do.&nbsp;
+      </p>
+      <p>Since I was already documenting this information, I decided to
+make
+this information available to others who might want to use it.&nbsp;</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<p>Such is the case of the FT-817:&nbsp; While it is possible to
+perform
+most functions (such as setting frequency and mode) and display a few
+of
+the displayed parameters (such as the S-meter,) while the status of a
+few
+other items (such as attenuator, AGC, preamplifier, and transmitter
+power
+settings, to name a few) does not seem to be available via the
+interface.
+</p>
+<p>Not with <b><i>documented</i></b> commands, anyway...
+</p>
+<p>As it turns out, there are a number of <b><u>very</u></b> powerful <b><i>undocumented</i></b>
+commands specific to the FT-817 that allow access to most of this sort
+of data - both to read and change this data - but more on this later.
+These
+commands are no doubt what allows Yaesu to have an <i>automated</i>
+test
+fixture for most calibration points in the radio.
+</p>
+<p>The FT-817's command structure consists of a 5 byte command.&nbsp;
+It
+is sent at the baud rate specified in menu item 14.&nbsp; The format is
+8 data bits, no parity, 1 start bit, and 2 stop bits.&nbsp;&nbsp; The
+command
+sent <b><i>to</i></b> the FT-817 is formatted as follows:
+</p>
+<blockquote><b><tt><font size="+1">[Data 1][Data 2][Data 3][Data
+4][Command]</font></tt></b></blockquote>
+<b><i>Note:&nbsp; </i></b>It is specified in the manual that these 5
+bytes
+are to be sent in quick succession - within 200 milliseconds of each
+other.&nbsp;
+Experimentation reveals, however, that this would be too slow - it is
+more
+likely that <b><i>all 5 bytes</i></b> must be sent within a 200
+millisecond
+period.
+<p>Not all commands "look" at all 4 data bytes, but in all cases, all 4
+bytes <b><i>must</i></b> be sent.&nbsp; On those commands where not
+all
+4 data bytes are required, those unused bytes may contain anything.
+</p>
+<p><b><i>Note:</i></b>&nbsp; The initial version of the FT-817
+Operating
+Manual has the labeling of the format of the TX and RX status swapped
+on
+page 73.
+</p>
+<p>The command set is as follows in (the commands are in numerical
+order.)&nbsp;
+The bytes designated with <b>X</b> may contain any data:
+<br>
+&nbsp;
+<table bgcolor="#ffffff" border="1">
+  <tbody>
+    <tr>
+      <td>
+      <center><b>Command</b> <br>
+      <b>Description</b></center>
+      </td>
+      <td>
+      <center><b>Data</b> <br>
+      <b>Byte</b> <br>
+      <b>1</b></center>
+      </td>
+      <td>
+      <center><b>Data</b> <br>
+      <b>Byte</b> <br>
+      <b>2</b></center>
+      </td>
+      <td>
+      <center><b>Data</b> <br>
+      <b>Byte</b> <br>
+      <b>3</b></center>
+      </td>
+      <td>
+      <center><b>Data</b> <br>
+      <b>Byte</b> <br>
+      <b>4</b></center>
+      </td>
+      <td>
+      <center><b>Command</b> <br>
+      <b>(in HEX)</b></center>
+      </td>
+      <td>
+      <center><b>Remarks</b></center>
+      </td>
+    </tr>
+    <tr>
+      <td>Lock On</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>00</center>
+      </td>
+      <td>This command is equivalent to turning the dial/panel lock
+on.&nbsp;
+This precise effect of this setting depends on the state of submenu
+item
+#32 (stored at memory location 5E HEX - see below.)&nbsp;
+      <p>This command returns 00 if it was unlocked, and F0 if already
+locked.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Set Frequency</td>
+      <td>
+      <center>100/10 MHz</center>
+      </td>
+      <td>
+      <center>1 MHz/100 kHz</center>
+      </td>
+      <td>
+      <center>10/1 kHz</center>
+      </td>
+      <td>
+      <center>100/10 Hz</center>
+      </td>
+      <td>
+      <center>01</center>
+      </td>
+      <td>This commands sets the current frequency (see below)</td>
+    </tr>
+    <tr>
+      <td>Split On</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>02</center>
+      </td>
+      <td>This command enables split operation.&nbsp; Use the <b>Read
+Transmitter
+Status</b> command (below) to determine current split status.&nbsp;
+      <p>This command returns 00 if not already on, and F0 (HEX) if
+already on.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Read Frequency&nbsp; <br>
+and mode</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>03</center>
+      </td>
+      <td>This command returns five bytes (see below)</td>
+    </tr>
+    <tr>
+      <td>Clarifier On</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>05</center>
+      </td>
+      <td>This command turns the clarifier (a.k.a. RIT) on.&nbsp;
+      <p>This command returns 00 if not already on, and F0 (HEX) if
+already on.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Set Operating&nbsp; <br>
+Mode</td>
+      <td>
+      <center>Mode&nbsp; <br>
+Byte</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>07</center>
+      </td>
+      <td>The mode byte is described below</td>
+    </tr>
+    <tr>
+      <td>Set PTT ON</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>08</center>
+      </td>
+      <td>This "keys" the FT-817.&nbsp; In CW, this sets the radio to
+transmit
+mode, but does key the transmitter.&nbsp;
+      <p>Keying and unkeying the PTT line will cancel the transmit mode
+(i.e.
+put it back into receive.)&nbsp; </p>
+      <p>This command returns 00 if the '817 was unkeyed, and F0 if
+already keyed.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Set Repeater&nbsp; <br>
+Offset Direction</td>
+      <td>
+      <center>Offset</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>09</center>
+      </td>
+      <td>The byte "Offset" has the following function:&nbsp; <br>
+09 = - (minus) shift&nbsp;&nbsp;&nbsp; 49 = + (positive)
+shift&nbsp;&nbsp;&nbsp;
+89 = simplex</td>
+    </tr>
+    <tr>
+      <td>Set DCS/CTCSS&nbsp; <br>
+mode</td>
+      <td>
+      <center>Mode</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>0A</center>
+      </td>
+      <td>The byte "Mode" has the following function:&nbsp; <br>
+0A = DCS Enable&nbsp;&nbsp;&nbsp; 2A = CTCSS Enable&nbsp;&nbsp;&nbsp;
+4A = DCS/CTCSS Encoder&nbsp; enable&nbsp;&nbsp;&nbsp; 8A = DCS/CTCSS
+Encoder
+Disable</td>
+    </tr>
+    <tr>
+      <td>Set CTCSS&nbsp; <br>
+Tone Frequency</td>
+      <td>
+      <center>100/10 Hz</center>
+      </td>
+      <td>
+      <center>1/0.1 Hz</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>0B</center>
+      </td>
+      <td>This command sets the CTCSS frequency (see below) *</td>
+    </tr>
+    <tr>
+      <td>Set DCS Code</td>
+      <td>
+      <center>DCS MSB</center>
+      </td>
+      <td>
+      <center>DCS LSB</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>0C</center>
+      </td>
+      <td>This command sets the DCS code.&nbsp; This is a 16 bit word
+containing
+the DCS code using two bytes (see below) *</td>
+    </tr>
+    <tr>
+      <td>Turn on FT-817</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>0F</center>
+      </td>
+      <td>This can be used to turn the FT-817 on - <b><i>only</i></b>
+if the
+corresponding <b>off</b> command was used <b>and</b> if power is
+being
+supplied via the rear connector.&nbsp; See the notes concerning the <b>off&nbsp;</b>
+command below.</td>
+    </tr>
+    <tr>
+      <td>Read TX keyed state <b><i>(Undocumented)</i></b></td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>10</center>
+      </td>
+      <td>This command returns 00 if the FT-817 is unkeyed, and nonzero
+(F0 HEX)
+if it is keyed.</td>
+    </tr>
+    <tr>
+      <td>Lock Off</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>80</center>
+      </td>
+      <td>This command is equivalent to turning the dial/panel lock
+off.&nbsp;
+      <p>This command returns 00 if the '817 was already locked, and F0
+(HEX)
+if already unlocked.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Toggle VFO</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>81</center>
+      </td>
+      <td>This command toggles between VFO-A and VFO-B</td>
+    </tr>
+    <tr>
+      <td>Split Off</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>82</center>
+      </td>
+      <td>This command disables split operation.&nbsp; Use the <b>Read
+Transmitter
+Status</b> command (below) to determine current split status.&nbsp;
+      <p>This command returns 00 if previously on, and F0 (HEX) if
+already off.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Clarifier Off</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>85</center>
+      </td>
+      <td>This command turns the clarifier (a.k.a. RIT) off.&nbsp;
+      <p>This command returns 00 if previously on, and F0 (HEX) if
+already off.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Set PTT Off</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>88</center>
+      </td>
+      <td>This command puts the FT-817 into receive mode.&nbsp;
+      <p>This command returns 00 if the '817 was keyed, and F0 if
+already unkeyed.</p>
+      </td>
+    </tr>
+    <tr>
+      <td>Turn off FT-817</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>8F</center>
+      </td>
+      <td>This command can be used to turn the FT-817 off.&nbsp; When
+powered
+from the rear connection and the "on" command (above) was used, approx.
+10 mA is consumed when "off" - See notes below.</td>
+    </tr>
+    <tr>
+      <td>Radio Configuration <b><i>(Undocumented)</i></b></td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>A7</center>
+      </td>
+      <td>This command causes a string of several bytes indicating the
+radio's
+configuration to be dumped.&nbsp; (See below)</td>
+    </tr>
+    <tr>
+      <td>Unknown Status?&nbsp; <b><i>(Undocumented)</i></b></td>
+      <td>
+      <center>?</center>
+      </td>
+      <td>
+      <center>?</center>
+      </td>
+      <td>
+      <center>?</center>
+      </td>
+      <td>
+      <center>?</center>
+      </td>
+      <td>
+      <center>BA</center>
+      </td>
+      <td>This command causes one byte (usually 00?) to be
+returned.&nbsp; Its
+function is unknown (see below)</td>
+    </tr>
+    <tr>
+      <td>Read FT-817 EEPROM Data&nbsp; <b><i>(Undocumented)</i></b></td>
+      <td>
+      <center>Address&nbsp; <br>
+MSB</center>
+      </td>
+      <td>
+      <center>Address&nbsp; <br>
+LSB</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>BB</center>
+      </td>
+      <td>This command causes <b><i>two</i></b> bytes of EEPROM data
+to be returned,
+beginning with the address in data bytes 1 and 2.&nbsp; (Approximately
+6.25k of EEPROM data may be accessed - See below)</td>
+    </tr>
+    <tr>
+      <td>Write FT-817 EEPROM Data<b><i>&nbsp; (Undocumented)</i></b></td>
+      <td>
+      <center>Address&nbsp; <br>
+MSB</center>
+      </td>
+      <td>
+      <center>Address&nbsp; <br>
+LSB</center>
+      </td>
+      <td>
+      <center>Data for Address</center>
+      </td>
+      <td>
+      <center>Data for Address + 1</center>
+      </td>
+      <td>
+      <center>BC</center>
+      </td>
+      <td>This command writes <b><i>two</i></b> bytes to the EEPROM at
+the address
+in data bytes 1 and 2.&nbsp; (<b>USE WITH CARE - </b>See below)</td>
+    </tr>
+    <tr>
+      <td>Read TX metering&nbsp; <b><i>(Undocumented)</i></b></td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>BD</center>
+      </td>
+      <td>This command returns one byte (00) when in receive.&nbsp;
+When in transmit,
+this command returns <b>two</b> bytes (in BCD format) indicating
+Forward
+power, VSWR, ALC, and Modulation.&nbsp; (See below)</td>
+    </tr>
+    <tr>
+      <td>Reset FT-817 to factory defaults and blow away all "soft"
+calibration
+settings!&nbsp; <b>Use with extreme care! <i>(Undocumented)</i></b></td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>BE</center>
+      </td>
+      <td><b>This command completely resets <i><u>all</u></i>
+configuration settings
+and factory calibration parameters to their factory (<u>pre-alignment</u>)
+values
+as
+well as erasing all channel memories.&nbsp; Be very careful -
+be very very careful when using this command!&nbsp; <i>(See below)</i></b></td>
+    </tr>
+    <tr>
+      <td>Read Receiver Status</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>E7</center>
+      </td>
+      <td>This command returns one byte containing receiver status (see
+below)</td>
+    </tr>
+    <tr>
+      <td>Set Clarifier Frequency</td>
+      <td>
+      <center>Clarifier Direction</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>10/1 kHz</center>
+      </td>
+      <td>
+      <center>100/10 Hz</center>
+      </td>
+      <td>
+      <center>F5</center>
+      </td>
+      <td>This command sets the clarifier (a.k.a. RIT) direction and
+offset amount
+(see below)</td>
+    </tr>
+    <tr>
+      <td>Read Transmitter Status</td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>X</center>
+      </td>
+      <td>
+      <center>F7</center>
+      </td>
+      <td>This command returns one byte containing transmitter status
+(see below)</td>
+    </tr>
+    <tr>
+      <td>Set Repeater Offset Amount</td>
+      <td>
+      <center>10/1 MHz</center>
+      </td>
+      <td>
+      <center>100/10 kHz</center>
+      </td>
+      <td>
+      <center>00</center>
+      </td>
+      <td>
+      <center>00</center>
+      </td>
+      <td>
+      <center>F9</center>
+      </td>
+      <td>This command sets the magnitude of the repeater offset.&nbsp;
+It may
+range from 0 to 99.99 MHz (see below)</td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<blockquote>Note:&nbsp; An asterisk (*) in the <b>Notes</b> column
+indicates
+that further study of that particular command is warranted, as its
+specific
+format may be unclear and/or it may do more than is immediately
+apparent.</blockquote>
+<b><i><font size="+2">"Below"</font></i></b>
+<ul>
+  <li> <b>Command 01 - Set frequency:</b>&nbsp; The current frequency
+is
+set using
+4 BCD bytes.&nbsp; To set a frequency such as 435.12345 MHz, data bytes
+1-4 would be [43][51][23][45] followed by the the set frequency command
+[01]</li>
+  <li> <b>Command 03 - Read frequency and mode:</b>&nbsp; This command
+returns
+5 bytes with the first 4 bytes containing the current frequency in the
+same format as the <b>Set frequency</b> command (above) while the last
+byte contains the current mode as follows:&nbsp; <b>00</b> - LSB,<b> 01</b>
+- USB,<b> 02</b> - CW,<b> 03</b> - CWR,<b> 04</b> - AM,<b> 06</b> -
+WFM, <b>08</b>
+- FM,<b> 0A</b> - DIG,<b> 0C</b> - PKT</li>
+  <li> <b>Command 07 - Set operation mode:</b>&nbsp; <b>00</b> - LSB,
+    <b>01</b>
+- USB, <b>02</b> - CW, <b>03</b> - CWR, <b>04</b> - AM, <b>08</b> -
+FM,<b>
+0A</b> - DIG,<b> 0C</b> - PKT.&nbsp; <b><i>Note:&nbsp; </i>Setting
+other
+than one of the listed modes can "crash" the FT-817, necessitating
+removal
+of power.</b>&nbsp; Note that the WFM mode (08) cannot be set using
+this
+command, rather that the mode is implicit when selecting the frequency
+in the range correlating with the FM broadcast band (i.e. 76-108 MHz.)</li>
+  <li> <b>Command 0B - Set CTCSS Tone Frequency:</b>&nbsp; Bytes 1 and
+2
+contain
+the tone frequency in BCD format.&nbsp; For a frequency of 192.8, the
+two
+bytes would be [19][28].&nbsp; <i>Note:&nbsp; This format needs to be
+verified.</i></li>
+  <li> <b>Command 0C - Set DCS Code:</b>&nbsp; Bytes 1 and 2 contain
+the
+DCS code
+in BCD format.&nbsp; For a DCS code of 546, the two bytes would be
+[05][46]. <i>Note:&nbsp;
+This format needs to be verified.</i></li>
+  <li> <b>Command 8F - Turn Off FT-817:</b>&nbsp; Note that when this
+command
+is used, the CPU remains active in order to be able to detect the "On"
+command (0F) and a small amount of current is continuously drawn it
+should
+be used with caution when operating the FT-817 from via the rear power
+connector as noted several times below:</li>
+  <ul>
+    <li>That the FT-817 will respond to some commands after the <b>OFF</b>
+command
+is executed and the '817 is powered from the rear power connector.</li>
+    <li>Repeatedly sending the <b>OFF</b> command will cause the
+FT-817 to
+send
+a string of unknown data - only if the '817 is powered from the rear
+power
+connector.</li>
+    <li>When this command is executed using <b>internal</b> batteries
+the '817
+will shut completely down and will <b><i>not</i></b> respond to an <b>ON</b>
+command.&nbsp; If, after an <b>OFF</b> command was sent with the '817
+operating
+on internal batteries, the configuration is changed such that power <b><i>is</i></b>
+supplied via the rear connector, the '817 will begin to consume 10
+milliamps
+when off (having been shut off with the <b>OFF</b> command) and it <b><i>will</i></b>
+respond to the <b>ON</b> command.</li>
+    <li>Note that even if the <b>OFF</b> command was used, the '817
+will <b>not</b>
+consume 10 milliamps when off if running on <b><i>internal</i></b>
+batteries
+only.&nbsp; (Remember, again, that the <b>ON</b> command won't work
+when
+on internal batteries.)</li>
+    <li>When this command is executed using with power supplied at the
+rear
+power
+connector the current consumption will be approximately 10 milliamps,
+depending
+on battery voltage.</li>
+  </ul>
+  <li> <b>Command A7 - Radio Configuration:</b>&nbsp; This command
+causes
+a 9
+bytes to be sent by the FT-817.&nbsp; The purpose of some of these
+bytes
+is unknown, but several of them appear to indicate the configuration of
+J4001-J4009.&nbsp; The purposes of this data (starting with the first
+byte)
+as far as known, is as follows:</li>
+  <ul>
+    <li>Byte 1 - 0xA7 - This appears to be an echo of the command itself</li>
+    <li>Byte 2 - 0x02 - <i>Unknown</i></li>
+    <li>Byte 3 - 0x00 - <i>Unknown</i></li>
+    <li>Byte 4 - 0x04 - <i>Unknown</i></li>
+    <li>Byte 5 - 0x67 - <i>Unknown</i></li>
+    <li>Byte 6 - Byte indicating actual "solder ball" configuration</li>
+    <li>Byte 7 - Another byte indicating actual "solder ball"
+configuration</li>
+    <li>Byte 8 - Contents of EEPROM address 4</li>
+    <li>Byte 9 - Contents of EEPROM address 5</li>
+    <li>&nbsp;The bytes dumped (in HEX) by <b><i><u>my</u></i></b>
+'817 (with
+"blobs"
+on J4005-J4009) are as follows: <b>A7 02 00 04 67 D8 BF D8 BF</b>.</li>
+  </ul>
+  <li> <b>Command BA - Unknown Status?:</b>&nbsp; This command causes
+one
+byte
+to be returned.&nbsp; Preliminary investigations have shown that this
+only
+returns a 00.&nbsp; Further investigation should be carried out,
+possibly
+with different data in bytes 1-4.</li>
+  <li> <b>Command BB - Read EEPROM Data:</b>&nbsp; The FT-817 uses an
+64
+kbit
+(8 Kbyte) EEPROM to store internal configuration and memories and most
+bytes in this EEPROM may be read with this command, 2 bytes at a
+time.&nbsp;
+The address to be read is a 16 bit address with the upper 8 bits in the
+first byte and the lower 8 bits in the second byte.&nbsp; The first of
+the two bytes to be returned contains the data at the address in bytes
+1 and 2 while the second of the two bytes returns the data at the <b><i>next</i></b>
+address up from that specified.&nbsp; Addresses from 0 to 1925 (HEX)
+(just
+over 6.25k bytes) are valid and attempts to retrieve addresses out of
+this
+range <i>appear</i> to return <b>one</b> byte - a zero.&nbsp;
+Currently
+known EEPROM data and addresses are detailed below.&nbsp; (Note:&nbsp;
+I received information from someone who actually read the EEPROM with
+an
+outboard programmer, and he reports that the EEPROM contained nothing
+in
+the addresses above 1925 HEX.)</li>
+  <li> <b>Command BC - Write EEPROM Data:</b>&nbsp; The first two
+bytes
+specify
+the EEPROM address to be written (in the same format as the Read EEPROM
+Data command above) while the third byte contains the data to be
+written
+at that address, and the forth byte contains the data to be written at
+the <b><i>next</i></b> address up from that specified.&nbsp; Because
+this
+command writes <b>two</b> bytes to EEPROM, the user <b>must</b> know
+what
+should be written to <b>both</b> addresses.&nbsp; <b><i>Note that
+careless
+use of this command can cause the FT-817's CPU to crash and/or cause a
+complete wipe of <u>all</u> EEPROM data including configuration,
+software
+calibration/alignment, and memories - the effect being similar to that
+of the "Reset to Factory Defaults" command (below!)</i>&nbsp; If you
+insist
+on using this command without <i>first</i> recording the 76 "soft
+calibration"
+settings and noting what is in your radio's memories, you are an <u>idiot</u>!</b><i>&nbsp;&nbsp;
+(Am
+I
+clear on this point?)&nbsp; </i><b>A reset of this type can
+occur
+if you carelessly write to addresses 0-3 of the EEPROM.</b></li>
+  <li> <b>Command BD - Read TX Metering:</b>&nbsp; This command
+returns
+one byte
+(always 00) when the FT-817 is in receive mode (and should thus be
+ignored)
+but it returns <b><i>two</i></b> bytes (each containing two BCD
+digits)
+when it is transmitting.&nbsp; The first byte contains the current
+status
+of the PWR and VSWR meters (upper and lower 4 bits respectively) while
+the second byte contains the current status of the ALC and MOD meters
+(upper
+and lower 4 bits respectively.)</li>
+  <li> <b>Command BE - Reset to Factory Defaults:</b>&nbsp; <b>Note
+that
+this
+command completely resets <i><u>all</u></i> configuration settings and
+factory calibration parameters to their factory (<u>pre-alignment</u>)
+values as well as erasing all channel memories.&nbsp; <i>This may even
+require that you send the radio back to Yaesu if you didn't note all
+calibration
+settings!</i></b>&nbsp; If you insist on using this command, it is <b><i>strongly
+recommended</i></b> that you record each of the 76 factory calibration
+settings in the alignment menu.&nbsp; <b><i>You have been warned!!!</i>&nbsp;
+If
+you
+insist on using this command without <i>first</i> recording the
+76 "soft calibration" values as well as recording what is in your
+radio's
+memories, you get what you deserve (i.e. a poorly-calibrated radio with
+empty memories...)</b></li>
+  <li> <b>Command E7 - Read Receiver Status:</b>&nbsp; This command
+returns one
+byte.&nbsp; <b>Its contents are valid <i>only</i> when the '817 is in
+    <i>receive</i>
+mode and it should be ignored when transmitting.</b></li>
+  <ul>
+    <li>The lower 4 bits (0-3) of this byte indicate the current
+S-meter
+reading.&nbsp;
+00 refers to an S-Zero reading, 04 = S4, 09 = S9, 0A = "10 over," 0B =
+"20 over" and so on up to 0F.</li>
+    <li>Bit 4&nbsp; contains no useful information.</li>
+    <li>Bit 5 is 0 in non-FM modes, and it is 0 if the discriminator is
+centered
+(within 3.5 kHz for standard FM) when in the FM, FMN, or PKT modes, and
+1 if the receiver is off-frequency.</li>
+    <li>Bit 6 is 0 if the CTCSS or DCS is turned off (or in a mode
+where it is
+not available.)&nbsp; It is also 0 if there is a signal being receive
+and
+the correct CTCSS tone or DCS code is being decoded.&nbsp; It is 1 if
+there
+is a signal and the CTCSS/DCS decoding is enable, but the wrong CTCSS
+tone,
+DCS code, or no CTCSS/DCS is present.</li>
+    <li>Bit 7 is 0 if there is a signal present, or 1 if the receiver
+is
+squelched.</li>
+  </ul>
+  <li> <b>Command F5 - Set Clarifier Frequency:</b>&nbsp; This command
+sets the
+clarifier (a.k.a. RIT) parameters (but it does not turn it on or
+off.)&nbsp;
+The data to be sent is as follows:</li>
+  <ul>
+    <li>Byte 1:&nbsp; 00 = Positive (+) offset&nbsp; Any other value
+sets a
+negative
+(-) offset.</li>
+    <li>Byte 2:&nbsp; Note used</li>
+    <li>Bytes 3 and 4:&nbsp; These are BCD bytes containing the 10 and
+1 kHz
+digits
+(in byte 3) and 100 and 10 Hz digits (in byte 4.)&nbsp; For setting a
+clarifier
+offset frequency of 9.87 Khz (negative) these bytes would be
+[01][00][09][87],
+with the last byte being [F5] of course.</li>
+  </ul>
+  <li> <b>Command F7 - Read Transmitter Status:</b>&nbsp; This command
+returns
+one byte containing the current transmitter status.&nbsp; <b>This data
+is invalid when the radio is in receive mode</b>.&nbsp; This data is as
+follows:</li>
+  <ul>
+    <li>The lower 4 bits (0-3) of this byte contain the current "Power
+Output"
+reading, regardless of the display meter setting.</li>
+    <li>Bit 4 contains no known useful information.</li>
+    <li>Bit 5 is 0 if the SPLIT mode is on, 1 if the SPLIT mode is
+off.&nbsp;
+This
+appears to reflect the current status of the split mode only when in
+transmit.</li>
+    <li>Bit 6 is 0 if the SWR is acceptably low, and 1 if it is too
+high. <i>Note:&nbsp;
+Investigation is warranted to determine how this SWR status correlates
+with the reading obtained using the <b>Read TX Metering</b> command
+(above.)</i></li>
+    <li>Bit 7 indicates the current PTT status:&nbsp; 0 = Unkeyed, 1 =
+Keyed</li>
+  </ul>
+</ul>
+<table width="45%" align="right" bgcolor="#cccccc" border="1">
+  <tbody>
+    <tr>
+      <td>
+      <center><b><i>"Won't I wear out my EEPROM?"</i></b></center>
+      <p>The '817 uses an EEPROM to store nonvolatile data. This means
+that every
+time you change a setting or a band, updated information is written to
+the EEPROM.&nbsp; </p>
+      <p>As it turns out, EEPROMs have a limited number of "write"
+cycles before
+they literally "wear out."&nbsp; Typically, the lifetime is 1 million
+writes.&nbsp;
+Under "good" conditions, however (i.e. normal room temperature, normal
+voltage conditions) typical EEPROMs will withstand 10 million or more
+writes
+before they start to fail... According to the manufacturer, at
+least...&nbsp; </p>
+      <p>What does this mean, then?&nbsp; </p>
+      <p>For 1 million writes to occur, you would have to do the same
+thing to
+cause a write to the same address, once per second for 11 days:&nbsp;
+You
+are likely to wear out the button before you wear out the EEPROM.&nbsp;
+Since the lifetime of the EEPROM in the typical '817 is likely to be
+closer
+to 10 million writes, the actual figure is likely to be more like 4
+months
+of constant rewriting.&nbsp; </p>
+      <p>A computer, however, won't get tired as easily.&nbsp; If your
+program
+does 10 writes per second, you may want to reconsider how it operates
+if
+you are concerned about the EEPROM's lifetime:&nbsp; <b><i>Do the math!</i></b></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><b><i><font size="+1">Additional notes:</font></i></b>
+</p>
+<ul>
+  <li> <b>No checksum is used on any of the data</b>, so it is
+impossible
+to be
+absolutely certain that the data read back (or transmitted to the
+FT-817)
+is absolutely correct.&nbsp; For certain potentially "dangerous"
+commands
+(such as EEPROM Write) remember that <b><i>two</i></b> bytes <b><u>must</u></b>
+be written:&nbsp; The byte at the address that you wish to change, and
+the byte at that address plus one.&nbsp; Additionally, when modifying
+single
+bits at an specific address, one must know what the data was prior to
+modification. <b>This
+requires that both bytes be read <i>prior</i> to writing them</b>.&nbsp;
+It
+is
+    <b><i>strongly recommended</i></b> that before writing any
+EEPROM
+data, you read the two potentially affected bytes <b><i>several times</i></b>
+to make absolutely certain that they are correct.&nbsp; Keep in mind
+that
+it is possible to completely blow away the radio's memories and
+configuration
+(including "software calibration" parameters) with the EEPROM write
+command!</li>
+  <li>When the radio is "busy" (i.e. changing modes, bands, writing
+memories,
+someone is pushing buttons, etc.) it can occasionally "miss" a command
+or corrupt the transmitted data.&nbsp; When querying the radio one
+should
+be aware of this and be prepared to re-read the data.&nbsp; When
+sending
+a command that involves the radio changing its configuration, it is a
+good
+idea to wait a couple of hundred milliseconds before sending another
+command.&nbsp;
+This is particularly true of commands that involve several bytes of
+data
+- such as reading the receive frequency and mode.&nbsp; It is always a
+good idea to read the status of the radio back (after having modified
+it)
+to make certain that the changes "stick."</li>
+  <li>If your computer program is keeping the serial port very "busy"
+(i.e.
+requesting
+a lot of data) the radio may respond to commands sluggishly, or it may
+even miss certain button presses entirely.&nbsp; To be fair, you must <i>really</i>
+keep the radio busy to cause this.</li>
+  <li>I have noticed that the FT-817 will occasionally stop responding
+to
+serial
+port commands when the <b>LOCK</b> function has been enabled from the
+front
+panel.&nbsp; Power-cycling the radio will restore communications.&nbsp;
+I have not determined if this will also happen if the <b>LOCK</b> was
+software
+commanded, or if pressing the <b>LOCK</b> button (to unlock the radio)
+will restore communications.</li>
+  <li>Some commands (such as frequency entry) may take a few 10's of
+milliseconds
+to take effect, so be prepared to simply wait for the radio to finish.</li>
+</ul>
+<b><i><font size="+1">The EEPROM Memory Map:</font></i></b>
+<p>All of the nonvolatile parameters in the FT-817 are stored in the
+EEPROM
+(which is why there is no lithium battery in it).&nbsp; The content of
+all of the memory locations is yet to be determined (and probably can
+never
+be) but a few that are known for certain are listed below.&nbsp; <b>For
+a
+list
+of EEPROM memory locations listed in address order, go to the <a
+ href="ft817_memmap.html">Memory
+Map page</a>.</b>
+</p>
+<p>The "factory calibration settings" (i.e. those obtained by pressing
+the A, B, and C keys while powering up the radio - and these parameters
+are variously referred to as "soft calibration settings" and the like)
+are stored in EEPROM.&nbsp; Addresses 7 through 82 correlate with menu
+items 1 through 76 (i.e. add 6 to the menu item to calculate the EEPROM
+address.)&nbsp; Most of these parameters range from 0-255 - a parameter
+which correlates directly with the value stored in memory.&nbsp; A few
+known exceptions are as follows:
+</p>
+<ul>
+  <li>Menu item 17 (VCC calibration) contains a representation of the
+voltage
+present at the moment that item was selected in the "Soft Calibration"
+menu.&nbsp; The <i>actual</i> calibration value is stored in memory
+location
+53 (HEX.)</li>
+  <li>Menu items 75 and 76 (LSB and USB CP)&nbsp; This is represented
+by a
+signed
+digit, with the MSB (highest bit) representing a negative number when
+it
+is set.&nbsp; In this way a 1 = 1, and FF (hex) = -1.</li>
+</ul>
+<b>Writing new values immediately affects the specified
+parameter.&nbsp;
+That is, they take effect immediately!&nbsp; In the case of VFOs and
+memories,
+however, you won't see any effect until you select<i> that</i>
+VFO/Band/Memory
+combination that you have written.</b>
+<p><b><i>Note:&nbsp; It is imperative that you record the value of all
+76 "factory calibration settings" prior to messing with them!&nbsp;
+Failure
+to do so may result in a poorly-functioning radio that needs to be sent
+back for recalibration!</i></b>
+</p>
+<p>Additionally, many of the selectable menu items are stored in EEPROM
+as well.&nbsp; When these values are written/updated, the change is <b><i>immediate</i></b>.&nbsp;
+These
+are
+stored as follows.&nbsp; <i>Note -&nbsp; These locations are
+believed to be correct, but since there are so many, I may have made a
+mistake.&nbsp; Let me know if you find some errors</i>:
+</p>
+<center>
+<p><b><font size="+2">Memory locations for Menu items</font></b>
+<br>
+<font size="+1">(Not it any particular order)</font></p>
+</center>
+<table bgcolor="#ffffff" border="1">
+  <tbody>
+    <tr>
+      <td>
+      <center><b>Function</b></center>
+      </td>
+      <td>
+      <center><b>Byte</b> <br>
+      <b>Address</b> <br>
+      <b>(HEX)</b></center>
+      </td>
+      <td>
+      <center><b>Bit(s)</b> <br>
+      <b>used</b> <br>
+      <b>(7-0)</b></center>
+      </td>
+      <td><b>Remarks (bit status)</b></td>
+    </tr>
+    <tr>
+      <td>VFO-A/B</td>
+      <td>55</td>
+      <td>0</td>
+      <td>0 = VFO-A, 1 = VFO-B</td>
+    </tr>
+    <tr>
+      <td>IPO On/Off</td>
+      <td><b>Base address + 2</b>
+      <p><i>Refer to VFO Memory record format (farther down the page)</i></p>
+      </td>
+      <td>5</td>
+      <td>0 = IPO off, 1 = IPO on&nbsp; <br>
+Note:&nbsp; The "Phantom" band is that "extra" HF band that exists
+to allow tuning outside of amateur bands.&nbsp; <br>
+Note:&nbsp; IPO, ATT, etc aren't actually available on FM BCB, Air,
+2 M, and UHF bands.)</td>
+    </tr>
+    <tr>
+      <td>ATT On/Off</td>
+      <td>(Same addresses as IPO, except that bit 4 is used)</td>
+      <td>4</td>
+      <td>0 = ATT off, 1 = ATT on</td>
+    </tr>
+    <tr>
+      <td>Clar On/Off</td>
+      <td>(Same addresses as IPO, except that bit 6 is used)</td>
+      <td>6</td>
+      <td>0 = Clar off, 1 = Clar on</td>
+    </tr>
+    <tr>
+      <td>NB On/Off</td>
+      <td>57</td>
+      <td>5</td>
+      <td>0 = NB off, 1 = NB on</td>
+    </tr>
+    <tr>
+      <td>AGC Mode</td>
+      <td>57</td>
+      <td>1, 0</td>
+      <td>00 = Auto,&nbsp; 01 = Fast, 10 = Slow, 11 = Off</td>
+    </tr>
+    <tr>
+      <td>TX Power</td>
+      <td>79 (All bands)</td>
+      <td>1, 0</td>
+      <td>00 = High, 01 = L3, 10 = L2, 11 = L1</td>
+    </tr>
+    <tr>
+      <td>DW On/Off</td>
+      <td>79</td>
+      <td>3</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>PRI On/Off</td>
+      <td>79</td>
+      <td>4</td>
+      <td>0 = PRI off, 1 = PRI on</td>
+    </tr>
+    <tr>
+      <td>SCN (Scan) Mode</td>
+      <td>79</td>
+      <td>6,5</td>
+      <td>00 = No scan, 10 = Scan up, 11 = Scan down</td>
+    </tr>
+    <tr>
+      <td>ART On/Off</td>
+      <td>79</td>
+      <td>7</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>Pwr Meter</td>
+      <td>58</td>
+      <td>1, 0</td>
+      <td>00 = PWR, 01 = ALC, 10 = SWR, 11 = MOD</td>
+    </tr>
+    <tr>
+      <td>BK On/Off</td>
+      <td>58</td>
+      <td>5</td>
+      <td>0 = BK off, 1 = BK on</td>
+    </tr>
+    <tr>
+      <td>KYR On/Off</td>
+      <td>58</td>
+      <td>4</td>
+      <td>0 = KYR off, 1 = KYR on</td>
+    </tr>
+    <tr>
+      <td>VLT On/Off</td>
+      <td>58</td>
+      <td>6</td>
+      <td>0 = VLT off, 1 = VLT on</td>
+    </tr>
+    <tr>
+      <td>DSP On/Off</td>
+      <td>57</td>
+      <td>2</td>
+      <td>0 = DSP off, 1 = DSP on</td>
+    </tr>
+    <tr>
+      <td>CHG On/Off</td>
+      <td>7B</td>
+      <td>4</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>VOX On/Off</td>
+      <td>58</td>
+      <td>7</td>
+      <td>0 = VOX off, 1 = VOX on</td>
+    </tr>
+    <tr>
+      <td>NAR On/Off&nbsp; <br>
+(CW, CWN, DIG Mode)</td>
+      <td><b>Base address + 1</b>
+      <p><i>Refer to VFO Memory record format (farther down the page)</i></p>
+      </td>
+      <td> <br>
+4</td>
+      <td>0 = Off, 1 = On&nbsp; <br>
+Note:&nbsp; The "Phantom" band is that "extra" HF band that exists
+to allow tuning outside of amateur bands.&nbsp; <br>
+Note that bits are allocated for this function even on bands where
+they are not used.</td>
+    </tr>
+    <tr>
+      <td>NAR On/Off&nbsp; <br>
+(FM, FMN Mode)</td>
+      <td>Same addresses as NAR On/Off - CW Mode (above)</td>
+      <td>3</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>SPL On/Off</td>
+      <td>7A</td>
+      <td>7</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>RPT Offset</td>
+      <td>Same addresses as NAR On/Off - CW Mode (above)</td>
+      <td>7-6</td>
+      <td>0 = Simplex, 01 = Minus, 10 = Plus, 11 = Nonstandard Split</td>
+    </tr>
+  </tbody>
+</table>
+<center>
+<p><b><font size="+2">Submenu Memory Locations:</font></b></p>
+</center>
+<p><br>
+<table bgcolor="#ffffff" border="1">
+  <tbody>
+    <tr>
+      <td>
+      <center><b>Menu #</b> <br>
+      <b>(Description)</b></center>
+      </td>
+      <td>
+      <center><b>Byte</b> <br>
+      <b>Address</b> <br>
+      <b>(HEX)</b></center>
+      </td>
+      <td>
+      <center><b>Bit(s)</b> <br>
+      <b>used</b> <br>
+      <b>(7-0)</b></center>
+      </td>
+      <td>
+      <center><b>Remarks (bit status)</b></center>
+      </td>
+    </tr>
+    <tr>
+      <td>1 - 144 ARS</td>
+      <td>5F</td>
+      <td>6</td>
+      <td>0 = ARS off, 1 = on</td>
+    </tr>
+    <tr>
+      <td>2 - 430 ARS</td>
+      <td>5F</td>
+      <td>5</td>
+      <td>0 = ARS off, 1 = on</td>
+    </tr>
+    <tr>
+      <td>3 - 9600 Mic (0-100)</td>
+      <td>6C</td>
+      <td>6-0</td>
+      <td>Contains 0-100 (decimal) as displayed</td>
+    </tr>
+    <tr>
+      <td>4 - Disable AM/FM Dial</td>
+      <td>63</td>
+      <td>7</td>
+      <td>0 = enable, 1 = disable</td>
+    </tr>
+    <tr>
+      <td>5 - AM Mic (0-100)</td>
+      <td>68</td>
+      <td>6-0</td>
+      <td>Contains 0-100 (decimal) as displayed</td>
+    </tr>
+    <tr>
+      <td>6 - AM Step</td>
+      <td><b>Base address + 3</b>
+      <p><i>Refer to VFO Memory record format (farther down the page)</i></p>
+      </td>
+      <td>5-3</td>
+      <td>000 = 2.5 kHz, 001 = 5 kHz, 010 = 9 kHz, 011 = 10 kHz, 100 =
+12.5 kHz,
+101 = 25 kHz <br>
+Note:&nbsp; The "Phantom" band is that "extra" HF band that exists
+to allow tuning outside of amateur bands.&nbsp; <br>
+Note that bits are allocated for this function even on bands where
+they are not used.</td>
+    </tr>
+    <tr>
+      <td>7 - Front/Rear Antenna</td>
+      <td>7A</td>
+      <td>0 - HF&nbsp; <br>
+1 - 6m&nbsp; <br>
+2 - FM&nbsp; <br>
+3 - Air&nbsp; <br>
+4 - 2m&nbsp; <br>
+5 - UHF</td>
+      <td>0 = Front, 1 = Rear antenna&nbsp;
+      <p><i>(<b>Note:</b>&nbsp; Different "bands" are stored in
+different bit
+locations as noted.)</i></p>
+      </td>
+    </tr>
+    <tr>
+      <td>8 - APO Time</td>
+      <td>65</td>
+      <td>2-0</td>
+      <td>000 = Off, 001 = 1 Hour, 010 = 2 Hours, etc.&nbsp; (i.e. a 3
+bit number
+from 0 to 6)</td>
+    </tr>
+    <tr>
+      <td>9 - ARTS Beep Off/Range/All</td>
+      <td>5D</td>
+      <td>7-6</td>
+      <td>00 = Off, 01 = Range , 10&nbsp; = All</td>
+    </tr>
+    <tr>
+      <td>10 - Backlight Off/On/Auto</td>
+      <td>5B</td>
+      <td>7-6</td>
+      <td>00 = Off, 01 = On, 10 = Auto</td>
+    </tr>
+    <tr>
+      <td>11 - Batt-Chg 6/8/10 Hours</td>
+      <td>62</td>
+      <td>7-6</td>
+      <td>00 = 6 Hours, 01 = 8 Hours, 10 = 10 Hours</td>
+    </tr>
+    <tr>
+      <td>12 - Beep Freq 440/880 Hz</td>
+      <td>5C</td>
+      <td>7</td>
+      <td>0 = 440 Hz, 1 = 880 Hz</td>
+    </tr>
+    <tr>
+      <td>13 - Beep Volume (0-100)&nbsp;</td>
+      <td>5C</td>
+      <td>6-0</td>
+      <td>Contains 0-100 as displayed</td>
+    </tr>
+    <tr>
+      <td>14 - CAT Rate (4800, 9600, 38400)</td>
+      <td>64</td>
+      <td>&nbsp;7-6</td>
+      <td>00 = 4800 Baud, 01 = 9600 Baud, 10 = 38400 Baud.&nbsp; <br>
+Note:&nbsp; If you can read this address, you probably already know
+what the baud rate is...</td>
+    </tr>
+    <tr>
+      <td>15 - Color Color1/Color2</td>
+      <td>5B</td>
+      <td>4</td>
+      <td>0 = Color1 (Blue)&nbsp; 1 = Color2 (Amber)</td>
+    </tr>
+    <tr>
+      <td>16 - Contrast (1-12)</td>
+      <td>5B</td>
+      <td>3-0</td>
+      <td>0010 = 1 through 1101 = 12</td>
+    </tr>
+    <tr>
+      <td>17 - CW Delay (10-2500 ms)</td>
+      <td>60</td>
+      <td>(all)</td>
+      <td>From 1 to 250 (decimal) with each step representing 10 ms</td>
+    </tr>
+    <tr>
+      <td>18 - CW ID Off/On</td>
+      <td>5D</td>
+      <td>4</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>19 - CW Paddle Normal/Reverse</td>
+      <td>58</td>
+      <td>2</td>
+      <td>0 = Normal, 1 = Reverse</td>
+    </tr>
+    <tr>
+      <td>20 - CW Pitch (300-1000 Hz)</td>
+      <td>5E</td>
+      <td>3-0</td>
+      <td>From 0 to E (hex) with 0 = 300 Hz and each step representing
+50 Hz</td>
+    </tr>
+    <tr>
+      <td>21 - CW Speed (4-60 WPM)</td>
+      <td>62</td>
+      <td>5-0</td>
+      <td>From 0 to 38 (hex) with 0 = 4 WPM and 38 = 60 WPM (each step
+= 1 WPM)</td>
+    </tr>
+    <tr>
+      <td>22 - CW Weight (1:2.5 - 1:4.5)</td>
+      <td>5F</td>
+      <td>4-0</td>
+      <td>From 0 to 14 (hex) with 0 = 1:2.5, incrementing in 0.1 weight
+steps</td>
+    </tr>
+    <tr>
+      <td>23 - DCS Code</td>
+      <td><b>Base address + 9</b>
+      <p><i>Refer to VFO Memory record format (farther down the page)</i></p>
+      </td>
+      <td>5-0</td>
+      <td>From 0 to 67 (hex) with 0 = DCS code 023 and 67 (hex) = DCS
+code 754&nbsp; <br>
+Note:&nbsp; The "Phantom" band is that "extra" HF band that exists
+to allow tuning outside of amateur bands.&nbsp; <br>
+Note that bits are allocated for this function even on bands where
+they are not used.</td>
+    </tr>
+    <tr>
+      <td>24 - Dig Disp (-3000 to +3000 Hz)</td>
+      <td>6F-70</td>
+      <td>(all)</td>
+      <td>6F is MSB and 70 is LSB with sign in bit 7 of the MSB, in 10
+Hz steps.&nbsp;
+I.e.&nbsp; <br>
+0000 = 0 Hz, 0001 = +10 Hz, FF01 = -10 Hz, 012C = +3000 Hz, FED4 =
+-3000 Hz</td>
+    </tr>
+    <tr>
+      <td>25 - Dig Mic (0-100)</td>
+      <td>6A</td>
+      <td>6-0</td>
+      <td>Contains 0-100 (decimal) as displayed</td>
+    </tr>
+    <tr>
+      <td>26 - Dig Mode</td>
+      <td>65</td>
+      <td>7-5</td>
+      <td>000 = RTTY, 001 = PSK31-L, 010 = PSK31-U, 011 = USER-L, 100 =
+USER-U</td>
+    </tr>
+    <tr>
+      <td>27 - Dig Shift</td>
+      <td>6D-6E</td>
+      <td>(all)</td>
+      <td>6D is MSB, 6E is LSB.&nbsp; Same format as #24</td>
+    </tr>
+    <tr>
+      <td>28 - Emergency</td>
+      <td>64</td>
+      <td>5</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>29 - FM Mic (0-100)</td>
+      <td>69</td>
+      <td>6-0</td>
+      <td>Contains 0-100 (decimal) as displayed</td>
+    </tr>
+    <tr>
+      <td>30 - FM Step</td>
+      <td><b>Base address + 3</b>
+      <p><i>Refer to VFO Memory record format (farther down the page)</i></p>
+      </td>
+      <td>2-0</td>
+      <td>000 = 5 kHz, 001 = 6.25 kHz, 010 = 10 kHz, 011 = 12.5 kHz,
+100 = 15
+kHz, 101 = 20 kHz, 110 = 25 kHz, 111 = 50 kHz <br>
+Note:&nbsp; The "Phantom" band is that "extra" HF band that exists
+to allow tuning outside of amateur bands.</td>
+    </tr>
+    <tr>
+      <td>31 - ID</td>
+      <td><i>This value does not appear to be stored in "reachable"
+EEPROM.</i></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>32 - Lock Mode</td>
+      <td>5E</td>
+      <td>5-4</td>
+      <td>00 = Dial, 01 = Freq, 10 = Panel</td>
+    </tr>
+    <tr>
+      <td>33 - Main Step</td>
+      <td>5D</td>
+      <td>5</td>
+      <td>0 = Fine, 1 = Coarse</td>
+    </tr>
+    <tr>
+      <td>34 - Mem Group</td>
+      <td>65</td>
+      <td>4</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>35 - Mem Tag</td>
+      <td><i>To Be Determined</i></td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>36 - Mic Key</td>
+      <td>68</td>
+      <td>7</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>37 - Mic Scan</td>
+      <td>69</td>
+      <td>7</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>38 - Op Filter</td>
+      <td>5E</td>
+      <td>7-6</td>
+      <td>00 = Off, 01 = SSB, 10 = CW</td>
+    </tr>
+    <tr>
+      <td>39 - Pkt Mic (0-100)</td>
+      <td>6B</td>
+      <td>6-0</td>
+      <td>Contains 0-100 (decimal) as displayed</td>
+    </tr>
+    <tr>
+      <td>40 - Pkt Rate</td>
+      <td>5D</td>
+      <td>2</td>
+      <td>0 = 1200, 1 = 9600</td>
+    </tr>
+    <tr>
+      <td>41 - Resume</td>
+      <td>5D</td>
+      <td>1-0</td>
+      <td>00 = Off, 01 = 3 Sec, 10 = 5 Sec, 11 = 10 Sec</td>
+    </tr>
+    <tr>
+      <td>42 - Rpt Shift</td>
+      <td><b>Base address + addresses F-11 (HEX)</b>
+      <p><i>Refer to VFO Memory record format (farther down the page)</i></p>
+      </td>
+      <td>(all)</td>
+      <td>A 24 bit number from with each count representing a 10
+Hz&nbsp; step
+(i.e. 10 Hz = 1, 10 kHz = 1000) representing up to a 99.99 MHz
+shift.&nbsp; <br>
+Note:&nbsp; The "Phantom" band is that "extra" HF band that exists
+to allow tuning outside of amateur bands.&nbsp; <br>
+Note that bits are allocated for this function even on bands where
+they are not used.</td>
+    </tr>
+    <tr>
+      <td>43 - Scope</td>
+      <td>5D</td>
+      <td>3</td>
+      <td>0 = Cont, 1 = Chk</td>
+    </tr>
+    <tr>
+      <td>44 - Sidetone</td>
+      <td>61</td>
+      <td>6-0</td>
+      <td>Contains 0-100 (decimal) as displayed</td>
+    </tr>
+    <tr>
+      <td>45 - Sql/RF-G</td>
+      <td>5F</td>
+      <td>7</td>
+      <td>0 = RF-Gain, 1 = Squelch</td>
+    </tr>
+    <tr>
+      <td>46 - SSB Mic</td>
+      <td>67</td>
+      <td>6-0</td>
+      <td>Contains 0-100 (decimal) as displayed</td>
+    </tr>
+    <tr>
+      <td>47 - SSB Step</td>
+      <td><b>Base address + 3</b>
+      <p><i>Refer to VFO Memory record format (farther down the page)</i></p>
+      </td>
+      <td>7-6</td>
+      <td>00 = 1 kHz, 01 = 2.5 kHz, 10 = 5 kHz <br>
+Note that bits are allocated for this function even on bands where
+they are not used.</td>
+    </tr>
+    <tr>
+      <td>48 - Tone Freq</td>
+      <td><b>Base address + 6</b>
+      <p><i>Refer to VFO Memory record format (farther down the page)</i></p>
+      </td>
+      <td>4-0</td>
+      <td>Contains 0-31 with 0 = 67.0 Hz and 31 = 254.1 Hz representing
+each
+of the standard 32 CTCSS tones.&nbsp; <br>
+Note:&nbsp; The "Phantom" band is that "extra" HF band that exists
+to allow tuning outside of amateur bands.&nbsp; <br>
+Note that bits are allocated for this function even on bands where
+they are not used.</td>
+    </tr>
+    <tr>
+      <td>49 - TOT Time</td>
+      <td>66</td>
+      <td>4-0</td>
+      <td>Contains 0-20 (with 0 = TOT Off)</td>
+    </tr>
+    <tr>
+      <td>50 - VOX Delay</td>
+      <td>64</td>
+      <td>4-0</td>
+      <td>0 = 100 Ms with each step representing 100 Ms, up to 24 =
+2500 Ms</td>
+    </tr>
+    <tr>
+      <td>51 - VOX Gain</td>
+      <td>63</td>
+      <td>6-0</td>
+      <td>Contains 1-100 (decimal) as displayed</td>
+    </tr>
+    <tr>
+      <td>52 - Extend</td>
+      <td>6B</td>
+      <td>7</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>53 - DCS INV</td>
+      <td>66</td>
+      <td>7-6</td>
+      <td>00 = Tn-Rn, 01 = Tn-Riv, 10 = Tiv-Rn, 11 = Tiv-Riv</td>
+    </tr>
+    <tr>
+      <td>54 - R LSB Car</td>
+      <td>71</td>
+      <td>(all)</td>
+      <td>Each step represents 10 Hz with the MSB indicating a negative
+value.&nbsp;
+(From -300 to +300 Hz)</td>
+    </tr>
+    <tr>
+      <td>55 - R USB Car</td>
+      <td>72</td>
+      <td>(all)</td>
+      <td>Same format as #54</td>
+    </tr>
+    <tr>
+      <td>56 - T LSB Car</td>
+      <td>73</td>
+      <td>(all)</td>
+      <td>Same format as #54</td>
+    </tr>
+    <tr>
+      <td>57 - T USB Car</td>
+      <td>74</td>
+      <td>(all)</td>
+      <td>Same format as #54</td>
+    </tr>
+  </tbody>
+</table>
+</p>
+<center>
+<p><b><font size="+2">Miscellaneous memory locations:</font></b></p>
+</center>
+<table bgcolor="#ffffff" border="1">
+  <tbody>
+    <tr>
+      <td>
+      <center><b>Description</b></center>
+      </td>
+      <td>
+      <center><b>Byte</b> <br>
+      <b>Address</b> <br>
+      <b>(HEX)</b></center>
+      </td>
+      <td>
+      <center><b>Bit(s)</b> <br>
+      <b>Used</b> <br>
+      <b>(7-0)</b></center>
+      </td>
+      <td>
+      <center><b>Remarks</b></center>
+      </td>
+    </tr>
+    <tr>
+      <td>VFO A/B, HOME, MTUNE, QMB,&nbsp; MTQMB, and memory frequency
+storage</td>
+      <td><b>Base address + addresses A-D (HEX)</b></td>
+      <td>(all)&nbsp;</td>
+      <td><i>Refer to VFO Memory and Memory record formats (farther
+down the
+page)</i></td>
+    </tr>
+    <tr>
+      <td>VFO A/B, HOME, MTUNE, QMB, MTQMB, and memory mode Storage</td>
+      <td><b>Base address + 0</b></td>
+      <td>2-0</td>
+      <td><i>Refer to VFO Memory and Memory record formats (farther
+down the
+page)</i></td>
+    </tr>
+    <tr>
+      <td>Display menu (toggled using the "F" key)</td>
+      <td>76</td>
+      <td>3-0</td>
+      <td>0000 = VFO A/B, A=B, SPL;&nbsp; 0001 = MW, MC, TAG;&nbsp;
+0010 = STO,
+RCL, PMS;&nbsp; 0011 = RPT, REV, TON;&nbsp; 0100 = SCN, PRI, DW;&nbsp;
+0101 = SSM, SCH, ART;&nbsp; 0110 = IPO, ATT, NAR;&nbsp; 0111 = NB,
+AGC;&nbsp;
+1000 = PWR, MTR;&nbsp; 1001 = VOX, BK, KYR;&nbsp; 1010 = CHG, VLT,
+DSP;&nbsp;
+1011 = TCH, DCH</td>
+    </tr>
+    <tr>
+      <td>Submenu selection (displayed holding the "F" key)</td>
+      <td>75</td>
+      <td>5-0</td>
+      <td>Range from 0 to 38 (Hex) for menu items 1-57</td>
+    </tr>
+    <tr>
+      <td>FST (Fast Tuning) On/Off</td>
+      <td>57</td>
+      <td>7</td>
+      <td>0 = On, 1 = Off</td>
+    </tr>
+    <tr>
+      <td>PBT On/Off</td>
+      <td>57</td>
+      <td>4</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>Lock On/Off</td>
+      <td>57</td>
+      <td>6</td>
+      <td>0 = On, 1 = Off</td>
+    </tr>
+    <tr>
+      <td>Band Selection - VFO A</td>
+      <td>59</td>
+      <td>3-0</td>
+      <td>0000 = 160 M, 0001 = 75 M, 0010 = 40 M, 0011 = 30 M, 0100 =
+20 M, 0101
+= 17 M, 0110 = 15 M, 0111 = 12 M, 1000 = 10 M, 1001 = 6 M, 1010 = FM
+BCB,
+1011 = Air, 1100 = 2 M, 1101&nbsp; = UHF, 1110 = (Phantom)</td>
+    </tr>
+    <tr>
+      <td>Band Selection - VFO B</td>
+      <td>59</td>
+      <td>7-4</td>
+      <td>Same as above</td>
+    </tr>
+    <tr>
+      <td>Mem/VFO status</td>
+      <td>55</td>
+      <td>7</td>
+      <td>0 = Memory, 1 = VFO A or B</td>
+    </tr>
+    <tr>
+      <td>Memory/MTUNE</td>
+      <td>55</td>
+      <td>5</td>
+      <td>0 = Memory, 1 = MTUNE</td>
+    </tr>
+    <tr>
+      <td>HOME select</td>
+      <td>55</td>
+      <td>4</td>
+      <td>0 = (Not home)&nbsp; 1 = HOME memory selected</td>
+    </tr>
+    <tr>
+      <td>QMB Select</td>
+      <td>55</td>
+      <td>2</td>
+      <td>0 = (Not QMB)&nbsp; 1 = QMB</td>
+    </tr>
+    <tr>
+      <td>MTQMB Select</td>
+      <td>55</td>
+      <td>1</td>
+      <td>0 = (Not MTQMB)&nbsp; 1 = MTQMB</td>
+    </tr>
+    <tr>
+      <td>Voltmeter Calibration Factor</td>
+      <td>53</td>
+      <td>(all)</td>
+      <td>This is an "internal" value used to calibrate the voltmeter
+display.</td>
+    </tr>
+    <tr>
+      <td>"Current" Memory Channel saved in EEPROM.&nbsp; This is the
+memory
+channel that will be "remembered" when the radio is powered-up next
+time
+-&nbsp; <b>This is <i>not</i> necessarily the <u>current</u> memory.</b></td>
+      <td>44F</td>
+      <td>(all)</td>
+      <td>0 = Memory 1, C7 (HEX) =&nbsp; Memory 200, M-PL = C8, M-PU =
+C9</td>
+    </tr>
+    <tr>
+      <td>Radio "version" configuration</td>
+      <td>4-5</td>
+      <td>(all)</td>
+      <td>These two bytes contain the configuration of jumpers
+J4001-J4009.&nbsp;
+These bytes do not contain the bits relating to these jumpers directly,
+but some sort of calculated number indicating jumper
+configuration.&nbsp;
+Known configurations are as follows:&nbsp; <br>
+J4005-J4009 jumpered:&nbsp; 0xD8, 0xBF</td>
+    </tr>
+    <tr>
+      <td>EEPROM integrity "checksums"</td>
+      <td>0-3</td>
+      <td>(all)</td>
+      <td>When a "hard reset" is done, these addresses contain
+something akin
+to a checksum.&nbsp; <b>If the contents of these addresses is
+disturbed,
+the CPU will do a complete initialization of the EEPROM, erasing all
+configuration,
+"soft calibration" values, and memories.&nbsp; <i>You have been warned!</i></b></td>
+    </tr>
+  </tbody>
+</table>
+<p>
+</p>
+<hr width="100%">
+<center>
+<p><b><font size="+2">VFO Memory Record Format (Preliminary):</font></b></p>
+</center>
+<p><b>VFO Memory records:</b>
+</p>
+<ul>
+  <li> <b>For a list of EEPROM memory locations listed in address
+order,
+go to
+the <a href="ft817_memmap.html">Memory
+Map
+page</a>.</b></li>
+  <li>The first "VFO" memory record is at 7D (HEX) with the first 15
+VFO A
+memories
+followed by the 15 VFO B memories, separated by 26 bytes.</li>
+  <li>Each record is 26 bytes long.&nbsp; There are 15 "bands" for each
+VFO
+(A
+and B) as follows:</li>
+  <ul>
+    <li>160 M, 75 M, 40 M, 30 M, 20 M, 17 M, 15 M, 12 M, 10 M, 6 M, FM
+BCB,
+Air,
+2 M, UHF</li>
+    <li>Phantom (This is an extra "HF" band to allow tuning outside an
+HF
+amateur
+band)</li>
+    <li>Again, the "base addresses" of the VFO memory records may be
+found on
+the Memory<b><a href="ft817_memmap.html">
+Map page</a>.</b></li>
+  </ul>
+  <li>"MTQMB" "VFO memory" may be found at 40B (HEX)</li>
+  <li>MTUNE "VFO memory" may be found at 425 (HEX).&nbsp; This memory
+seems
+to
+be "transient" - usually the "working" value is that of the associated
+VFOA/B and band combination.</li>
+  <li>Note that the "tuning memories" (i.e. MTUNE, MTQMB) seem to
+follow the
+VFO Memory Record Format (see table below) rather than the Memory
+Record
+format above.</li>
+  <li> <b><u>Important:</u>&nbsp; Do not write frequency information
+to
+the <u>currently-selected</u>
+VFO.</b>&nbsp; Because changes take effect <b><i>immediately</i></b>,
+whilst
+you are writing the new frequency - one or two bytes at a time, it <b><i>may</i></b>
+- for an instant - be an <b>invalid</b> frequency for that VFO/band
+combination.&nbsp;
+At this instant, the '817 may see it as invalid and overwrite it with a
+default frequency.&nbsp; To update a VFO memory record with <b><i>any</i></b>
+information, it is suggested that you switch to a different VFO while
+you
+do it.&nbsp; Use bit 0 at 0x55 to determine/change which VFO you are
+using
+before writing to it.</li>
+</ul>
+VFO records are stored in the following format:
+<br>
+&nbsp;
+<table bgcolor="#ffffff" border="1">
+  <tbody>
+    <tr>
+      <td>
+      <center><b>Description</b></center>
+      </td>
+      <td>
+      <center><b>Offset</b> <br>
+      <b>from</b> <br>
+      <b>base</b> <br>
+      <b>(HEX)</b></center>
+      </td>
+      <td>
+      <center><b>Bit(s)</b> <br>
+      <b>Used</b> <br>
+      <b>(7-0)</b></center>
+      </td>
+      <td>
+      <center><b>Remarks</b></center>
+      </td>
+    </tr>
+    <tr>
+      <td>Mode</td>
+      <td>0</td>
+      <td>2-0</td>
+      <td>000 = LSB, 001 = USB, 010 = CW, 011 = CWR, 100 = AM, 101 =
+FM, 110
+= DIG, 111 = PKT (Note:&nbsp; WFM is represented as "FM" when in the
+FM-BCB
+range.)</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>0</td>
+      <td>7-3</td>
+      <td><i>Unknown - probably unused</i></td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>1</td>
+      <td>2-0</td>
+      <td><i>Unknown - probably unused</i></td>
+    </tr>
+    <tr>
+      <td>Nar On/Off (FM, FMN Mode)</td>
+      <td>1</td>
+      <td>3</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>Nar On/Off (CW, CWN, DIG mode)</td>
+      <td>1</td>
+      <td>4</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>1</td>
+      <td>5</td>
+      <td><i>Unknown - probably unused</i></td>
+    </tr>
+    <tr>
+      <td>RPT Offset</td>
+      <td>1</td>
+      <td>7-6</td>
+      <td>00 = Simplex, 01 = Minus, 10 = Plus, 11 = Nonstandard Split
+(using
+separate TX freq)</td>
+    </tr>
+    <tr>
+      <td>Tone/DCS Select</td>
+      <td>2</td>
+      <td>1-0</td>
+      <td>00 = Off, 01 = Tone (tx), 10 = Tone + Tone Squelch, 11 = DCS</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>2</td>
+      <td>3-2</td>
+      <td><i>Unknown</i></td>
+    </tr>
+    <tr>
+      <td>Att On/Off</td>
+      <td>2</td>
+      <td>4</td>
+      <td>0 = Att Off, 1 = Att On</td>
+    </tr>
+    <tr>
+      <td>IPO On/Off</td>
+      <td>2</td>
+      <td>5</td>
+      <td>0 = IPO Off, 1 = IPO On</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>2</td>
+      <td>7-6</td>
+      <td><i>Unknown - probably unused</i></td>
+    </tr>
+    <tr>
+      <td>FM Step (Menu # 30)</td>
+      <td>3</td>
+      <td>2-0</td>
+      <td>000 = 5 kHz, 001 = 6.25 kHz, 010 = 10 kHz, 011 = 12.5 kHz,
+100 = 15
+kHz, 101 = 20 kHz, 110 = 25 kHz, 111 = 50 kHz</td>
+    </tr>
+    <tr>
+      <td>AM Step (Menu #6)</td>
+      <td>3</td>
+      <td>5-3</td>
+      <td>000 = 2.5 kHz, 001 = 5 kHz, 010 = 9 kHz, 011 = 10 kHz, 100 =
+12.5 kHz,
+101 = 25 kHz</td>
+    </tr>
+    <tr>
+      <td>SSB Step (Menu # 47)</td>
+      <td>3</td>
+      <td>7-6</td>
+      <td>00 = 1 kHz, 01 = 2.5 kHz, 10 = 5 kHz</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>4</td>
+      <td>&nbsp;</td>
+      <td><i>Unknown</i></td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>5</td>
+      <td>&nbsp;</td>
+      <td><i>Unknown</i></td>
+    </tr>
+    <tr>
+      <td>CTCSS Tone Freq (Menu #48)</td>
+      <td>6</td>
+      <td>4-0</td>
+      <td>Contains 0-31 with 0 = 67.0 Hz and 32 = 254.1 Hz representing
+each
+of the standard 32 CTCSS tones</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>6</td>
+      <td>7-5</td>
+      <td><i>Unknown</i></td>
+    </tr>
+    <tr>
+      <td>DCS Code</td>
+      <td>7</td>
+      <td>6-0&nbsp;</td>
+      <td>Contains 0-67 (HEX) with 0 = DCS Code 023, 67 (HEX) = DCS
+code 754</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>7</td>
+      <td>7&nbsp;</td>
+      <td><i>Unknown</i></td>
+    </tr>
+    <tr>
+      <td>RIT Offset</td>
+      <td>8-9</td>
+      <td>(all)</td>
+      <td>The RIT offset is stored as a signed number in two bytes
+ranging from
+-999 to 999 representing -9.99 to +9.99 kHz offset.&nbsp; The MSB (with
+the sign) is stored in the lower byte (8) and the LSB is in the upper
+byte
+(9.)</td>
+    </tr>
+    <tr>
+      <td>RX Frequency</td>
+      <td>A-D</td>
+      <td>(all)</td>
+      <td>Frequency is stored in a binary format with the MSB in the
+lower byte
+(A) and the LSB in the upper byte (D)&nbsp; <br>
+Example:&nbsp; A value of 02 97 F2 19 (HEX) translates to 43512345
+(decimal) and thus a display frequency of 435.12345 MHz.</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>E</td>
+      <td>&nbsp;</td>
+      <td><i>Unknown - probably unused</i></td>
+    </tr>
+    <tr>
+      <td>Repeater offset (Menu #42)</td>
+      <td>F-11</td>
+      <td>(all)</td>
+      <td>A 24 bit number with each count representing a 10 Hz step
+(i.e. 10
+Hz = 1, 10 kHz = 1000, etc.) representing up to a 99.99 MHz shift.</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>12-19</td>
+      <td>&nbsp;</td>
+      <td><i>Unknown - probably unused</i></td>
+    </tr>
+  </tbody>
+</table>
+<center>
+<hr width="100%">
+<p><b><font size="+2">Memory (not VFO) Record Format (Preliminary):</font></b></p>
+</center>
+<p><b>Memory records:</b>
+</p>
+<ul>
+  <li> <b>For a list of EEPROM memory locations listed in address
+order,
+go to
+the <a href="ft817_memmap.html">Memory
+Map
+page</a>.</b></li>
+  <li>Memory 1 begins at 484 (HEX) and each memory contains 26
+bytes.&nbsp;
+There
+are 202 memories - 200 memories plus "M-PL" and "M-PU".&nbsp; To find
+the
+address of a memory, us the following procedure:</li>
+  <ul>
+    <li>The base address of the desired memory may be calculated by
+taking the
+memory number, subtracting one, multiplying by 1A (HEX) and then adding
+484 (HEX.)&nbsp; Refer to the chart below for the offset to the desired
+information.</li>
+  </ul>
+  <li>There are 4 "HOME" memories:</li>
+  <ul>
+    <li>HF:&nbsp; 389 (HEX)</li>
+    <li>6 M:&nbsp; 3A3</li>
+    <li>2 M:&nbsp; 3BD</li>
+    <li>UHF:&nbsp; 3D7</li>
+  </ul>
+  <li>"QMB" Memory may be found at 3F1 (HEX)</li>
+  <li> <b><u>Important:</u>&nbsp; Do not write information to the <u>currently-selected</u>
+Memory.</b>&nbsp; Because changes take effect <b><i>immediately</i></b>,
+whilst
+you
+are writing the new frequency - one or two bytes at a time,
+it <b><i>may</i></b> - for an instant - be an <b>invalid</b>
+frequency
+for that VFO/band combination.&nbsp; At this instant, the '817 may see
+it as invalid and overwrite it with a default frequency.&nbsp; When
+modifying
+a memory, it is best two switch to VFO mode, as <b>there is no known
+way
+to accurately determine which memory us currently in use.</b></li>
+  <li>Note that the "tuning memories" (i.e. MTUNE, MTQMB) seem to
+follow the
+VFO Memory Record Format (see below) rather than the Memory Record
+format.</li>
+  <li>Beginning at 0x450, there is a bitmap, one memory per bit,
+indicating
+which
+memories are used, and which are hidden.&nbsp; For example, the bit
+corresponding
+with memory 1 is bit 0 at 0x450, memory 2 is bit 1 at 0x450, etc.&nbsp;
+The bit is set (1) if it is to be visible, and clear (0) if it is to be
+hidden.&nbsp; For a memory to show up, this bit must be set.</li>
+</ul>
+Memory records are stored in the following format:
+<br>
+&nbsp;
+<table bgcolor="#ffffff" border="1">
+  <tbody>
+    <tr>
+      <td>
+      <center><b>Description</b></center>
+      </td>
+      <td>
+      <center><b>Offset</b> <br>
+      <b>from</b> <br>
+      <b>base</b> <br>
+      <b>(HEX)</b></center>
+      </td>
+      <td>
+      <center><b>Bit(s)</b> <br>
+      <b>Used</b> <br>
+      <b>(7-0)</b></center>
+      </td>
+      <td>
+      <center><b>Remarks</b></center>
+      </td>
+    </tr>
+    <tr>
+      <td>Mode</td>
+      <td>0</td>
+      <td>2-0</td>
+      <td>000 = LSB, 001 = USB, 010 = CW, 011 = CWR, 100 = AM, 101 =
+FM, 110
+= DIG, 111 = PKT&nbsp; (Note:&nbsp; WFM is represented as "FM" when in
+the FM-BCB range.)</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>0</td>
+      <td>4-3</td>
+      <td><i>Unknown</i></td>
+    </tr>
+    <tr>
+      <td>HF/VHF (?)</td>
+      <td>0</td>
+      <td>5</td>
+      <td>0 = 6 Meters and above, 1 = Below 6 meters (Note:&nbsp; Exact
+purpose
+of this bit is unknown)</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>0</td>
+      <td>6</td>
+      <td><i>Purpose unknown, but occasionally used</i></td>
+    </tr>
+    <tr>
+      <td>TAG On/Off</td>
+      <td>0</td>
+      <td>7</td>
+      <td>0 = Memory frequency displayed, 1 = Memory Tag (Label)
+Displayed</td>
+    </tr>
+    <tr>
+      <td>Frequency Range</td>
+      <td>1</td>
+      <td>2-0</td>
+      <td>000 = HF, 001 = 6 M, 010 = FM BCB, 011 = Air, 100 = 2 Meters,
+101 =
+UHF.&nbsp; <b>Note:&nbsp; </b>These bits must be appropriately set
+when
+loading the frequency.</td>
+    </tr>
+    <tr>
+      <td>NAR On/Off&nbsp; <br>
+(FM, FMN Mode)</td>
+      <td>1</td>
+      <td>3</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>NAR On/Off&nbsp; <br>
+(CW, CWN, DIG Mode)</td>
+      <td>1</td>
+      <td>4</td>
+      <td>0 = Off, 1 = On</td>
+    </tr>
+    <tr>
+      <td>UHF/Not UHF (?)</td>
+      <td>1</td>
+      <td>5</td>
+      <td>0 = &lt; UHF, 1 = UHF (Note:&nbsp; Exact purpose of this bit
+is unknown)</td>
+    </tr>
+    <tr>
+      <td>RPT Offset</td>
+      <td>1</td>
+      <td>7-6</td>
+      <td>0 = Simplex, 01 = Minus,&nbsp; 10 = Plus,11 = Nonstandard
+Split (using
+separate TX freq)</td>
+    </tr>
+    <tr>
+      <td>Tone/DCS Select</td>
+      <td>2</td>
+      <td>1-0</td>
+      <td>00 = Off, 01 = Tone (tx), 10 = Tone + Tone Squelch, 11 = DCS</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>2</td>
+      <td>3-2</td>
+      <td><i>Unknown</i></td>
+    </tr>
+    <tr>
+      <td>ATT On/Off</td>
+      <td>2</td>
+      <td>4</td>
+      <td>0 = ATT Off, 1 = ATT On</td>
+    </tr>
+    <tr>
+      <td>IPO On/Off</td>
+      <td>2</td>
+      <td>5</td>
+      <td>0 = IPO Off, 1 = IPO On</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>2</td>
+      <td>6</td>
+      <td><i>Unknown</i></td>
+    </tr>
+    <tr>
+      <td>Memory Skip</td>
+      <td>2</td>
+      <td>7</td>
+      <td>0 = Memory Active, 1 = Memory Skip</td>
+    </tr>
+    <tr>
+      <td>FM Step</td>
+      <td>3</td>
+      <td>2-0</td>
+      <td>000 = 5 kHz, 001 = 6.25 kHz, 010 = 10 kHz, 011 = 12.5 kHz,
+100 = 15
+kHz, 101 = 20 kHz, 110 = 25 kHz, 111 = 50 kHz</td>
+    </tr>
+    <tr>
+      <td>AM Step</td>
+      <td>3</td>
+      <td>5-3</td>
+      <td>000 = 2.5 kHz, 001 = 5 kHz, 010 = 9 kHz, 011 = 10 kHz, 100 =
+12.5 kHz,
+101 = 25 kHz&nbsp;</td>
+    </tr>
+    <tr>
+      <td>SSB Step</td>
+      <td>3</td>
+      <td>7-6</td>
+      <td>00 = 1 kHz, 01 = 2.5 kHz, 10 = 5 kHz</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>4</td>
+      <td>&nbsp;</td>
+      <td><i>Purpose unknown, but occasionally used</i></td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>5</td>
+      <td>&nbsp;</td>
+      <td><i>Purpose unknown, but occasionally used</i></td>
+    </tr>
+    <tr>
+      <td>CTCSS Tone Freq.</td>
+      <td>6</td>
+      <td>4-0</td>
+      <td>Contains 0-31 with 0 = 67.0 Hz, 31 = 254.1 Hz, representing
+each of
+the standard 32 CTCSS tones.</td>
+    </tr>
+    <tr>
+      <td>DCS Code</td>
+      <td>7</td>
+      <td>6-0&nbsp;</td>
+      <td>Contains 0-67 (HEX) with 0 = DCS Code 023, 67 (HEX) = DCS
+code 754</td>
+    </tr>
+    <tr>
+      <td><i>Unknown</i></td>
+      <td>7</td>
+      <td>7&nbsp;</td>
+      <td><i>Unknown</i></td>
+    </tr>
+    <tr>
+      <td>RIT Offset</td>
+      <td>8-9</td>
+      <td>(all)</td>
+      <td>The RIT offset is stored as a signed number in two bytes
+ranging from
+-999 to 999 representing -9.99 to +9.99 kHz offset.&nbsp; The MSB (with
+the sign) is stored in the lower byte (8) and the LSB is in the upper
+byte
+(9.)</td>
+    </tr>
+    <tr>
+      <td>RX Frequency</td>
+      <td>A-D</td>
+      <td>(all)</td>
+      <td>Frequency is stored in a binary format with the MSB in the
+lower byte
+(A) and the LSB in the upper byte (D)&nbsp; <br>
+Example:&nbsp; A value of 02 97 F2 19 (HEX) translates to 43512345
+(decimal) and thus a display frequency of 435.12345 MHz.</td>
+    </tr>
+    <tr>
+      <td>TX Frequency <b><u>OR</u></b> Repeater offset</td>
+      <td>E-11</td>
+      <td>(all)</td>
+      <td>When a nonstandard split is used, these bytes contain the
+transmit
+frequency in the same format as above.&nbsp; <br>
+When a standard (or no) offset is used, these bytes contain the offset
+specified in menu item #42 in that same format in bytes F-11
+(HEX).&nbsp; <br>
+(Refer to <b>RPT Offset</b> - bits 7-6 in byte 1 of the memory record)</td>
+    </tr>
+    <tr>
+      <td>Label</td>
+      <td>12-19</td>
+      <td>(all)</td>
+      <td>8 ASCII Character label.&nbsp; Unused memories contain 0xff.</td>
+    </tr>
+  </tbody>
+</table>
+<blockquote><b>Notes:</b>
+  <ul>
+    <li>There are a few parameters that aren't used in all
+instances.&nbsp;
+Case
+in point:&nbsp; Memory locations are reserved for AM step size even in
+the FM BCB, even though AM mode is not possible.&nbsp; Other instances
+are bits for the setting of IPO and ATT status on bands above 6
+meters.&nbsp;
+These bits have no effect.</li>
+    <li>Various parameters may be stored in several places for
+different bands
+and it is believed that most of these parameters are represented.</li>
+    <li>Setting values outside the specified ranges may have
+unpredictable
+results.</li>
+    <li>If you determined that any of the above data is incorrect or
+incomplete
+(very likely...) please let me know.</li>
+    <li>Those entries marked with an asterisk (*) are suspect in their
+function
+- further investigation is warranted.</li>
+    <li>Attempts to write frequencies into memory that are invalid will
+result
+in that memory's content being set to a default value (e.g. 7.00000
+MHz,
+LSB for HF, etc.)</li>
+    <li>All entries in an unused (blank) memory contain FF (HEX)</li>
+    <li>Attempts to change to a memory containing no information will
+result in
+memory 1 being selected instead.</li>
+    <li>Frequency ranges are as follows:</li>
+    <ul>
+      <li>HF:&nbsp; 33 MHz and below</li>
+      <li>6 M:&nbsp; From 33 MHz to 56 MHz</li>
+      <li>FM-BCB:&nbsp; 76-108 MHz</li>
+      <li>Air:&nbsp; 108-137 MHz</li>
+      <li>2 M:&nbsp; 137-154 MHz</li>
+      <li>UHF:&nbsp; 420-470 MHz</li>
+    </ul>
+  </ul>
+</blockquote>
+<b><font size="+1">For an EEPROM Memory Map of the FT-817, go to the <a
+ href="ft817_memmap.html">EEPROM
+Memory Map</a> page.&nbsp; </font></b><font size="+1">This list shows
+known
+EEPROM addresses in ascending order.</font>
+<p><b>To be included in the future:</b>
+</p>
+<ul>
+  <li>How the CLONE mode works?&nbsp; It should be pointed out that
+with the
+above information, using the CLONE mode with a computer is really
+pointless!&nbsp;
+Nevertheless, maybe I'll figure out the format some day...</li>
+</ul>
+<b>Wish list:</b>
+<ul>
+  <li>I'm looking for a command that can "peek" at various internal CPU
+parameters,
+such as RAM locations, etc.&nbsp; I have yet to find a way to do this.</li>
+  <li>It would be nice to be able to directly read the "raw" A/D
+converter
+values
+for things like RF power (forward and reverse) as well as voltage, PA
+current,
+and the S-meter with better than 4 bit resolution.&nbsp; Again, I have
+yet to find a way to do this.</li>
+</ul>
+<b><i>Miscellany:</i></b>
+<ul>
+  <li>The CLONE mode always operates at 9600 baud, no matter what the
+interface
+baud rate is set to.</li>
+  <li>Note:&nbsp; The PBT (IF Shift) does NOT appear to be stored in
+EEPROM
+memory
+and there does not appear to be any sort of command available to
+change/read
+it.</li>
+  <li>It does not appear to be possible to read the voltmeter via the
+serial
+port.</li>
+</ul>
+<p><br>
+<i><font size="+2"><b>Known Issues </b>(as of 28 January, 2002)<b>:</b></font></i>
+</p>
+<ul>
+  <li>Bits that control/switch various VFO and Memory modes are not
+well
+documented.&nbsp;
+The truth table/logic of their operation needs to be further examined.</li>
+  <li>The memory location containing the bits showing which memories
+are
+used/erased
+is known, but yet to be documented here.</li>
+  <li>There is no known way to tell which memory is currently
+selected.&nbsp;
+Memory 0x44F only tells which memory will be selected when the radio
+powers
+up next time (i.e. it is updated when the radio is powered down.)</li>
+  <li>The setting of menu item #31 (The CW ID) doesn't seem to be
+stored
+anywhere
+in the EEPROM - it was not to be found even in an EEPROM read via an
+outboard
+programmer.&nbsp; It is possible that this is stored in an available
+on-CPU
+EEPROM.</li>
+</ul>
+<p><br>
+<b><i><font face="Comic Sans MS">Work continues on this page - please
+revisit soon!</font></i></b>
+</p>
+<p><b><i><font size="-1">Note:&nbsp; CAT (in this context) is a
+trademark
+of Yaesu/Vertex Standard Co. Ltd.</font></i></b>
+</p>
+<p><b><i>Notice:</i></b>&nbsp; The information contained on this and
+related
+pages is believed to be accurate, but no guarantees are expressed or
+implied.&nbsp;
+The information on this and related pages should be considered to be
+"as-is"
+and the user is completely responsible for the way this information is
+used.&nbsp; <b>If you find information that you believe to be
+incorrect,
+or if you discover something new, please report it <a href="email.html">via
+email</a>.</b>
+</p>
+<p><font face="Comic Sans MS"><b><i><font size="+1">Go to <a
+ href="ft817pg.shtml">The
+KA7OEI FT-817 "Front Page"</a> -</font></i></b> </font>This is, well,
+the
+"front" page of the '817 pages here...
+</p>
+<p><i>Any comments or questions?&nbsp; Send an <a href="email.html">email</a>!</i>
+</p>
+<center>
+<p><b><i><font size="-2">This page maintained by Clint Turner,
+KA7OEI.&nbsp;
+(Copyright 2001-2004 by Clint Turner)</font></i></b><a
+ href="/rose/client.lst"><img src="placeholder.gif" border="0"></a></p>
+</center>
+<i>Since 12/2010:<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+var sc_project=6438626; 
+var sc_invisible=0; 
+var sc_security="1bab1455"; 
+var sc_text=2; 
+</script>
+<script type="text/javascript"
+ src="http://www.statcounter.com/counter/counter.js"></script><noscript><div
+class="statcounter"><a
+title="joomla visitor"
+href="http://statcounter.com/joomla/" target="_blank"><img
+class="statcounter"
+src="http://c.statcounter.com/6438626/0/1bab1455/0/"
+alt="joomla visitor" ></a></div></noscript>
+<!-- End of StatCounter Code --></i>
+</body>
+</html>
