@@ -7,7 +7,7 @@
 #define FT817_h
 
 #include "Arduino.h"
-#include <../NewSoftSerial/NewSoftSerial.h>
+#include <NewSoftSerial.h>
 #define FT817_FREQ_SET 0x01
 #define FT817_FREQMODE_READ 0x03
 #define FT817_MODE_SET 0x07
@@ -56,7 +56,7 @@ class FT817
    boolean setFreqTest(unsigned long freq);
    void setFreq(long freq);
    unsigned long getFreqMode();
-void setSplitModeOn();
+	void setSplitModeOn();
 	void setSplitModeOff();
 	void setCTCSSEncoderOn();
 	void setCTCSSOff();
