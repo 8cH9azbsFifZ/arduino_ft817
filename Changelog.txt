@@ -1,1 +1,2 @@
+* Merged from http://code.google.com/p/ft-817-automatic-loop/
 * Merged from r29 from http://code.google.com/p/qrptracker/source/browse/trunk/Arduino/libraries/FT817/?r=29
