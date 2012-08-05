@@ -54,7 +54,7 @@ int swr;                       // SWR helper variable
 const int minPos = 9;          // Minimum Position reachable by the Servo
 const int maxPos = 180;        // Maximum Position reachable by the Servo
 
-PWMServo myservo;
+//PWMServo myservo;
 FT817 rig;
 
 void setup() {

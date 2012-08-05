@@ -24,6 +24,7 @@
 #endif
 
 #include "FT817.h"
+
 #define DEBUG false
 extern SoftwareSerial rigSoftSerial(16,17);
 
