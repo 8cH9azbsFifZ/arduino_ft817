@@ -6,7 +6,7 @@
 #ifndef FT817_h
 #define FT817_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <NewSoftSerial.h>
 #define FT817_FREQ_SET 0x01
 #define FT817_FREQMODE_READ 0x03
@@ -83,7 +83,6 @@ byte mode;
    unsigned char * out;
    void blink();
    void rigComError(char * string);
-   //NewSoftSerial rigSoftSerial(2,3);
 };
 
 #endif
