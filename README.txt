@@ -4,6 +4,7 @@ This is a standalone library for controlling the YAESU FT 817 using the famous a
 
 * Alain De Carolis, WW3WW
 * Bruce Gordon Robertson, VE9QRP
+* Gerolf Ziegenhain, DG6FL
 
 Installation Instructions
 -------------------------
