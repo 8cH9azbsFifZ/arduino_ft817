@@ -1,7 +1,9 @@
 #include <Arduino.h>
 #include "FT817.h"
 #include <NewSoftSerial.h>
+
 #define DEBUG false
+
 extern NewSoftSerial rigSoftSerial(16,17);
 
 FT817::FT817()

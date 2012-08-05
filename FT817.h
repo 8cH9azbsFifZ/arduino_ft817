@@ -8,6 +8,7 @@
 
 #include <Arduino.h>
 #include <NewSoftSerial.h>
+
 #define FT817_FREQ_SET 0x01
 #define FT817_FREQMODE_READ 0x03
 #define FT817_MODE_SET 0x07
