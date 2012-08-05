@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include "FT817.h"
-#include <NewSoftSerial.h>
+#include <SoftwareSerial.h>
 
 #define DEBUG false
 
-extern NewSoftSerial rigSoftSerial(16,17);
+extern SoftwareSerial rigSoftSerial(16,17);
 
 FT817::FT817()
 {
@@ -13,7 +13,7 @@ FT817::FT817()
 
 }
 
-void FT817::assignSerial(NewSoftSerial s) {
+void FT817::assignSerial(SoftwareSerial s) {
   rigSoftSerial = s;
 }
 

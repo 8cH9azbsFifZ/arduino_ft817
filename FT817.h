@@ -7,7 +7,7 @@
 #define FT817_h
 
 #include <Arduino.h>
-#include <NewSoftSerial.h>
+#include <SoftwarSerial.h>
 
 #define FT817_FREQ_SET 0x01
 #define FT817_FREQMODE_READ 0x03
@@ -66,7 +66,7 @@ class FT817
 	void setLockOff();
 	void off();
 	void on();
-   void assignSerial(NewSoftSerial s);
+   void assignSerial(SoftwareSerial s);
    void begin(int baud);
 
   private:
