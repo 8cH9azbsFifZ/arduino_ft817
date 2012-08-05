@@ -1,0 +1,1 @@
+* Merged from r29 from http://code.google.com/p/qrptracker/source/browse/trunk/Arduino/libraries/FT817/?r=29
