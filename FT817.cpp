@@ -1,4 +1,4 @@
-#include "WProgram.h"
+#include "Arduino.h"
 #include "FT817.h"
 #include <../NewSoftSerial/NewSoftSerial.h>
 #define DEBUG false
