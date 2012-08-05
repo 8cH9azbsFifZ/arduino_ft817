@@ -14,3 +14,4 @@ Installation Instructions
 References
 ----------
 * http://www.alain.it/2012/02/10/ft-817-automatic-loop/
+* http://jallib.googlecode.com/svn/trunk/project/catpad_mw/cat_ft817.jal

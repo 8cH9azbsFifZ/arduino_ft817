@@ -64,7 +64,7 @@
 #define FT817_PTT_OFF  0x88								// c5
 #define FT817_PTT_ON   0x08								// c5
 #define FT817_READ_RX_STATE 0xE7							// c5
-#define FT817_READ_TX_STATE 0x10							// FIXME: not in hamlib - what is it?	
+#define FT817_READ_TX_STATE 0x10							// FIXME: not official
 #define FT817_READ_TX_STATE2 0xF7						// c5
 #define FT817_READ_TX_METERS 0xBD 						// FIXME: not in hamlib
 																	// 0xBD is undocumented
@@ -87,6 +87,10 @@
 #define FT817_RPT_PLUS 0x49								// c1
 #define FT817_RPT_SIMPLEX 0x89							// c1
 #define FT817_RPT_OFFSET_FREQ 0xF9						// i5
+#define FT817_CONFIG_READ 0xA7							// FIXME: unofficial
+#define FT817_CONFIG_RES 0xBE								// FIXME: DO NOT USE
+#define FT817_CONFIG_EEPROM_READ 0xBB					// FIXME: unofficial
+#define FT817_CONFIG_EEPROM_WRITE 0xBC					// FIXmE: unofficial
 
 // FT 817 STR_CAL
 #define FT817_S0 0x00
