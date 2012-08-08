@@ -130,7 +130,7 @@ class FT817
     void setMode(byte mode);
     void verifiedSetFreq(unsigned long freq);
     byte getMode();
-    byte getRxStatus(); //FIXME: seems like not all functions are implemented yet
+    byte getRxStatus(char *smeter); //FIXME: seems like not all functions are implemented yet
     boolean setFreqTest(unsigned long freq);
     void setFreq(long freq);
     unsigned long getFreqMode(char *modename);
