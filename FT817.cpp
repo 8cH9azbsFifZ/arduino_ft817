@@ -144,14 +144,16 @@ void FT817::setMode(byte mode) {
 }
 
 byte FT817::getMode() {
-    unsigned long l = getFreqMode();
+	 char *modename;
+    unsigned long l = getFreqMode(modename);
     return mode;
 }
 
 boolean FT817::setFreqTest(unsigned long freq) {
     setFreq(freq);
     //delay(100);
-    unsigned long freqOut = getFreqMode();
+	 char *modename;
+    unsigned long freqOut = getFreqMode(modename);
     if (freqOut == freq) {
     /*
     Serial.print("pass: ");
@@ -181,7 +183,7 @@ void FT817::setFreq(long freq) {
 }
 
 
-unsigned long FT817::getFreqMode() {
+unsigned long FT817::getFreqMode(char *modename) {
     rigSoftSerial.flush();// not sure why I have to do this.
     //check for data after setFreq
     boolean readValid = true;
@@ -190,6 +192,8 @@ unsigned long FT817::getFreqMode() {
     byte chars[4];
     long timeout = millis();
     long elapsed = 0;
+	 sprintf (modename, "");
+
     while (rigSoftSerial.available() < 5 && elapsed < 2000) {
         elapsed = millis() - timeout;
     }
@@ -207,6 +211,21 @@ unsigned long FT817::getFreqMode() {
             if (DEBUG) { Serial.println(chars[i]); }
         }
         mode = rigSoftSerial.read();
+		  switch (mode)
+		  {
+			  case FT817_MODE_LSB: sprintf (modename, "LSB"); break;
+			  case FT817_MODE_USB: sprintf (modename, "USB"); break;
+			  case FT817_MODE_CW: sprintf (modename, "CW"); break;
+			  case FT817_MODE_CWR: sprintf (modename, "CWR"); break;
+			  case FT817_MODE_AM: sprintf (modename, "AM"); break;
+			  case FT817_MODE_FM: sprintf (modename, "FM"); break;
+			  case FT817_MODE_FMN: sprintf (modename, "FMN"); break;
+			  case FT817_MODE_DIG: sprintf (modename, "DIG"); break;
+			  case FT817_MODE_PKT: sprintf (modename, "PKT"); break;
+			  case FT817_MODE_CW_NARROW: sprintf (modename, "CWN"); break;
+			  case FT817_MODE_CWR_NARROW: sprintf (modename, "CWRN"); break;
+			  case FT817_MODE_DIG_NARROW: sprintf (modename, "DIGN"); break;
+		  }
     } 
 
     if (readValid == false) {
@@ -220,6 +239,7 @@ unsigned long FT817::getFreqMode() {
         return freq;
      }
 }
+
 
 char FT817::readOneChar() {
     
@@ -350,21 +370,30 @@ boolean FT817::txMeters() {
 }
 
 int FT817::getSWR() {
-
     tx = txMeters();
     return swr;
-
 }
 
 boolean FT817::getTXSuccess() {
-    
     return tx;
-    
 }
 
 boolean FT817::txState() {
     fourBytePreamble();
     sendCATCommandChar(FT817_READ_TX_STATE);
+    byte b = readOneChar();
+    
+    if (b == 0) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+boolean FT817::getRxStatus() {
+    fourBytePreamble();
+    sendCATCommandChar(FT817_READ_RX_STATE);
     byte b = readOneChar();
     
     if (b == 0) {

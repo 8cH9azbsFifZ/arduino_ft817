@@ -130,10 +130,10 @@ class FT817
     void setMode(byte mode);
     void verifiedSetFreq(unsigned long freq);
     byte getMode();
-    byte getRxStatus();
+    byte getRxStatus(); //FIXME: seems like not all functions are implemented yet
     boolean setFreqTest(unsigned long freq);
     void setFreq(long freq);
-    unsigned long getFreqMode();
+    unsigned long getFreqMode(char *modename);
     void setSplitModeOn();
     void setSplitModeOff();
     void setCTCSSEncoderOn();
@@ -156,7 +156,7 @@ class FT817
     void sendCATCommandArray( byte command[], int len);
     unsigned long from_bcd_be(unsigned char const* nybbles, size_t length);
     unsigned char * to_bcd_be( byte bcd_data[], unsigned long freq, unsigned bcd_len);
-    byte mode;
+    byte mode; // FIXME: global variable
     byte status;
     boolean tx;
     int swr;
