@@ -1,19 +1,11 @@
 /*
+   FT 817 Library for Arduino
+	Contributing Authors:
+		Alain De Carolis, WW3WW
+		Bruce Gordon Robertson, VE9QRP
+		Gerolf Ziegenhain, DG6FL
 
-    Apr 21th 2012
-    
-    FT-817 Automatic Loop
-    by Alain De Carolis, WW3WW
-    version 1.0
-    
-    This progam uses a modified version of the qrptracker library
-    written by Bruce Gordon Robertson, VE9QRP
-    
-    released under the GPL V3 license
-    
-    for more info and full source code visit
-    https://code.google.com/p/ft-817-automatic-loop/
-    
+	Released under the GPL V3 license
 */
 
 #if defined(ARDUINO) && ARDUINO >= 100

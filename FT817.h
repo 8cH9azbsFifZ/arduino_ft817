@@ -1,4 +1,5 @@
 /*
+   FT 817 Library for Arduino
 	Contributing Authors:
 		Alain De Carolis, WW3WW
 		Bruce Gordon Robertson, VE9QRP
