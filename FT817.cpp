@@ -390,22 +390,23 @@ byte FT817::getRxStatus(char *smeter) {
 	 sprintf (smeter, "");
 	 switch (b)
 	 {
-		 case FT817_S0: sprintf (smeter, "S0 "); break;
-		 case FT817_S1: sprintf (smeter, "S1 "); break;
-		 case FT817_S2: sprintf (smeter, "S2 "); break;
-		 case FT817_S3: sprintf (smeter, "S3 "); break;
-		 case FT817_S4: sprintf (smeter, "S4 "); break;
-		 case FT817_S5: sprintf (smeter, "S5 "); break;
-		 case FT817_S6: sprintf (smeter, "S6 "); break;
-		 case FT817_S7: sprintf (smeter, "S7 "); break;
-		 case FT817_S8: sprintf (smeter, "S8 "); break;
-		 case FT817_S9: sprintf (smeter, "S9 "); break;
+		 case FT817_S0:  sprintf (smeter, "S0 "); break;
+		 case FT817_S1:  sprintf (smeter, "S1 "); break;
+		 case FT817_S2:  sprintf (smeter, "S2 "); break;
+		 case FT817_S3:  sprintf (smeter, "S3 "); break;
+		 case FT817_S4:  sprintf (smeter, "S4 "); break;
+		 case FT817_S5:  sprintf (smeter, "S5 "); break;
+		 case FT817_S6:  sprintf (smeter, "S6 "); break;
+		 case FT817_S7:  sprintf (smeter, "S7 "); break;
+		 case FT817_S8:  sprintf (smeter, "S8 "); break;
+		 case FT817_S9:  sprintf (smeter, "S9 "); break;
 		 case FT817_S10: sprintf (smeter, "+10"); break;
 		 case FT817_S20: sprintf (smeter, "+20"); break;
 		 case FT817_S30: sprintf (smeter, "+30"); break;
 		 case FT817_S40: sprintf (smeter, "+40"); break;
 		 case FT817_S50: sprintf (smeter, "+50"); break;
 		 case FT817_S60: sprintf (smeter, "+60"); break;
+		 default: 		  sprintf (smeter, "S0 "); break;
 	 }
 	 return b;
 }

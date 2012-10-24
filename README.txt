@@ -7,6 +7,8 @@ using the famous arduino :)
 * Bruce Gordon Robertson, VE9QRP
 * Gerolf Ziegenhain, DG6FL
 
+Released under GPLv3.
+
 Installation Instructions
 -------------------------
 * Copy this whole current directory to
