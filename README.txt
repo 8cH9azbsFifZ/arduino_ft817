@@ -1,11 +1,7 @@
 Arduino FT 817
 --------------
 This is a standalone library for controlling the YAESU FT 817 
-using the famous arduino :)
-
-* Alain De Carolis, WW3WW
-* Bruce Gordon Robertson, VE9QRP
-* Gerolf Ziegenhain, DG6FL
+using the famous arduino. It also features some examples on what to do.
 
 Released under GPLv3.
 
