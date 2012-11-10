@@ -105,15 +105,15 @@ byte modus;
 #define GPS_RX_PIN 2
 #define GPS_SPEED 9600
 
-SoftwareSerial serial_gps(GPS_TX_PIN, GPS_RX_PIN);
-Adafruit_GPS GPS(&serial_gps);
+SoftwareSerial Serial1(GPS_TX_PIN, GPS_RX_PIN);
+Adafruit_GPS GPS(&Serial1);
 
 void initialize_gps ()
 {
   GPS.begin(GPS_SPEED);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
-  serial_gps.println(PMTK_Q_RELEASE);
+  Serial1.println(PMTK_Q_RELEASE);
 }
 
 
@@ -184,15 +184,7 @@ void display_frequency_mode_smeter ()
   lcd.setCursor(0,1);
   lcd.print(lower);
   
-  #ifdef TIMER
-  // display gps time  
-  #define TIME 6
-  int pos_time = LCD_NUM_COL-TIME;
-  char time[TIME];
-  sprintf (time, "%02d:%02d", (int)(GPS.hour), (int)(GPS.minute));
-  lcd.setCursor(pos_time,1);
-  lcd.print(time);
-  #endif
+
 }
 
 
@@ -368,7 +360,29 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
   return 0;
 }
 
-
+/*************************************************************************************************/
+void read_gps ()
+{
+  char c = GPS.read();
+  GPS.hour = 0;
+  GPS.minute = 0;
+  if (GPS.newNMEAreceived()) {
+    if (!GPS.parse(GPS.lastNMEA())) {
+      return;
+    } 
+  }   
+  
+  // display gps time  
+  lcd.clear();
+  //#define TIME 6
+  int pos_time = 0;//LCD_NUM_COL-TIME;
+  //char time[TIME];
+  //sprintf (time, "%02d:%02d", (int)(GPS.hour), (int)(GPS.minute));
+  //lcd.print(time);
+    lcd.print(GPS.hour, DEC); lcd.print(':');
+    lcd.print(GPS.minute, DEC); lcd.print(':');
+    lcd.print(GPS.seconds, DEC); lcd.print('.');
+}
 
 
 
@@ -388,27 +402,16 @@ void setup ()
   display_frequency_mode_smeter ();
 }
 
-/*************************************************************************************************/
-void read_gps ()
-{
-  char c = GPS.read();
-  GPS.hour = 0;
-  GPS.minute = 0;
-  if (GPS.newNMEAreceived()) {
-    if (!GPS.parse(GPS.lastNMEA())) {
-      GPS.hour = 0;
-      GPS.minute = 0;
-    } 
-  }   
-}
+
 
 /*************************************************************************************************/
 // Main loop
 void loop ()
 {
-  read_gps();
   
-  read_rig(); 
+  //read_rig(); 
+  read_gps(); return;
+
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
   lcd_key = lcd.readButtons();
