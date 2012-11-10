@@ -51,65 +51,6 @@ uint8_t lcd_key;
 #endif /* i2c Adafruit */
 
 
-/* Liquid Crystal Library */
-#ifdef LIQUID
-#include <LiquidCrystal.h> 
-
-// select the pins used on the LCD panel
-LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
-
-
-// define some values used by the panel and buttons
-int lcd_key;
-int adc_key_in;
-#define btnRIGHT  0
-#define btnUP     1
-#define btnDOWN   2
-#define btnLEFT   3
-#define btnSELECT 4
-#define btnNONE   5
-
-#define CLICK_NONE         0
-#define CLICK_LEFTHOLD     11
-#define CLICK_RIGHTHOLD    12
-#define CLICK_UPHOLD       10
-#define CLICK_DOWNHOLD     9
-#define CLICK_LEFTRIGHT    1
-#define CLICK_RIGHTLEFT    2
-#define CLICK_DOWNUP       3
-#define CLICK_UPDOWN       4
-#define CLICK_LEFTLEFT     5
-#define CLICK_RIGHTRIGHT   6
-#define CLICK_UPUP         7
-#define CLICK_DOWNDOWN     8
-
-#define N_BUTTONS 10
-int buttons[N_BUTTONS];
-
-int detect_multiclick ()
-{
-   // 3 button sequence for better detection 
-  if (buttons[0] == btnRIGHT and buttons[1] == btnRIGHT and buttons[2] == btnRIGHT) { return CLICK_RIGHTHOLD; }
-  if (buttons[0] == btnLEFT and buttons[1] == btnLEFT and buttons[2] == btnLEFT) { return CLICK_LEFTHOLD; }
-  if (buttons[0] == btnDOWN and buttons[1] == btnDOWN and buttons[2] == btnDOWN) { return CLICK_DOWNHOLD; }
-  if (buttons[0] == btnUP and buttons[1] == btnUP and buttons[2] == btnUP) { return CLICK_UPHOLD; }
-
-  // 2 button pushes
-  if (buttons[0] == btnRIGHT and buttons[1] == btnLEFT) { return CLICK_LEFTRIGHT; }
-  if (buttons[0] == btnLEFT and buttons[1] == btnRIGHT) { return CLICK_RIGHTLEFT; }
-  if (buttons[0] == btnDOWN and buttons[1] == btnUP) { return CLICK_UPDOWN; }
-  if (buttons[0] == btnUP and buttons[1] == btnDOWN) { return CLICK_DOWNUP; }
-  
-  // double clicks
-  if (buttons[0] == btnLEFT and buttons[1] == btnNONE and buttons[2] == btnLEFT) { return CLICK_LEFTLEFT; }
-  if (buttons[0] == btnRIGHT and buttons[1] == btnNONE and buttons[2] == btnRIGHT) { return CLICK_RIGHTRIGHT; }  
-  if (buttons[0] == btnDOWN and buttons[1] == btnNONE and buttons[2] == btnDOWN) { return CLICK_DOWNDOWN; }
-  if (buttons[0] == btnUP and buttons[1] == btnNONE and buttons[2] == btnUP) { return CLICK_UPUP; }
-  
-  return CLICK_NONE;
-}
-#endif /* Liquid Crystal */
-
 /*************************************************************************************************/
 /* Configure the FT 817 stuff */
 #include <SoftwareSerial.h>
@@ -121,10 +62,10 @@ typedef struct
   FT817 serial;
   int rxPin, txPin, speed; // serial connection parameters for the arduino
   // current status
-  long freq;
-  char mode[4];
-  char smeter[4];
-  byte smeterbyte;
+  long freq, freq_old;
+  char mode[4], mode_old[4];
+  char smeter[4], smeter_old[4];
+  byte smeterbyte, smeterbyte_old;
 } t_rig;
 t_rig rig; 
 
@@ -180,12 +121,34 @@ void initialize_screen ()
 void read_rig()
 {
   rig.serial.begin(rig.speed);
+  
+  // save old state
+  rig.freq_old = rig.freq;
+  rig.smeter_old = rig.smeter;
+  rig.smeterbyte_old = rig.smeterbyte;
+  rig.mode_old = rig.mode;
+  
   do // rig frequency may initially be 0
   {
     rig.freq = rig.serial.getFreqMode(rig.mode);
     rig.smeterbyte = rig.serial.getRxStatus(rig.smeter);
   } while (rig.freq == 0); 
 } 
+
+/*************************************************************************************************/
+#define CHANGED 1
+#define UNCHANGED 0
+int rig_state_changed ()
+{
+  if (rig_freq_old == rig_freq &&   
+    rig.smeter_old == rig.smeter && 
+    rig.smeterbyte_old = rig.smeterbyte &&
+    rig.mode_old = rig.mode)
+  {
+    return CHANGED;
+  }
+  return UNCHANGED;
+}
 
 /*************************************************************************************************/
 void display_frequency_mode_smeter ()
