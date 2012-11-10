@@ -485,7 +485,10 @@ int FT817::setRPTshift (byte shift)
 	/* Note: this doesn't have effect unless FT817 is in FM mode
 	   although the command is accepted in any mode.
 	*/
-	sendCATCommandChar(shift);
+ 	 sendCATCommandChar(shift);
+    threeBytePreamble();
+    sendCATCommandChar(FT817_SET_RPT);
+    readOneChar();
 
 	/* 
 	 * fill in the offset freq 
