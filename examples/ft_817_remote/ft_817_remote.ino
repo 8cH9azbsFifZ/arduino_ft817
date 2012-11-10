@@ -89,7 +89,7 @@ char cur_ch_name[CH_NAME_LEN];
 #define NO_CHANNEL_FOUND -1
 
 // NB: indices as in list above!! 
-const int watchdog_frequencies[] = {43932500, 2706500, 14521250}; 
+const int watchdog_frequencies[] = {43932500, 2706500, 14521250}; // FIXME: can be configured
 const int num_watchdog_frequencies = 3;//FIXME
 
 /*************************************************************************************************/
@@ -104,9 +104,9 @@ byte modus;
 // Initialize serial connection
 void initialize_ft817 ()
 {
-  rig.rxPin = 12;
-  rig.txPin = 13;
-  rig.speed = 4800;
+  rig.rxPin = 12;// FIXME: can be configured
+  rig.txPin = 13;// FIXME: can be configured
+  rig.speed = 4800; // FIXME: can be configured
   Serial.begin(rig.speed);
   SoftwareSerial mySerial(rig.rxPin,rig.txPin);
   rig.serial.assignSerial(mySerial);
@@ -121,17 +121,6 @@ void initialize_screen ()
   lcd.print("FT 817 (DG6FL)"); // print a simple message
 }
 
-
-/***********************nchannels**************************************************************************/
-// Global Setup Routing 
-void setup (){
-  initialize_ft817();
-  initialize_screen();
-  modus = M_CHANNELS;
-  lcd_key = btnNONE;
-  adc_key_in = 0;
-  set_channel (0);
-}
 
 
 /*************************************************************************************************/
@@ -205,34 +194,6 @@ void get_cur_ch_name (long freq)
 }
 
 
-/*************************************************************************************************/
-// Main loop
-void loop ()
-{
-  read_rig(); // update the rig structure
-  display_frequency_mode_smeter (); // Update the display
-  
-  // handle the key input
-  lcd_key = read_LCD_buttons(); // read into global variable; events can be processed by functions below
-  int a = detect_multiclick();
-  if (a != CLICK_NONE)
-  {
-    if (a == CLICK_UPUP) { modus = M_CHANNELS; }
-    if (a == CLICK_DOWNDOWN) { modus = M_FREQUENCY; }
-    if (a == CLICK_LEFTLEFT) { modus = M_WATCHDOG; }
-    if (a == CLICK_LEFTHOLD) { modus = M_SCANNING; }
-  }
-  
-  switch (modus)
-  {
-    case M_WATCHDOG: { watchdog(); break; }
-    case M_CHANNELS: { channels_mode(); break; }
-    case M_FREQUENCY: { freq_plus_minus_mode (); break; }
-    case M_SCANNING: { scan_function(); break; }
-  }
-  //
-  // TBD: band scanner
-}
 
 
 /*************************************************************************************************/
@@ -369,3 +330,48 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 {
   return 0;
 }
+
+
+
+/*************************************************************************************************/
+// Global Setup Routing 
+void setup (){
+  initialize_ft817();
+  initialize_screen();
+  modus = M_CHANNELS;
+  lcd_key = btnNONE;
+  adc_key_in = 0;
+  set_channel (0);
+}
+
+
+
+/*************************************************************************************************/
+// Main loop
+void loop ()
+{
+  read_rig(); // update the rig structure
+  display_frequency_mode_smeter (); // Update the display
+  
+  // handle the key input
+  lcd_key = read_LCD_buttons(); // read into global variable; events can be processed by functions below
+  int a = detect_multiclick();
+  if (a != CLICK_NONE)
+  {
+    if (a == CLICK_UPUP) { modus = M_CHANNELS; }
+    if (a == CLICK_DOWNDOWN) { modus = M_FREQUENCY; }
+    if (a == CLICK_LEFTLEFT) { modus = M_WATCHDOG; }
+    if (a == CLICK_LEFTHOLD) { modus = M_SCANNING; }
+  }
+  
+  switch (modus)
+  {
+    case M_WATCHDOG: { watchdog(); break; }
+    case M_CHANNELS: { channels_mode(); break; }
+    case M_FREQUENCY: { freq_plus_minus_mode (); break; }
+    case M_SCANNING: { scan_function(); break; }
+  }
+  //
+  // TBD: band scanner
+}
+
