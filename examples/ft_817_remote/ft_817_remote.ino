@@ -257,7 +257,7 @@ void set_channel (int ch)
   }
   if (ch < 0)
   {
-    ch =  - 1;
+    ch =  nchannels-1;
   }
   cur_ch = ch;
 
