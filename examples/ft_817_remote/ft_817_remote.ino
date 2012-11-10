@@ -54,7 +54,6 @@ uint8_t lcd_key;
 typedef struct
 {
   FT817 serial;
-  int rxPin, txPin, speed; // serial connection parameters for the arduino
   // current status
   long freq, freq_old;
   char mode[4], mode_old[4];
@@ -62,6 +61,17 @@ typedef struct
   byte smeterbyte, smeterbyte_old;
 } t_rig;
 t_rig rig; 
+
+#define FT817_TX_PIN 13
+#define FT817_RX_PIN 12
+#define FT817_SPEED 4800
+
+void initialize_ft817 ()
+{
+  Serial.begin(FT817_SPEED);
+  SoftwareSerial mySerial(FT817_RX_PIN,FT817_TX_PIN);
+  rig.serial.assignSerial(mySerial);
+}
 
 
 /*************************************************************************************************/
@@ -96,18 +106,10 @@ byte modus;
 SoftwareSerial serial_gps(GPS_TX_PIN, GPS_RX_PIN);
 Adafruit_GPS GPS(&serial_gps);
 
-
-/*************************************************************************************************/
-// Initialize serial connection
-void initialize_ft817 ()
+void initialize_gps ()
 {
-  rig.rxPin = 12;// FIXME: can be configured
-  rig.txPin = 13;// FIXME: can be configured
-  rig.speed = 4800; // FIXME: can be configured
-  Serial.begin(rig.speed);
-  SoftwareSerial mySerial(rig.rxPin,rig.txPin);
-  rig.serial.assignSerial(mySerial);
 }
+
 
 /*************************************************************************************************/
 // Initialize the screen
@@ -123,7 +125,7 @@ void initialize_screen ()
 /*************************************************************************************************/
 void read_rig()
 {
-  rig.serial.begin(rig.speed);
+  rig.serial.begin(FT817_SPEED);
   
   // save old state
   rig.freq_old = rig.freq;
