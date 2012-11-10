@@ -480,7 +480,7 @@ unsigned char * FT817::to_bcd_be( unsigned char bcd_data[], unsigned long  freq,
 
 // Set repeater shift
 // FT817_RPT_MINUS FT817_RPT_PLUS FT817_RPT_SIMPLEX
-int FT817::setRPTshift (byte shift)
+int FT817::setRPTshift (byte shift, int offset)
 {
 	/* Note: this doesn't have effect unless FT817 is in FM mode
 	   although the command is accepted in any mode.
