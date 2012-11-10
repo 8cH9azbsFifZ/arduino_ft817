@@ -160,6 +160,8 @@ class FT817
     void on();
     void assignSerial(SoftwareSerial s);
     void begin(int baud);
+	 int ft817_set_rptr_shift (byte shift);
+
 
   private:
     void simpleCommand(int command);
