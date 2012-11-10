@@ -229,18 +229,8 @@ void channels_mode ()
 void freq_plus_minus_mode ()
 {
   float delta_freq = 10; // 10 == 100 Hz
-  #ifdef LIQUID_CRYSTAL
-  switch (lcd_key)             
-  {
-   case btnRIGHT: { rig.serial.setFreq(rig.freq + delta_freq); break; }
-   case btnLEFT:  { rig.serial.setFreq(rig.freq - delta_freq); break; }
-   case btnUP:    { rig.serial.setMode(FT817_MODE_USB); break; }
-   case btnDOWN:  { rig.serial.setMode(FT817_MODE_CW); break;  }
-   }
-   #endif
-   #ifdef ADAFRUIT_I2C
+
      // TBD
-   #endif
 }
 
 /*************************************************************************************************/
