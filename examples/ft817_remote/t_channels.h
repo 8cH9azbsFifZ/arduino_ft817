@@ -1,0 +1,144 @@
+
+/*
+	 This file is part of xmlbandplan.
+
+    Xmlbandplan is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Xmlbandplan is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Xmlbandplan.  If not, see http://www.gnu.org/licenses/;.	  
+*/
+
+/*
+ * This file has been created by xmlbandplan.
+ */
+
+// Single channels
+typedef struct 
+{
+  char *name; // channel name
+  long freq;  // frequency
+  byte mode;  // mode
+} t_channel;
+
+const t_channel channels[] = {
+						{"WSPR",13600, NULL , NULL },
+{"WSPR",183660, NULL , NULL },
+{"QRP",183600,FT817_MODE_CW_NARROW, NULL },
+{"ATV",373500, NULL , NULL },
+{"Emergency Region 1",376000, NULL , NULL },
+{"QRP",369000, NULL , NULL },
+{"Digital Speech",363000, NULL , NULL },
+{"QRP",356000,FT817_MODE_CW_NARROW, NULL },
+{"QRS",355500,FT817_MODE_CW_NARROW, NULL },
+{"WSPR",359260, NULL , NULL },
+{"QRP",703000,FT817_MODE_CW_NARROW, NULL },
+{"Emergency Region 1",711000, NULL , NULL },
+{"ATV",716500, NULL , NULL },
+{"Digital Speech",707000, NULL , NULL },
+{"QRP",709000, NULL , NULL },
+{"WSPR",703860, NULL , NULL },
+{"QRP",1011600,FT817_MODE_CW_NARROW, NULL },
+{"WSPR",1013870, NULL , NULL },
+{"QRP",1406000,FT817_MODE_CW_NARROW, NULL },
+{"Emergency",1430000, NULL , NULL },
+{"WSPR",1409560, NULL , NULL },
+{"QRP",1808600,FT817_MODE_CW_NARROW, NULL },
+{"QRP",1813000, NULL , NULL },
+{"Digital Speech",1815000, NULL , NULL },
+{"Emergency",1816000, NULL , NULL },
+{"WSPR",1810460, NULL , NULL },
+{"QRP",2106000,FT817_MODE_CW_NARROW, NULL },
+{"QRS",2105500,FT817_MODE_CW_NARROW, NULL },
+{"Digital Speech",2118000, NULL , NULL },
+{"WSPR",2199460, NULL , NULL },
+{"QRP",2490600,FT817_MODE_CW_NARROW, NULL },
+{"QRP",2495000, NULL , NULL },
+{"WSPR",2492460, NULL , NULL },
+{"QRP",2836000, NULL , NULL },
+{"Digital Speech",2833000, NULL , NULL },
+{"FM Call",2960000,FT817_MODE_FM, NULL },
+{"FM Call Simplex Repeater: Input and Output",2961000,FT817_MODE_FM, NULL },
+{"QRS",2805500,FT817_MODE_CW_NARROW, NULL },
+{"QRP",2806000,FT817_MODE_CW_NARROW, NULL },
+{"APRS",2925000,FT817_MODE_FM, NULL },
+{"WSPR",2812460, NULL , NULL },
+{"41",2656500,FT817_MODE_FM, NULL },
+{"42",2657500,FT817_MODE_FM, NULL },
+{"43",2658500,FT817_MODE_FM, NULL },
+{"44",2659500,FT817_MODE_FM, NULL },
+{"45",2660500,FT817_MODE_FM, NULL },
+{"46",2661500,FT817_MODE_FM, NULL },
+{"47",2662500,FT817_MODE_FM, NULL },
+{"48",2663500,FT817_MODE_FM, NULL },
+{"49",2664500,FT817_MODE_FM, NULL },
+{"50",2665500,FT817_MODE_FM, NULL },
+{"51",2666500,FT817_MODE_FM, NULL },
+{"52",2667500,FT817_MODE_FM, NULL },
+{"53",2668500,FT817_MODE_FM, NULL },
+{"54",2669500,FT817_MODE_FM, NULL },
+{"55",2670500,FT817_MODE_FM, NULL },
+{"56",2671500,FT817_MODE_FM, NULL },
+{"57",2672500,FT817_MODE_FM, NULL },
+{"58",2673500,FT817_MODE_FM, NULL },
+{"59",2674500,FT817_MODE_FM, NULL },
+{"60",2675500,FT817_MODE_FM, NULL },
+{"61",2676500,FT817_MODE_FM, NULL },
+{"62",2677500,FT817_MODE_FM, NULL },
+{"63",2678500,FT817_MODE_FM, NULL },
+{"64",2679500,FT817_MODE_FM, NULL },
+{"65",2680500,FT817_MODE_FM, NULL },
+{"66",2681500,FT817_MODE_FM, NULL },
+{"67",2682500,FT817_MODE_FM, NULL },
+{"68",2683500,FT817_MODE_FM, NULL },
+{"69",2684500,FT817_MODE_FM, NULL },
+{"70",2685500,FT817_MODE_FM, NULL },
+{"71",2686500,FT817_MODE_FM, NULL },
+{"72",2687500,FT817_MODE_FM, NULL },
+{"73",2688500,FT817_MODE_FM, NULL },
+{"74",2689500,FT817_MODE_FM, NULL },
+{"75",2690500,FT817_MODE_FM, NULL },
+{"76",2691500,FT817_MODE_FM, NULL },
+{"77",2692500,FT817_MODE_FM, NULL },
+{"78",2693500,FT817_MODE_FM, NULL },
+{"79",2694500,FT817_MODE_FM, NULL },
+{"80",2695500,FT817_MODE_FM, NULL },
+{"WSPR",502930, NULL , NULL },
+{"S1: simplex channel",14521250,FT817_MODE_FM, NULL },
+{"ARPS",14480000,FT817_MODE_FM, NULL },
+{"Echolink",14496250,FT817_MODE_FM, NULL },
+{"Echolink",14497500,FT817_MODE_FM, NULL },
+{"RTTY local",14530000, NULL , NULL },
+{"DV CQ: Digital Speech with data and FM",14537500, NULL , NULL },
+{"PSK31: MGM PSK31",14417000, NULL , NULL },
+{"SSB CQ",14430000, NULL , NULL },
+{"MGM CQ",14437000, NULL , NULL },
+{"WSPR",14448900, NULL , NULL },
+{"SSTV CQ",14450000, NULL , NULL },
+{"ATV: ATV SSB Callback",14452500, NULL , NULL },
+{"RTTY CQ",14460000, NULL , NULL },
+{"Fax CQ",14470000, NULL , NULL },
+{"ATV CQ / Callback",14475000, NULL , NULL },
+{"DB0VA",43932500,FT817_MODE_FM, FT817_RPT_MINUS},
+{"DB0ESW",43905000,FT817_MODE_FM, FT817_RPT_MINUS},
+{"1",43307500,FT817_MODE_FM, NULL },
+{"2",43310000,FT817_MODE_FM, NULL },
+{"3",43312500,FT817_MODE_FM, NULL },
+{"4",43315000,FT817_MODE_FM, NULL },
+{"5",43317500,FT817_MODE_FM, NULL },
+{"6",43320000,FT817_MODE_FM, NULL },
+{"7",43322500,FT817_MODE_FM, NULL },
+{"8",43325000,FT817_MODE_FM, NULL },
+{"9",43327500,FT817_MODE_FM, NULL },
+{"10",43330000,FT817_MODE_FM, NULL },
+
+};
+int nchannels = sizeof(channels)/sizeof(channels[0]);
+						
