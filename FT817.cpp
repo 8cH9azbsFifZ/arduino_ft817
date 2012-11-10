@@ -135,8 +135,8 @@ void FT817::blink() {
 void FT817::rigComError(char * string) {
     //blink();
     Serial.print("Rigcomm error: ");
- Serial.println(string);
- //instead loop the getFreqMode until we get good data
+ 	 Serial.println(string);
+  	 //instead loop the getFreqMode until we get good data
 }
 
 void FT817::setMode(byte mode) {
@@ -475,4 +475,33 @@ unsigned char * FT817::to_bcd_be( unsigned char bcd_data[], unsigned long  freq,
     }
 
     return bcd_data;
+}
+
+
+// Set repeater shift
+// Copied from Hamlib
+int FT817::ft817_set_rptr_shift (RIG *rig, vfo_t vfo, rptr_shift_t shift)
+{
+	/* Note: this doesn't have effect unless FT817 is in FM mode
+	   although the command is accepted in any mode.
+	*/
+	if (vfo != RIG_VFO_CURR)
+		return -RIG_ENTARGET;
+
+	rig_debug(RIG_DEBUG_VERBOSE, "ft817: set repeter shift = %i\n", shift);
+
+	switch (shift) {
+
+	case RIG_RPT_SHIFT_NONE:
+		return ft817_send_cmd(rig, FT817_NATIVE_CAT_SET_RPT_SHIFT_SIMPLEX);
+
+	case RIG_RPT_SHIFT_MINUS:
+		return ft817_send_cmd(rig, FT817_NATIVE_CAT_SET_RPT_SHIFT_MINUS);
+
+	case RIG_RPT_SHIFT_PLUS:
+		return ft817_send_cmd(rig, FT817_NATIVE_CAT_SET_RPT_SHIFT_PLUS);
+
+	}
+
+	return -RIG_EINVAL;
 }
