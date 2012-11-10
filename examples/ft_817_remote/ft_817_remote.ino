@@ -122,7 +122,7 @@ void initialize_screen ()
 }
 
 
-/*************************************************************************************************/
+/***********************nchannels**************************************************************************/
 // Global Setup Routing 
 void setup (){
   initialize_ft817();
@@ -151,8 +151,7 @@ void display_frequency_mode_smeter ()
   int khz = (freq % 1000000)/1000;
   int hz = freq%1000;
   char ffreq[12];
-  //sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
-    sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
+  sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
 
   get_cur_ch_name(rig.freq);
    
@@ -311,7 +310,7 @@ byte signal_detected ()
 int scan_function()
 {
   int i;
-  for (i = 0; i < num_ch; i++)
+  for (i = 0; i < nchannels; i++)
   {
     set_channel (i);
     delay(SCAN_DELAY);
