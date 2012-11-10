@@ -239,7 +239,7 @@ void set_channel (int ch)
   rig.serial.setFreq(channels[cur_ch].freq);
   rig.serial.setFreq(channels[cur_ch].freq); // sometime not set at 1st time FIXME with while
   rig.serial.setMode(channels[cur_ch].mode);
-  if (channels[cur_ch].rpt != 0) { rig.serial.setRPTshift(channels[cur_ch].rpt); }
+  //if (channels[cur_ch].rpt != 0) { rig.serial.setRPTshift(channels[cur_ch].rpt); }
 }
 
 /*************************************************************************************************/
@@ -336,13 +336,15 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 
 /*************************************************************************************************/
 // Global Setup Routing 
-void setup (){
+void setup ()
+{
   initialize_ft817();
   initialize_screen();
   modus = M_CHANNELS;
   lcd_key = btnNONE;
   adc_key_in = 0;
-  set_channel (99); // FIXME: detect current start channel 
+//ESW repeater  set_channel (99); // FIXME: detect current start channel 
+  set_channel (0); // FIXME: detect current start channel 
 }
 
 
