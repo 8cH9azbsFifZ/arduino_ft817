@@ -181,16 +181,6 @@ void display_frequency_mode_smeter ()
   lcd.print(upper);
   lcd.setCursor(0,1);
   lcd.print(lower);
-
-  // display gps time  
-  int pos_time = LCD_NUM_COL-5;
-  //char time[6];
-  //sprintf (time, "%02d:%02d", GPS.hour, GPS.minute);
-  lcd.setCursor(pos_time,1);
-  //lcd.print(time);
-  lcd.print(GPS.hour, DEC);
-  lcd.print(":");
-  lcd.print(GPS.minute, DEC);
 }
 
 
@@ -390,14 +380,25 @@ void setup ()
 void read_gps ()
 {
   char c = GPS.read();
-  
+
     if (GPS.newNMEAreceived()) {
 
     if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
       return; // we can fail to parse a sentence in which case we should just wait for another
     }
     
-      
+    return;
+
+  // display gps time  
+  int pos_time = LCD_NUM_COL-5;
+  //char time[6];
+  //sprintf (time, "%02d:%02d", GPS.hour, GPS.minute);
+  lcd.setCursor(pos_time,1);
+  //lcd.print(time);
+  lcd.print(GPS.hour, DEC);
+  lcd.print(":");
+  lcd.print(GPS.minute, DEC);   
+  
  #ifdef SERIAL_DEBUG
  Serial.print("\nTime: ");
     Serial.print(GPS.hour, DEC); Serial.print(':');
