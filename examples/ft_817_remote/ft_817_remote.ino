@@ -1,3 +1,26 @@
+
+/*
+    This file is part of the FT817 Arduino Library.
+
+    The FT817 Arduino Library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The FT817 Arduino Library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FT817 Arduino Library.  If not, see http://www.gnu.org/licenses/;.	  
+
+    Author: Gerolf Ziegenhain, DG6FL
+
+*/
+
+#define LONG_MAX 1000000000
+
 /*************************************************************************************************/
 /* Configure the display screen  */
 #include <LiquidCrystal.h> 
@@ -235,8 +258,8 @@ void set_channel (int ch)
   }
   cur_ch = ch;
 
-  // update the rig
-  do 
+  // update the rig 
+  do // it may happen, that the frequency is not set correctly during the 1st attempt.
   {
       rig.serial.setFreq(channels[cur_ch].freq);
       read_rig();
@@ -244,6 +267,25 @@ void set_channel (int ch)
   
   rig.serial.setMode(channels[cur_ch].mode);
   if (channels[cur_ch].rpt != 0) { rig.serial.setRPTshift(channels[cur_ch].rpt); }
+}
+
+/*************************************************************************************************/
+int find_nearest_channel ()
+{
+  int freq = rig.freq;
+  int i;
+  int nearest_channel = 0;
+  long delta_freq_min = LONG_MAX;
+  for (i = 0; i < nchannels; i++)
+  {
+    long delta_freq = channels[i].freq - freq;
+    if (delta_freq < delta_freq_min)
+    {
+      nearest_channel = i;
+      delta_freq_min = delta_freq;
+    }
+  }
+  return nearest_channel;
 }
 
 /*************************************************************************************************/
