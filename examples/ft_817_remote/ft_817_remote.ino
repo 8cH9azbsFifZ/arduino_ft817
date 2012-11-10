@@ -364,8 +364,7 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 void read_gps ()
 {
   char c = GPS.read();
-  GPS.hour = 0;
-  GPS.minute = 0;
+
   if (GPS.newNMEAreceived()) {
     if (!GPS.parse(GPS.lastNMEA())) {
       return;
@@ -390,10 +389,11 @@ void read_gps ()
 // Global Setup Routing 
 void setup ()
 {
-  Serial.begin(9600); // DEBUG
-  
+ // Serial.begin(9600); // DEBUG
+   initialize_screen();
+  initialize_gps();
+  return;
   initialize_ft817();
-  initialize_screen();
   
   modus = M_CHANNELS;
   
@@ -407,10 +407,10 @@ void setup ()
 /*************************************************************************************************/
 // Main loop
 void loop ()
-{
-  
+{  
+  read_gps(); 
+  return;
   //read_rig(); 
-  read_gps(); return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
