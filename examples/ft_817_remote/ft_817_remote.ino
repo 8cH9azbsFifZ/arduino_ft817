@@ -273,7 +273,7 @@ void set_channel (int ch)
 }
 
 /*************************************************************************************************/
-long find_nearest_channel ()
+int find_nearest_channel ()
 {
   int i;
   int nearest_channel = 0;
@@ -287,18 +287,8 @@ long find_nearest_channel ()
       nearest_channel = i;
       delta_freq_min = delta_freq;
     }
-    lcd.clear();
-    lcd.print(i);
-    lcd.setCursor(5,0);
-    lcd.print(delta_freq);
-    lcd.setCursor(1,1);
-    lcd.print(delta_freq_min);
-    lcd.setCursor(10,1);
-    lcd.print(rig.freq);
-    delay(500);
   }
-  //return nearest_channel;
-  return delta_freq_min;
+  return nearest_channel;
 }
 
 /*************************************************************************************************/
@@ -402,6 +392,8 @@ void setup ()
   modus = M_CHANNELS;
   lcd_key = btnNONE;
   adc_key_in = 0;
+  read_rig();
+  cur_ch = find_nearest_channel();
 }
 
 
@@ -410,9 +402,6 @@ void setup ()
 // Main loop
 void loop ()
 {
-  read_rig();
-    cur_ch = find_nearest_channel();
-  return;
   read_rig(); // update the rig structure
   display_frequency_mode_smeter (); // Update the display
   
