@@ -342,7 +342,7 @@ void setup (){
   modus = M_CHANNELS;
   lcd_key = btnNONE;
   adc_key_in = 0;
-  //set_channel (0); 
+  set_channel (99); // FIXME: detect current start channel 
 }
 
 
