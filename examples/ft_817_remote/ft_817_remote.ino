@@ -218,19 +218,10 @@ void get_cur_ch_name (long freq)
 /*************************************************************************************************/
 void channels_mode ()
 {
-#ifdef LIQUID_CRYSTAL
-  switch (lcd_key)             
-  {
-    case btnRIGHT: { set_channel (cur_ch+1); break; }
-    case btnLEFT:  { set_channel (cur_ch-1); break; }
-    case btnUP:    { modus = M_SCANNING; break; }
-  }
-#endif
-#ifdef ADAFRUIT_I2C
+
   if (lcd_key & BUTTON_RIGHT)  { set_channel (cur_ch+1); }
   if (lcd_key & BUTTON_LEFT)   { set_channel (cur_ch-1); }
   if (lcd_key & BUTTON_UP)     { modus = M_SCANNING; }
-#endif
 }
 
 
