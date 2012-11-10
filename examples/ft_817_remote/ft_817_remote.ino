@@ -204,7 +204,6 @@ void get_cur_ch_name (long freq)
 /*************************************************************************************************/
 void channels_mode ()
 {
-
   if (lcd_key & BUTTON_RIGHT)  { set_channel (cur_ch+1); }
   if (lcd_key & BUTTON_LEFT)   { set_channel (cur_ch-1); }
   if (lcd_key & BUTTON_UP)     { modus = M_SCANNING; }
@@ -241,7 +240,10 @@ void set_channel (int ch)
   } while (rig.freq != channels[cur_ch].freq);
   
   rig.serial.setMode(channels[cur_ch].mode);
-  if (channels[cur_ch].rpt != 0) { rig.serial.setRPTshift(channels[cur_ch].rpt); }
+  if (channels[cur_ch].rpt != 0) 
+  { 
+    rig.serial.setRPTshift(channels[cur_ch].rpt); 
+  }
 }
 
 /*************************************************************************************************/
@@ -369,6 +371,7 @@ void loop ()
   }
   
   lcd_key = lcd.readButtons();
+
   
   switch (modus)
   {
@@ -378,5 +381,9 @@ void loop ()
     case M_SCANNING: { scan_function(); break; }
   }
   
+  if (lcd_key) // updates by button changes
+  {
+        display_frequency_mode_smeter (); // Update the display
+  }
 }
 
