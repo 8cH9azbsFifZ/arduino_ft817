@@ -124,9 +124,9 @@ void read_rig()
   
   // save old state
   rig.freq_old = rig.freq;
-  rig.smeter_old = rig.smeter;
+  sprintf(rig.smeter_old, "%s", rig.smeter);
   rig.smeterbyte_old = rig.smeterbyte;
-  rig.mode_old = rig.mode;
+  sprintf(rig.mode_old, "%s", rig.mode);
   
   do // rig frequency may initially be 0
   {
@@ -140,14 +140,14 @@ void read_rig()
 #define UNCHANGED 0
 int rig_state_changed ()
 {
-  if (rig_freq_old == rig_freq &&   
-    rig.smeter_old == rig.smeter && 
-    rig.smeterbyte_old = rig.smeterbyte &&
-    rig.mode_old = rig.mode)
+  if (rig.freq_old == rig.freq &&   
+        rig.smeterbyte_old == rig.smeterbyte )
+       // rig.smeter_old == rig.smeter &&  // FIXME: string comparison?
+       // rig.mode_old = rig.mode)
   {
-    return CHANGED;
+    return UNCHANGED;
   }
-  return UNCHANGED;
+  return CHANGED;
 }
 
 /*************************************************************************************************/
@@ -411,7 +411,10 @@ void setup ()
 void loop ()
 {
   read_rig(); // update the rig structure
-  display_frequency_mode_smeter (); // Update the display
+  if (rig_state_changed() == CHANGED)
+  {  
+    display_frequency_mode_smeter (); // Update the display
+  }
   
   // handle the key input
   #ifdef LIQUID_CRYSTAL
