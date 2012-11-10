@@ -193,15 +193,7 @@ void get_cur_ch_name (long freq)
       return;
     }
   }
-  /*
-  for (i = 0; i < nbands; i++) 
-  {
-    if (bands[i].low <= freq && freq <= bands[i].high) 
-    {
-      cur_ch_name = bands[i].name;
-      return;
-    }
-  }*/
+
   sprintf (cur_ch_name, "");
   return;
 }
