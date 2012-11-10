@@ -78,8 +78,9 @@ t_rig rig;
 
 /*************************************************************************************************/
 // Bands configuration
-#include <t_channels.h>
-#include <t_bandplan.h>
+#include "t_channels.h"
+#include "t_bandplan.h"
+
 int cur_ch;
 #define CH_NAME_LEN 40
 char cur_ch_name[CH_NAME_LEN];
@@ -171,7 +172,7 @@ void display_frequency_mode_smeter ()
 int freq_to_channel (long freq)
 {
   int i;
-  for (i = 0; i < num_ch; i++)
+  for (i = 0; i < nchannels; i++)
   {
     if (freq == channels[i].freq) return i;
   }
@@ -183,7 +184,7 @@ int freq_to_channel (long freq)
 void get_cur_ch_name (long freq)
 {
   int i;
-  for (i = 0; i < num_ch; i++)
+  for (i = 0; i < nchannels; i++)
   {
     if (freq == channels[i].freq) 
     {
@@ -264,13 +265,13 @@ void freq_plus_minus_mode ()
 void set_channel (int ch)
 {  
   // setup the internal current channel
-  if (ch > num_ch - 1)
+  if (ch > nchannels - 1)
   {
     ch = 0;
   }
   if (ch < 0)
   {
-    ch = num_ch - 1;
+    ch =  - 1;
   }
   cur_ch = ch;
 

@@ -26,6 +26,7 @@ typedef struct
   char *name; // channel name
   long freq;  // frequency
   byte mode;  // mode
+  byte rpt;   // repeater shift
 } t_channel;
 
 const t_channel channels[] = {
