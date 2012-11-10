@@ -341,7 +341,7 @@ void setup (){
   modus = M_CHANNELS;
   lcd_key = btnNONE;
   adc_key_in = 0;
-  //set_channel (0);
+  set_channel (0); 
 }
 
 
@@ -352,7 +352,7 @@ void loop ()
 {
   read_rig(); // update the rig structure
   display_frequency_mode_smeter (); // Update the display
-  /*
+  
   // handle the key input
   lcd_key = read_LCD_buttons(); // read into global variable; events can be processed by functions below
   int a = detect_multiclick();
@@ -371,6 +371,5 @@ void loop ()
     case M_FREQUENCY: { freq_plus_minus_mode (); break; }
     case M_SCANNING: { scan_function(); break; }
   }
-  */
 }
 
