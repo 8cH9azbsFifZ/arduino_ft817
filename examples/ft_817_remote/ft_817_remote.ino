@@ -184,9 +184,10 @@ void display_frequency_mode_smeter ()
 
   // display gps time  
   int pos_time = LCD_NUM_COL-5;
+  char time[6];
+  sprintf (time, "%02d:%02d", GPS.hour, GPS.minute);
   lcd.setCursor(pos_time,1);
-  lcd.print(GPS.hour, DEC); lcd.print(':');
-  lcd.print(GPS.minute, DEC); 
+  lcd.print(time);
 }
 
 
