@@ -23,12 +23,41 @@
 
 /*************************************************************************************************/
 /* Configure the display screen  */
+#define LCD_NUM_COL 16
+#define LCD_NUM_ROW 2
+
+
+/* i2c Adafruit */
+#define ADAFRUIT_I2C
+
+#ifdef ADAFRUIT_I2C
+#include <Wire.h>
+#include <Adafruit_MCP23017.h>
+#include <Adafruit_RGBLCDShield.h>
+
+Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
+
+// These #defines make it easy to set the backlight color
+#define RED 0x1
+#define YELLOW 0x3
+#define GREEN 0x2
+#define TEAL 0x6
+#define BLUE 0x4
+#define VIOLET 0x5
+#define WHITE 0x7
+
+uint8_t lcd_key;
+
+#endif /* i2c Adafruit */
+
+
+/* Liquid Crystal Library */
+#ifdef LIQUID
 #include <LiquidCrystal.h> 
 
 // select the pins used on the LCD panel
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
-#define LCD_NUM_COL 16
-#define LCD_NUM_ROW 2
+
 
 // define some values used by the panel and buttons
 int lcd_key;
@@ -79,6 +108,7 @@ int detect_multiclick ()
   
   return CLICK_NONE;
 }
+#endif /* Liquid Crystal */
 
 /*************************************************************************************************/
 /* Configure the FT 817 stuff */
@@ -225,12 +255,19 @@ void get_cur_ch_name (long freq)
 /*************************************************************************************************/
 void channels_mode ()
 {
+#ifdef LIQUID_CRYSTAL
   switch (lcd_key)             
   {
     case btnRIGHT: { set_channel (cur_ch+1); break; }
     case btnLEFT:  { set_channel (cur_ch-1); break; }
     case btnUP:    { modus = M_SCANNING; break; }
   }
+#endif
+#ifdef ADAFRUIT_I2C
+  if (lcd_key & BUTTON_RIGHT)  { set_channel (cur_ch+1); }
+  if (lcd_key & BUTTON_LEFT)   { set_channel (cur_ch-1); }
+  if (lcd_key & BUTTON_UP)     { modus = M_SCANNING; }
+#endif
 }
 
 
@@ -238,6 +275,7 @@ void channels_mode ()
 void freq_plus_minus_mode ()
 {
   float delta_freq = 10; // 10 == 100 Hz
+  #ifdef LIQUID_CRYSTAL
   switch (lcd_key)             
   {
    case btnRIGHT: { rig.serial.setFreq(rig.freq + delta_freq); break; }
@@ -245,6 +283,10 @@ void freq_plus_minus_mode ()
    case btnUP:    { rig.serial.setMode(FT817_MODE_USB); break; }
    case btnDOWN:  { rig.serial.setMode(FT817_MODE_CW); break;  }
    }
+   #endif
+   #ifdef ADAFRUIT_I2C
+     // TBD
+   #endif
 }
 
 /*************************************************************************************************/
@@ -360,6 +402,7 @@ int watchdog ()
 
 /*************************************************************************************************/
 // read the buttons
+#ifdef LIQUID_CRYSTAL
 int read_LCD_buttons()
 {
  adc_key_in = analogRead(0);      // read the value from the sensor 
@@ -373,7 +416,7 @@ int read_LCD_buttons()
  if (adc_key_in < 790)  return btnSELECT;   
  return btnNONE;  // when all others fail, return this...
 }
-
+#endif
 
 /*************************************************************************************************/
 float distance_between_points (float lat1, float lon1, float lat2, float lon2)
@@ -390,8 +433,10 @@ void setup ()
   initialize_ft817();
   initialize_screen();
   modus = M_CHANNELS;
+  #ifdef LIQUID_CRYSTAL
   lcd_key = btnNONE;
   adc_key_in = 0;
+  #endif
   read_rig();
   cur_ch = find_nearest_channel();
 }
@@ -406,6 +451,7 @@ void loop ()
   display_frequency_mode_smeter (); // Update the display
   
   // handle the key input
+  #ifdef LIQUID_CRYSTAL
   lcd_key = read_LCD_buttons(); // read into global variable; events can be processed by functions below
   int a = detect_multiclick();
   if (a != CLICK_NONE)
@@ -415,6 +461,11 @@ void loop ()
     if (a == CLICK_LEFTLEFT) { modus = M_WATCHDOG; }
     if (a == CLICK_LEFTHOLD) { modus = M_SCANNING; }
   }
+  #endif
+  #ifdef ADAFRUIT_I2C
+  lcd_key = lcd.readButtons();
+   // TBD: mode switch
+  #endif
   
   switch (modus)
   {
