@@ -26,11 +26,6 @@
 #define LCD_NUM_COL 16
 #define LCD_NUM_ROW 2
 
-
-/* i2c Adafruit */
-#define ADAFRUIT_I2C
-
-#ifdef ADAFRUIT_I2C
 #include <Wire.h>
 #include <Adafruit_MCP23017.h>
 #include <Adafruit_RGBLCDShield.h>
@@ -48,7 +43,6 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 
 uint8_t lcd_key;
 
-#endif /* i2c Adafruit */
 
 
 /*************************************************************************************************/
