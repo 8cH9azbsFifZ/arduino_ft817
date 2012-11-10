@@ -78,7 +78,8 @@ t_rig rig;
 
 /*************************************************************************************************/
 // Bands configuration
-#include <bandplan.h>
+#include <t_channels.h>
+#include <t_bandplan.h>
 int cur_ch;
 #define CH_NAME_LEN 40
 char cur_ch_name[CH_NAME_LEN];
