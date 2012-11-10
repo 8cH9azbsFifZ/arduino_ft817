@@ -488,7 +488,7 @@ int FT817::setRPTshift (int offset)
 	// set shift
 	byte shift;
 	if (offset > 0) { shift = FT817_RPT_PLUS; }
-	else if (offset < 0) { shift = FT817_RPT_MINUS; }
+	else if (offset < 0) { shift = FT817_RPT_MINUS; offset = offset*-1; }
 	else { shift = FT817_RPT_SIMPLEX; }
  	sendCATCommandChar(shift);
    threeBytePreamble();
