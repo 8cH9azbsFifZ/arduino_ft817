@@ -236,8 +236,12 @@ void set_channel (int ch)
   cur_ch = ch;
 
   // update the rig
-  rig.serial.setFreq(channels[cur_ch].freq);
-  rig.serial.setFreq(channels[cur_ch].freq); // sometime not set at 1st time FIXME with while
+  do 
+  {
+      rig.serial.setFreq(channels[cur_ch].freq);
+      read_rig();
+  } while (rig.freq != channels[cur_ch].freq);
+  
   rig.serial.setMode(channels[cur_ch].mode);
   if (channels[cur_ch].rpt != 0) { rig.serial.setRPTshift(channels[cur_ch].rpt); }
 }
