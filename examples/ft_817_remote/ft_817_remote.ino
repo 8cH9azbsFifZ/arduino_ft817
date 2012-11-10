@@ -64,7 +64,7 @@ t_rig rig;
 
 #define FT817_TX_PIN 13
 #define FT817_RX_PIN 12
-#define FT817_SPEED 4800
+#define FT817_SPEED 9600
 
 void initialize_ft817 ()
 {
@@ -113,6 +113,7 @@ void initialize_gps ()
   GPS.begin(GPS_SPEED);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
+  serial_gps.println(PMTK_Q_RELEASE);
 }
 
 
@@ -178,9 +179,20 @@ void display_frequency_mode_smeter ()
   char lower[22];
   sprintf(upper, "%s %s",ffreq,rig.mode);
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
+  sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
   lcd.print(upper);
   lcd.setCursor(0,1);
   lcd.print(lower);
+  
+  #ifdef TIMER
+  // display gps time  
+  #define TIME 6
+  int pos_time = LCD_NUM_COL-TIME;
+  char time[TIME];
+  sprintf (time, "%02d:%02d", (int)(GPS.hour), (int)(GPS.minute));
+  lcd.setCursor(pos_time,1);
+  lcd.print(time);
+  #endif
 }
 
 
@@ -364,7 +376,7 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 // Global Setup Routing 
 void setup ()
 {
-  //Serial.begin(9600); // DEBUG
+  Serial.begin(9600); // DEBUG
   
   initialize_ft817();
   initialize_screen();
@@ -380,55 +392,17 @@ void setup ()
 void read_gps ()
 {
   char c = GPS.read();
-
-    if (GPS.newNMEAreceived()) {
-
-    if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
-      return; // we can fail to parse a sentence in which case we should just wait for another
+  if (GPS.newNMEAreceived()) {
+    if (!GPS.parse(GPS.lastNMEA())) 
+      return; 
     }
-    
-    return;
-
-  // display gps time  
-  int pos_time = LCD_NUM_COL-5;
-  //char time[6];
-  //sprintf (time, "%02d:%02d", GPS.hour, GPS.minute);
-  lcd.setCursor(pos_time,1);
-  //lcd.print(time);
-  lcd.print(GPS.hour, DEC);
-  lcd.print(":");
-  lcd.print(GPS.minute, DEC);   
-  
- #ifdef SERIAL_DEBUG
- Serial.print("\nTime: ");
-    Serial.print(GPS.hour, DEC); Serial.print(':');
-    Serial.print(GPS.minute, DEC); Serial.print(':');
-    Serial.print(GPS.seconds, DEC); Serial.print('.');
-    Serial.println(GPS.milliseconds);
-    Serial.print("Date: ");
-    Serial.print(GPS.day, DEC); Serial.print('/');
-    Serial.print(GPS.month, DEC); Serial.print("/20");
-    Serial.println(GPS.year, DEC);
-    Serial.print("Fix: "); Serial.print((int)GPS.fix);
-    Serial.print(" quality: "); Serial.println((int)GPS.fixquality);
-    if (GPS.fix) {
-      Serial.print("Location: ");
-      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
-      Serial.print(", ");
-      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
-      Serial.print("Speed (knots): "); Serial.println(GPS.speed);
-      Serial.print("Angle: "); Serial.println(GPS.angle);
-      Serial.print("Altitude: "); Serial.println(GPS.altitude);
-      Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
-    }
-    #endif
 }
 
 /*************************************************************************************************/
 // Main loop
 void loop ()
 {
-  read_gps();
+  //read_gps();
   
   read_rig(); 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
