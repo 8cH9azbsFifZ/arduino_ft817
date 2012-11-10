@@ -396,12 +396,11 @@ void setup ()
   initialize_ft817();
   initialize_screen();
   modus = M_CHANNELS;
-  #ifdef LIQUID_CRYSTAL
-  lcd_key = btnNONE;
-  adc_key_in = 0;
-  #endif
   read_rig();
   cur_ch = find_nearest_channel();
+  
+  // 1st displa y
+  display_frequency_mode_smeter ();
 }
 
 
@@ -416,22 +415,7 @@ void loop ()
     display_frequency_mode_smeter (); // Update the display
   }
   
-  // handle the key input
-  #ifdef LIQUID_CRYSTAL
-  lcd_key = read_LCD_buttons(); // read into global variable; events can be processed by functions below
-  int a = detect_multiclick();
-  if (a != CLICK_NONE)
-  {
-    if (a == CLICK_UPUP) { modus = M_CHANNELS; }
-    if (a == CLICK_DOWNDOWN) { modus = M_FREQUENCY; }
-    if (a == CLICK_LEFTLEFT) { modus = M_WATCHDOG; }
-    if (a == CLICK_LEFTHOLD) { modus = M_SCANNING; }
-  }
-  #endif
-  #ifdef ADAFRUIT_I2C
   lcd_key = lcd.readButtons();
-   // TBD: mode switch
-  #endif
   
   switch (modus)
   {
