@@ -381,6 +381,8 @@ void read_gps ()
     lcd.print(GPS.hour, DEC); lcd.print(':');
     lcd.print(GPS.minute, DEC); lcd.print(':');
     lcd.print(GPS.seconds, DEC); lcd.print('.');
+    
+    delay(500);
 }
 
 
@@ -390,7 +392,7 @@ void read_gps ()
 void setup ()
 {
  // Serial.begin(9600); // DEBUG
-   initialize_screen();
+  initialize_screen();
   initialize_gps();
   return;
   initialize_ft817();
