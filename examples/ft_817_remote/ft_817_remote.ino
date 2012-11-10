@@ -392,17 +392,21 @@ void setup ()
 void read_gps ()
 {
   char c = GPS.read();
+  GPS.hour = 0;
+  GPS.minute = 0;
   if (GPS.newNMEAreceived()) {
-    if (!GPS.parse(GPS.lastNMEA())) 
-      return; 
-    }
+    if (!GPS.parse(GPS.lastNMEA())) {
+      GPS.hour = 0;
+      GPS.minute = 0;
+    } 
+  }   
 }
 
 /*************************************************************************************************/
 // Main loop
 void loop ()
 {
-  //read_gps();
+  read_gps();
   
   read_rig(); 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
