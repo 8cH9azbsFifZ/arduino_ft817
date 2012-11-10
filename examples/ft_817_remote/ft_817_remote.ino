@@ -150,8 +150,11 @@ void initialize_screen ()
 void read_rig()
 {
   rig.serial.begin(rig.speed);
-  rig.freq = rig.serial.getFreqMode(rig.mode);
-  rig.smeterbyte = rig.serial.getRxStatus(rig.smeter);
+  do // rig frequency may initially be 0
+  {
+    rig.freq = rig.serial.getFreqMode(rig.mode);
+    rig.smeterbyte = rig.serial.getRxStatus(rig.smeter);
+  } while (rig.freq == 0); 
 } 
 
 /*************************************************************************************************/
@@ -270,22 +273,32 @@ void set_channel (int ch)
 }
 
 /*************************************************************************************************/
-int find_nearest_channel ()
+long find_nearest_channel ()
 {
-  int freq = rig.freq;
   int i;
   int nearest_channel = 0;
   long delta_freq_min = LONG_MAX;
   for (i = 0; i < nchannels; i++)
   {
-    long delta_freq = channels[i].freq - freq;
+    long delta_freq = channels[i].freq - rig.freq;
+    if (delta_freq < 0) { delta_freq = -delta_freq; }
     if (delta_freq < delta_freq_min)
     {
       nearest_channel = i;
       delta_freq_min = delta_freq;
     }
+    lcd.clear();
+    lcd.print(i);
+    lcd.setCursor(5,0);
+    lcd.print(delta_freq);
+    lcd.setCursor(1,1);
+    lcd.print(delta_freq_min);
+    lcd.setCursor(10,1);
+    lcd.print(rig.freq);
+    delay(500);
   }
-  return nearest_channel;
+  //return nearest_channel;
+  return delta_freq_min;
 }
 
 /*************************************************************************************************/
@@ -389,8 +402,6 @@ void setup ()
   modus = M_CHANNELS;
   lcd_key = btnNONE;
   adc_key_in = 0;
-  read_rig();
-  cur_ch = find_nearest_channel();
 }
 
 
@@ -399,6 +410,9 @@ void setup ()
 // Main loop
 void loop ()
 {
+  read_rig();
+    cur_ch = find_nearest_channel();
+  return;
   read_rig(); // update the rig structure
   display_frequency_mode_smeter (); // Update the display
   
