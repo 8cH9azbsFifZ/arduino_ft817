@@ -484,6 +484,8 @@ int FT817::setRPTshift (int offset)
 	/* Note: this doesn't have effect unless FT817 is in FM mode
 	   although the command is accepted in any mode.
 	*/
+
+	// set shift
 	byte shift;
 	if (offset > 0) { shift = FT817_RPT_PLUS; }
 	else if (offset < 0) { shift = FT817_RPT_MINUS; }
@@ -493,12 +495,12 @@ int FT817::setRPTshift (int offset)
    sendCATCommandChar(FT817_SET_RPT);
    readOneChar();
 
-	/* 
-	 * fill in the offset freq 
-	to_bcd_be(data, offs / 10, 8);
-
-	return ft817_send_icmd(rig, FT817_NATIVE_CAT_SET_RPT_OFFSET, data);
-	*/
+	// set offset
+ 	unsigned char foo[4];
+   out = to_bcd_be(foo, offset, 8);
+   sendCATCommandArray(out, 4);
+   sendCATCommandChar(FT817_RPT_OFFSET_FREQ);
+   readOneChar();
 
 	return 0;
 }
