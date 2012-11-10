@@ -489,5 +489,13 @@ int FT817::ft817_set_rptr_shift (byte shift)
 		case RIG_RPT_SHIFT_MINUS: { sendCATCommandChar(FT817_NATIVE_CAT_SET_RPT_SHIFT_MINUS); break; }
 		case RIG_RPT_SHIFT_PLUS: { sendCATCommandChar(FT817_NATIVE_CAT_SET_RPT_SHIFT_PLUS); break; }
 	}
+
+	/* 
+	 * fill in the offset freq 
+	to_bcd_be(data, offs / 10, 8);
+
+	return ft817_send_icmd(rig, FT817_NATIVE_CAT_SET_RPT_OFFSET, data);
+	*/
+
 	return 0;
 }
