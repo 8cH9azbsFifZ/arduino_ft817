@@ -20,6 +20,7 @@
 */
 
 #define LONG_MAX 1000000000
+#include <SoftwareSerial.h>
 
 /*************************************************************************************************/
 /* Configure the display screen  */
@@ -47,7 +48,6 @@ uint8_t lcd_key;
 
 /*************************************************************************************************/
 /* Configure the FT 817 stuff */
-#include <SoftwareSerial.h>
 #include "FT817.h" 
 #define TRUE 0
 #define FALSE 1
@@ -87,6 +87,15 @@ const int num_watchdog_frequencies = 3;//FIXME
 #define M_FREQUENCY 3
 #define M_SCANNING 4
 byte modus;
+
+
+/*************************************************************************************************/
+#include <Adafruit_GPS.h>
+#define GPS_TX_PIN 3
+#define GPS_RX_PIN 2
+SoftwareSerial serial_gps(GPS_TX_PIN, GPS_RX_PIN);
+Adafruit_GPS GPS(&serial_gps);
+
 
 /*************************************************************************************************/
 // Initialize serial connection
