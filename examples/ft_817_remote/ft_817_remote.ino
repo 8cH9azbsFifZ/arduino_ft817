@@ -103,11 +103,16 @@ byte modus;
 #include <Adafruit_GPS.h>
 #define GPS_TX_PIN 3
 #define GPS_RX_PIN 2
+#define GPS_SPEED 9600
+
 SoftwareSerial serial_gps(GPS_TX_PIN, GPS_RX_PIN);
 Adafruit_GPS GPS(&serial_gps);
 
 void initialize_gps ()
 {
+  GPS.begin(GPS_SPEED);
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
 }
 
 
@@ -176,6 +181,12 @@ void display_frequency_mode_smeter ()
   lcd.print(upper);
   lcd.setCursor(0,1);
   lcd.print(lower);
+
+  // display gps time  
+  int pos_time = LCD_NUM_COL-5;
+  lcd.setCursor(pos_time,1);
+  lcd.print(GPS.hour, DEC); lcd.print(':');
+  lcd.print(GPS.minute, DEC); 
 }
 
 
@@ -359,6 +370,8 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 // Global Setup Routing 
 void setup ()
 {
+  //Serial.begin(9600); // DEBUG
+  
   initialize_ft817();
   initialize_screen();
   
@@ -369,21 +382,45 @@ void setup ()
   display_frequency_mode_smeter ();
 }
 
-
+/*************************************************************************************************/
+void read_gps ()
+{
+  char c = GPS.read();
+ #ifdef SERIAL_DEBUG
+ Serial.print("\nTime: ");
+    Serial.print(GPS.hour, DEC); Serial.print(':');
+    Serial.print(GPS.minute, DEC); Serial.print(':');
+    Serial.print(GPS.seconds, DEC); Serial.print('.');
+    Serial.println(GPS.milliseconds);
+    Serial.print("Date: ");
+    Serial.print(GPS.day, DEC); Serial.print('/');
+    Serial.print(GPS.month, DEC); Serial.print("/20");
+    Serial.println(GPS.year, DEC);
+    Serial.print("Fix: "); Serial.print((int)GPS.fix);
+    Serial.print(" quality: "); Serial.println((int)GPS.fixquality);
+    if (GPS.fix) {
+      Serial.print("Location: ");
+      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
+      Serial.print(", ");
+      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
+      Serial.print("Speed (knots): "); Serial.println(GPS.speed);
+      Serial.print("Angle: "); Serial.println(GPS.angle);
+      Serial.print("Altitude: "); Serial.println(GPS.altitude);
+      Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
+    }
+    #endif
+}
 
 /*************************************************************************************************/
 // Main loop
 void loop ()
 {
-  read_rig(); // update the rig structure
-  if (rig_state_changed() == CHANGED)
-  {  
-    display_frequency_mode_smeter (); // Update the display
-  }
+  read_gps();
+  
+  read_rig(); 
+  if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
   lcd_key = lcd.readButtons();
-
-  
   switch (modus)
   {
     case M_WATCHDOG: { watchdog(); break; }
@@ -392,9 +429,6 @@ void loop ()
     case M_SCANNING: { scan_function(); break; }
   }
   
-  if (lcd_key) // updates by button changes
-  {
-        display_frequency_mode_smeter (); // Update the display
-  }
+  if (lcd_key) { display_frequency_mode_smeter (); }
 }
 
