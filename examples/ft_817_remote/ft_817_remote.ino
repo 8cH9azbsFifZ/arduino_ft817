@@ -468,15 +468,12 @@ if (millis() - timer > 2000) {
   ncycles++;
 #ifdef DEBUG  
   Serial.print(ncycles);
-  
-   Serial.print(" Time: ");
-    Serial.print(GPS.hour, DEC); Serial.print(':');
-    Serial.print(GPS.minute, DEC); Serial.print(':');
-    Serial.print(GPS.seconds, DEC); Serial.print('.');
-    Serial.println(GPS.milliseconds);
- 
-#endif    
-    //return;
+  Serial.print(" Time: ");
+  Serial.print(GPS.hour, DEC); Serial.print(':');
+  Serial.print(GPS.minute, DEC); Serial.print(':');
+  Serial.print(GPS.seconds, DEC); Serial.print('.');
+  Serial.println(GPS.milliseconds);
+ #endif    
    
     #ifdef JAJA
   // display gps time  
@@ -530,6 +527,7 @@ void loop ()
   read_gps(); 
   return;
   read_rig(); 
+  return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
