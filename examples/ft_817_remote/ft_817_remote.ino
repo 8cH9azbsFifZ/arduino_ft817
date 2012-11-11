@@ -22,13 +22,13 @@
 #define LONG_MAX 1000000000
 #define TRUE 0
 #define FALSE 1
-#define INIT_WAIT_TIME 100
+#define INIT_WAIT_TIME 1000
 #include <SoftwareSerial.h>
 
 /*************************************************************************************************/
 #define DEBUG 1
 //#define DEBUG0 1
-#define DEBUG1 1
+//#define DEBUG1 1
 void initialize_debug ()
 {
   Serial.begin(9600); 
@@ -225,7 +225,7 @@ void display_frequency_mode_smeter ()
   int hz = freq % 1000;
   char ffreq[FREQ_LEN];
   sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
-#ifdef DEBUG1
+#ifdef DEBUG2
   Serial.print("MHz: "); Serial.print(mhz);
   Serial.print(" kHz: "); Serial.print(khz);
   Serial.print( "Hz: "); Serial.println(hz);
@@ -238,7 +238,7 @@ void display_frequency_mode_smeter ()
   Serial.print("Channel name: ");
   Serial.println(cur_ch_name);
 #endif
-
+return;
   // Formatted output
   char upper[LCD_NUM_COL+1];
   char lower[LCD_NUM_COL+1];
@@ -249,7 +249,7 @@ void display_frequency_mode_smeter ()
   Serial.println(upper);
   Serial.println(lower);
 #endif
-  return;
+  
   // LCD output
 
   lcd.clear();
@@ -508,6 +508,7 @@ void setup ()
   modus = M_CHANNELS;
   read_rig();
   cur_ch = find_nearest_channel();
+#define DEBUG1 1  
   display_frequency_mode_smeter ();
 }
 
