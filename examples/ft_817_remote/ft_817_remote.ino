@@ -20,6 +20,8 @@
 */
 
 #define LONG_MAX 1000000000
+#define TRUE 0
+#define FALSE 1
 #include <SoftwareSerial.h>
 
 /*************************************************************************************************/
@@ -49,8 +51,7 @@ uint8_t lcd_key;
 /*************************************************************************************************/
 /* Configure the FT 817 stuff */
 #include "FT817.h" 
-#define TRUE 0
-#define FALSE 1
+
 typedef struct
 {
   FT817 serial;
@@ -68,9 +69,8 @@ t_rig rig;
 
 void initialize_ft817 ()
 {
-  Serial.begin(FT817_SPEED);
-  SoftwareSerial mySerial(FT817_RX_PIN,FT817_TX_PIN);
-  rig.serial.assignSerial(mySerial);
+  SoftwareSerial Serial2(FT817_RX_PIN,FT817_TX_PIN);
+  rig.serial.assignSerial(Serial2);
 }
 
 
@@ -385,13 +385,18 @@ void read_gps ()
     delay(500);
 }
 
-
+/*************************************************************************************************/
+void initialize_debug ()
+{
+  Serial.begin(9600); 
+  Serial.println("Debug output");
+}
 
 /*************************************************************************************************/
 // Global Setup Routing 
 void setup ()
 {
- // Serial.begin(9600); // DEBUG
+  initialize_debug();
   initialize_screen();
   initialize_gps();
   return;
