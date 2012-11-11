@@ -549,6 +549,7 @@ void setup ()
 // Main loop
 void loop ()
 {  
+  return;
 #ifdef DEBUG
   Serial.println("loop");
 #endif
