@@ -495,10 +495,10 @@ void read_gps ()
 {
   // read everytime
   //do { serial_gps.listen(); } while (!serial_gps.available());
-  /* outdated due to interrupt
+  // outdated due to interrupt
   serial_gps.listen();
   char c = GPS.read();
-  */
+  
   
 #ifdef TIMER
   if (timer > millis()) timer = millis();
