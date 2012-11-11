@@ -88,13 +88,17 @@ void initialize_ft817 ()
 #ifdef DEBUG
   Serial.println("Init FT817");
 #endif  
-
+  lcd.setCursor(0,1);
+  lcd.print("Init FT817");
+  
   ft817.begin(FT817_SPEED);
   //do { serial_ft817.listen(); } while (!serial_ft817.available());
   serial_ft817.listen();
   ft817.getFreqMode(rig.mode);
   delay(INIT_WAIT_TIME);
   
+  read_rig();
+
 #ifdef DEBUG1
   Serial.println("End init FT817");
 #endif    
@@ -143,6 +147,9 @@ void initialize_gps ()
 #ifdef DEBUG  
   Serial.println("Init GPS");
 #endif  
+  lcd.setCursor(0,1);
+  lcd.print("Init GPS");
+  
   GPS.begin(GPS_SPEED);
 
   // initialize gps module
@@ -153,6 +160,9 @@ void initialize_gps ()
   delay(INIT_WAIT_TIME);
   serial_gps.println(PMTK_Q_RELEASE);
   
+  // 1st signal
+  read_gps(); 
+
 #ifdef DEBUG1
   Serial.println("End init GPS");
 #endif  
@@ -523,11 +533,12 @@ void setup ()
   initialize_debug();
 #endif  
   initialize_screen();
+  
   initialize_gps();
+  
   initialize_ft817();
 
   modus = M_CHANNELS;
-  read_rig();
   //cur_ch = find_nearest_channel();
   display_frequency_mode_smeter ();
 }
@@ -543,7 +554,7 @@ void loop ()
 #endif
   read_gps(); 
   read_rig(); 
-  //delay(500); // could also be done using an interrupt?
+  return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
