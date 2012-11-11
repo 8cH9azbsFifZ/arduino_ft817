@@ -360,8 +360,8 @@ int find_nearest_channel ()
     Serial.print(" freq: "); Serial.print(channels[i].freq);
     Serial.print(" rig freq: "); Serial.println(rig.freq);
     Serial.print(" delta_freq: "); Serial.println(delta_freq);
-    delay(10);
 #endif
+delay(10);
     if (delta_freq < 0) { delta_freq = -delta_freq; }
     if (delta_freq < delta_freq_min)
     {
