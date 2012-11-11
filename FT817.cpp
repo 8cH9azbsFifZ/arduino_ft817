@@ -31,12 +31,13 @@
 #include "FT817.h"
 
 #define DEBUG false
-extern SoftwareSerial rigSoftSerial(16,17);
+#define FT817_TX_PIN 13
+#define FT817_RX_PIN 12
+extern SoftwareSerial rigSoftSerial(FT817_RX_PIN,FT817_TX_PIN);
 
 FT817::FT817()
 {
-    //pass in serial port here?
-    pinMode(13, OUTPUT); 
+    pinMode(FT817_TX_PIN, OUTPUT); 
 }
 
 void FT817::assignSerial(SoftwareSerial s) {
@@ -123,13 +124,13 @@ void FT817::verifiedSetFreq(unsigned long freq) {
 
 
 void FT817::blink() {
-    digitalWrite(13, HIGH);   // set the LED on
+    digitalWrite(FT817_TX_PIN, HIGH);   // set the LED on
     delay(500);                  // wait for a second
-    digitalWrite(13, LOW);    // set the LED off
+    digitalWrite(FT817_TX_PIN, LOW);    // set the LED off
     delay(500);
-    digitalWrite(13, HIGH);   // set the LED on
+    digitalWrite(FT817_TX_PIN, HIGH);   // set the LED on
     delay(500);                  // wait for a second
-    digitalWrite(13, LOW);    // set the LED off
+    digitalWrite(FT817_TX_PIN, LOW);    // set the LED off
     delay(500);
 }
 void FT817::rigComError(char * string) {
