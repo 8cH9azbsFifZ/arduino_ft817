@@ -108,12 +108,13 @@ byte modus;
 SoftwareSerial Serial1(GPS_TX_PIN, GPS_RX_PIN);
 Adafruit_GPS GPS(&Serial1);
 
+#define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" // http://www.hhhh.org/wiml/proj/nmeaxor.html
 void initialize_gps ()
 {
   Serial.println("Init GPS");
   GPS.begin(GPS_SPEED);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
   delay(1000);
   Serial1.println(PMTK_Q_RELEASE);
 }
