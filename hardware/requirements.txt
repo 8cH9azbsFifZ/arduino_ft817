@@ -1,2 +1,6 @@
-Morse code input: 2x
+Number of wires:
+* Morse code input: 2x
+* GND
+* Serial RX
+* Serial TX
 
