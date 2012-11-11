@@ -75,7 +75,7 @@ void initialize_ft817 ()
   Serial.println("Init FT817");
 #endif  
   ft817.begin(FT817_SPEED);
-  serial_ft817.listen();
+  do { serial_ft817.listen(); } while (!serial_ft817.available());
   ft817.getFreqMode(rig.mode);
   delay(1000);
 }
@@ -149,7 +149,7 @@ void initialize_screen ()
 /*************************************************************************************************/
 void read_rig ()
 {
-  serial_ft817.listen();
+  do { serial_ft817.listen(); } while (!serial_ft817.available());
   
   // save old state
   rig.freq_old = rig.freq;
@@ -257,7 +257,7 @@ void freq_plus_minus_mode ()
 /*************************************************************************************************/
 void set_channel (int ch)
 {  
-  serial_ft817.listen();
+  do { serial_ft817.listen(); } while (!serial_ft817.available());
   // setup the internal current channel
   if (ch > nchannels - 1)
   {
@@ -382,7 +382,7 @@ int i = 0;
 uint32_t timer = millis();
 void read_gps ()
 {
-  serial_gps.listen();
+  do { serial_gps.listen(); } while (!serial_gps.available());
   char c = GPS.read();
 
   if (GPS.newNMEAreceived()) {
