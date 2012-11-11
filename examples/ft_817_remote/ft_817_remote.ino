@@ -174,7 +174,12 @@ void read_rig ()
     rig.freq = ft817.getFreqMode(rig.mode);
     rig.smeterbyte = ft817.getRxStatus(rig.smeter);
   } while (rig.freq == 0); 
+  
 #ifdef DEBUG  
+  Serial.println("Freq: ");
+  Serial.println(rig.freq);
+  Serial.println("Mode:" );
+  Serial.println(rig.mode);
   Serial.println("End read rig");
 #endif    
 } 
@@ -471,7 +476,7 @@ void setup ()
   modus = M_CHANNELS;
 
   read_rig();
-//return;
+return;
   cur_ch = find_nearest_channel();
   return;
   display_frequency_mode_smeter ();
