@@ -63,14 +63,16 @@ typedef struct
 } t_rig;
 t_rig rig; 
 
-#define FT817_TX_PIN 13
-#define FT817_RX_PIN 12
+#define FT817_TX_PIN 13 // defined in header -- FIXME
+#define FT817_RX_PIN 12 
 #define FT817_SPEED 9600
+SoftwareSerial Serial2(FT817_RX_PIN,FT817_TX_PIN);
 
 void initialize_ft817 ()
 {
-  SoftwareSerial Serial2(FT817_RX_PIN,FT817_TX_PIN);
+  Serial.println("Init FT817");
   rig.serial.assignSerial(Serial2);
+  rig.serial.begin(FT817_SPEED);
 }
 
 
@@ -124,6 +126,7 @@ void initialize_gps ()
 // Initialize the screen
 void initialize_screen ()
 {
+  Serial.println("Init screen");
   lcd.begin(LCD_NUM_COL, LCD_NUM_ROW);     // start the library
   lcd.clear();
   lcd.print("FT 817 (DG6FL)"); // print a simple message
@@ -132,9 +135,8 @@ void initialize_screen ()
 
 
 /*************************************************************************************************/
-void read_rig()
+void read_rig ()
 {
-  rig.serial.begin(FT817_SPEED);
   
   // save old state
   rig.freq_old = rig.freq;
@@ -416,10 +418,11 @@ void setup ()
   initialize_screen();
   initialize_gps();
   initialize_ft817();
-  return;
+
   modus = M_CHANNELS;
   
   read_rig();
+    return;
   cur_ch = find_nearest_channel();
   display_frequency_mode_smeter ();
 }

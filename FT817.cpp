@@ -31,8 +31,7 @@
 #include "FT817.h"
 
 #define DEBUG false
-#define FT817_TX_PIN 13
-#define FT817_RX_PIN 12
+
 extern SoftwareSerial rigSoftSerial(FT817_RX_PIN,FT817_TX_PIN);
 
 FT817::FT817()

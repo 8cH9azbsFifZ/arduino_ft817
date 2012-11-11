@@ -128,6 +128,9 @@
 #define COMMAND_DELAY_FREQ_CHANGE 0
 #define COMMAND_DELAY 0
 
+// FIXME
+#define FT817_TX_PIN 13
+#define FT817_RX_PIN 12
 
 class FT817
 {
