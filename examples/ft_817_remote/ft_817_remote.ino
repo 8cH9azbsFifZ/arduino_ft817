@@ -65,8 +65,8 @@ t_status rig;
 #define FT817_TX_PIN 13 // defined in header -- FIXME
 #define FT817_RX_PIN 12 
 #define FT817_SPEED 9600
-SoftwareSerial Serial2(FT817_RX_PIN,FT817_TX_PIN);
-FT817 ft817(&Serial2);
+SoftwareSerial serial_ft817(FT817_RX_PIN,FT817_TX_PIN);
+FT817 ft817(&serial_ft817);
 
 void initialize_ft817 ()
 {
@@ -108,10 +108,9 @@ byte modus;
 #define GPS_RX_PIN 2
 #define GPS_SPEED 9600
 
-SoftwareSerial Serial1(GPS_TX_PIN, GPS_RX_PIN);
-Adafruit_GPS GPS(&Serial1);
-SoftwareSerial Serial3(GPS_TX_PIN, GPS_RX_PIN);
-Adafruit_GPS GPS1(&Serial3);
+SoftwareSerial serial_gps(GPS_TX_PIN, GPS_RX_PIN);
+Adafruit_GPS GPS(&serial_gps);
+
 
 #define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" // http://www.hhhh.org/wiml/proj/nmeaxor.html
 
@@ -119,12 +118,11 @@ void initialize_gps ()
 {
   Serial.println("Init GPS");
   GPS.begin(GPS_SPEED);
-  GPS1.begin(GPS_SPEED);
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
   delay(1000);
-  Serial1.println(PMTK_Q_RELEASE);
+  serial_gps.println(PMTK_Q_RELEASE);
 }
 
 
@@ -376,7 +374,7 @@ int i = 0;
 uint32_t timer = millis();
 void read_gps ()
 {
-  Serial1.listen();
+  serial_gps.listen();
   char c = GPS.read();
 
   if (GPS.newNMEAreceived()) {
@@ -424,7 +422,6 @@ void setup ()
   initialize_debug();
   initialize_screen();
   initialize_gps();
-  return;
   initialize_ft817();
 return;
   modus = M_CHANNELS;
