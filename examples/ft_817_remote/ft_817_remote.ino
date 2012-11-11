@@ -29,7 +29,7 @@
 /*************************************************************************************************/
 #define DEBUG 1
 //#define DEBUG0 1
-//#define DEBUG1 1
+#define DEBUG1 1
 void initialize_debug ()
 {
   Serial.begin(9600); 
@@ -157,7 +157,7 @@ void initialize_gps ()
 #endif  
 }
 
-
+/*************************************************************************************************/
 boolean usingInterrupt = false;
 // Interrupt is called once a millisecond, looks for any new GPS data, and stores it
 SIGNAL(TIMER0_COMPA_vect) {
@@ -165,6 +165,7 @@ SIGNAL(TIMER0_COMPA_vect) {
   char c = GPS.read();
 }
 
+/*************************************************************************************************/
 void useInterrupt(boolean v) {
   if (v) {
     // Timer0 is already used for millis() - we'll just interrupt somewhere
@@ -201,8 +202,8 @@ void read_rig ()
 #ifdef DEBUG
   Serial.println("Read rig");
 #endif
-  do { serial_ft817.listen(); } while (!serial_ft817.available());
-  //serial_ft817.listen();
+  //do { serial_ft817.listen(); } while (!serial_ft817.available());
+  serial_ft817.listen();
   
   // save old state
   rig.freq_old = rig.freq;
@@ -214,6 +215,9 @@ void read_rig ()
   {
     rig.freq = ft817.getFreqMode(rig.mode);
     rig.smeterbyte = ft817.getRxStatus(rig.smeter);
+#ifdef DEBUG1
+    Serial.println("Try to read again");
+#endif
   } while (rig.freq == 0); 
   
 #ifdef DEBUG1
