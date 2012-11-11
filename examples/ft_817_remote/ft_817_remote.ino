@@ -253,8 +253,8 @@ void display_frequency_mode_smeter ()
   char upper[LCD_NUM_COL+1];
   char lower[LCD_NUM_COL+1];
   sprintf(upper, "%s %s",ffreq,rig.mode);
-  sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
-  //sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
+  //sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
+  sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
 #ifdef DEBUG1
   Serial.println(upper);
   Serial.println(lower);
@@ -544,7 +544,6 @@ void loop ()
   read_gps(); 
   read_rig(); 
   //delay(500); // could also be done using an interrupt?
-  return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
