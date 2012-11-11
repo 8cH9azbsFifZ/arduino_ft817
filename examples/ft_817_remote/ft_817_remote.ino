@@ -415,9 +415,8 @@ void setup ()
   initialize_debug();
   initialize_screen();
   initialize_gps();
-  return;
   initialize_ft817();
-  
+  return;
   modus = M_CHANNELS;
   
   read_rig();
