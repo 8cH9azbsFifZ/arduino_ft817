@@ -486,10 +486,10 @@ void check_ports ()
 {
 #ifdef DEBUG
   if (serial_gps.isListening()) { Serial.println("serial_gps is listening"); }
-  else { Serial.println("serial_gps is NOT listening"); }
+  //else { Serial.println("serial_gps is NOT listening"); }
   
   if (serial_ft817.isListening()) { Serial.println("serial_ft817 is listening"); }
-  else { Serial.println("serial_ft817 is NOT listening"); }
+  //else { Serial.println("serial_ft817 is NOT listening"); }
 #endif
 }
 
@@ -565,7 +565,7 @@ void loop ()
 #endif
   read_gps(); 
   read_rig(); 
-  delay(500); // could also be done using an interrupt?
+  //delay(500); // could also be done using an interrupt?
   return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
