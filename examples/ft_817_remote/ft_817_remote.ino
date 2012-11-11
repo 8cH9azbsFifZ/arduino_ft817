@@ -321,11 +321,11 @@ int find_nearest_channel ()
   {
     long delta_freq = channels[i].freq - rig.freq;
     if (delta_freq < 0) { delta_freq = -delta_freq; }
-   /* if (delta_freq < delta_freq_min)
+    if (delta_freq < delta_freq_min)
     {
      /* nearest_channel = i;
-      delta_freq_min = delta_freq;
-    }*/
+      delta_freq_min = delta_freq;*/
+    }
   }
   
 #ifdef DEBUG  
