@@ -220,7 +220,6 @@ return;
 
   get_cur_ch_name(rig.freq);
 #ifdef DEBUG
-
   Serial.println("LCD");
 #endif
   lcd.clear();
