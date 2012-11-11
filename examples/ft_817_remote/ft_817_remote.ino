@@ -474,9 +474,9 @@ void setup ()
   modus = M_CHANNELS;
 
   read_rig();
-return;
-  cur_ch = find_nearest_channel();
-  return;
+//return;
+  //cur_ch = find_nearest_channel();
+  //return;
   display_frequency_mode_smeter ();
 }
 
