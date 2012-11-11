@@ -442,7 +442,6 @@ void setup ()
 
   read_rig();
   cur_ch = find_nearest_channel();
-  return;
   display_frequency_mode_smeter ();
 }
 
