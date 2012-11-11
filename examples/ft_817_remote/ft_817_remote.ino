@@ -72,6 +72,7 @@ void initialize_ft817 ()
 {
   Serial.println("Init FT817");
   ft817.begin(FT817_SPEED);
+  ft817.getFreqMode(rig.mode);
   delay(1000);
 }
 

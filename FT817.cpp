@@ -21,8 +21,7 @@
 		Gerolf Ziegenhain, DG6FL
 */
 
-#include "Arduino.h"
-#include "FT817.h"
+#include <FT817.h>
 
 #define DEBUG false
 
@@ -32,7 +31,7 @@ FT817::FT817(SoftwareSerial *ser)
 }
 
 void FT817::begin(uint16_t baud) {
-    rigSoftSerial->begin(baud);
+    //rigSoftSerial->begin(baud);
 }
 
 boolean FT817::setLockOn() {

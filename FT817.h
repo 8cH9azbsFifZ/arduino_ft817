@@ -24,6 +24,7 @@
 #ifndef FT817_h
 #define FT817_h
 
+#include "Arduino.h"
 #include <SoftwareSerial.h>
 
 // Design note:
