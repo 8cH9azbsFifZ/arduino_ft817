@@ -31,6 +31,7 @@
 //#define DEBUG0 1
 #define DEBUG1 1
 //#define DEBUG_SERIAL 1 // debugging the serial ports
+#define DEBUG_GPS 1 // debug gps raw data
 void initialize_debug ()
 {
   Serial.begin(9600); 
@@ -508,7 +509,11 @@ void read_gps ()
  serial_gps.listen();  
  check_ports();
  char c = GPS.read();  
-  
+#ifdef DEBUG_GPS
+ if (c) { Serial.println(c); }
+ else { Serial.println("no raw data"); }
+#endif
+
 #ifdef TIMER
   if (timer > millis()) timer = millis();
   if (millis() - timer > TIMER) {
