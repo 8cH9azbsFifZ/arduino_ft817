@@ -487,7 +487,7 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 
 /*************************************************************************************************/
 int ncycles = 0;
-#define TIMER 2000 //timer in ms
+//#define TIMER 2000 //timer in ms
 #ifdef TIMER
 uint32_t timer = millis();
 #endif
@@ -495,9 +495,10 @@ void read_gps ()
 {
   // read everytime
   //do { serial_gps.listen(); } while (!serial_gps.available());
+  /* outdated due to interrupt
   serial_gps.listen();
-  
   char c = GPS.read();
+  */
   
 #ifdef TIMER
   if (timer > millis()) timer = millis();
@@ -519,7 +520,7 @@ void read_gps ()
   Serial.print(GPS.minute, DEC); Serial.print(':');
   Serial.print(GPS.seconds, DEC); Serial.print('.');
   Serial.println(GPS.milliseconds);
- #endif    
+#endif    
    
 #ifdef TIMER
   }
@@ -554,7 +555,7 @@ void loop ()
 #ifdef DEBUG
   Serial.println("loop");
 #endif
-  //read_gps(); 
+  read_gps(); 
   read_rig(); 
   delay(500); // could also be done using an interrupt?
   return;
