@@ -32,21 +32,16 @@ typedef struct
 const t_channel channels[] = {
 {"QRP",183600,FT817_MODE_CW_NARROW, 0 },
 {"QRP",356000,FT817_MODE_CW_NARROW, 0 },
-{"QRS",355500,FT817_MODE_CW_NARROW, 0 },
 {"QRP",703000,FT817_MODE_CW_NARROW, 0 },
 {"Emergency",711000, NULL , 0 },
 {"QRP",709000, NULL , 0 },
 {"QRP",1011600,FT817_MODE_CW_NARROW, 0 },
 {"QRP",1406000,FT817_MODE_CW_NARROW, 0 },
-{"Emergency",1430000, NULL , 0 },
 {"QRP",1808600,FT817_MODE_CW_NARROW, 0 },
 {"QRP",1813000, NULL , 0 },
-{"Emergency",1816000, NULL , 0 },
 {"QRP",2106000,FT817_MODE_CW_NARROW, 0 },
-{"QRS",2105500,FT817_MODE_CW_NARROW, 0 },
 {"QRP",2490600,FT817_MODE_CW_NARROW, 0 },
 {"QRP",2495000, NULL , 0 },
-{"QRP",2836000, NULL , 0 },
 {"FM",2960000,FT817_MODE_FM, 0 },
 {"FM",2961000,FT817_MODE_FM, 0 },
 {"QRS",2805500,FT817_MODE_CW_NARROW, 0 },
@@ -60,8 +55,6 @@ const t_channel channels[] = {
 {"3",43312500,FT817_MODE_FM, 0 },
 {"4",43315000,FT817_MODE_FM, 0 },
 {"5",43317500,FT817_MODE_FM, 0 },
-
-
 };
 int nchannels = sizeof(channels)/sizeof(channels[0]);
 						
