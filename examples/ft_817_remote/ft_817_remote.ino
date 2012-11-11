@@ -53,6 +53,7 @@ uint8_t lcd_key;
 /* Configure the FT 817 stuff */
 #include <FT817.h> 
 #define SMETER_LEN 4
+#define FREQ_LEN 12 // length of frequency display
 typedef struct
 {
   // current status
@@ -93,7 +94,7 @@ void initialize_ft817 ()
 #include "t_bandplan.h"
 
 int cur_ch;
-#define CH_NAME_LEN LCD_NUM_COL-SMETER_LEN
+#define CH_NAME_LEN 10 // NB: must be adjusted in bandplan header creation script, too!
 char cur_ch_name[CH_NAME_LEN];
 #define NO_CHANNEL -1
 #define CHANNEL_FOUND 0
@@ -211,7 +212,7 @@ void display_frequency_mode_smeter ()
   int mhz = freq / 1000000;
   int khz = (freq % 1000000)/1000;
   int hz = freq % 1000;
-  char ffreq[12];
+  char ffreq[FREQ_LEN];
   sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
 #ifdef DEBUG
   Serial.print("MHz: "); Serial.print(mhz);
@@ -230,7 +231,7 @@ void display_frequency_mode_smeter ()
   // Formatted output
   char upper[LCD_NUM_COL+1];
   char lower[LCD_NUM_COL+1];
-  sprintf(upper, "%s %s",ffreq,rig.mode);return;
+  sprintf(upper, "%s %s",ffreq,rig.mode);
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
 return;
 
