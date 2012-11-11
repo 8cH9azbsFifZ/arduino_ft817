@@ -174,7 +174,6 @@ class FT817
     unsigned long freq;
     unsigned char foo[4];
     unsigned char * out;
-    void blink();
     void rigComError(char * string);
     SoftwareSerial *rigSoftSerial;
 

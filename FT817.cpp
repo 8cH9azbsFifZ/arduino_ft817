@@ -111,18 +111,7 @@ void FT817::verifiedSetFreq(unsigned long freq) {
 }
 
 
-void FT817::blink() {
-    digitalWrite(FT817_TX_PIN, HIGH);   // set the LED on
-    delay(500);                  // wait for a second
-    digitalWrite(FT817_TX_PIN, LOW);    // set the LED off
-    delay(500);
-    digitalWrite(FT817_TX_PIN, HIGH);   // set the LED on
-    delay(500);                  // wait for a second
-    digitalWrite(FT817_TX_PIN, LOW);    // set the LED off
-    delay(500);
-}
 void FT817::rigComError(char * string) {
-    //blink();
     Serial.print("Rigcomm error: ");
  	 Serial.println(string);
   	 //instead loop the getFreqMode until we get good data
@@ -149,10 +138,6 @@ boolean FT817::setFreqTest(unsigned long freq) {
 	 char *modename;
     unsigned long freqOut = getFreqMode(modename);
     if (freqOut == freq) {
-    /*
-    Serial.print("pass: ");
-    Serial.println(freqOut);
-    */
     return true;
     }
     else { 
@@ -169,7 +154,6 @@ boolean FT817::setFreqTest(unsigned long freq) {
 
 void FT817::setFreq(long freq) {
     unsigned char foo[4];
-    // char bar[] = {0x11, 0x22};
     out = to_bcd_be(foo, freq, 8);
     sendCATCommandArray(out, 4);
     sendCATCommandChar(FT817_FREQ_SET);
