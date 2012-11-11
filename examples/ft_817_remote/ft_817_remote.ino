@@ -157,7 +157,7 @@ void initialize_screen ()
 /*************************************************************************************************/
 void read_rig ()
 {
-#ifdef DEBUG
+#ifdef DEBUG1
   Serial.println("Read rig");
 #endif
   //do { serial_ft817.listen(); } while (!serial_ft817.available());
@@ -175,7 +175,7 @@ void read_rig ()
     rig.smeterbyte = ft817.getRxStatus(rig.smeter);
   } while (rig.freq == 0); 
   
-#ifdef DEBUG  
+#ifdef DEBUG1
   Serial.print("Freq: ");  Serial.println(rig.freq);
   Serial.print("Mode: " ); Serial.println(rig.mode);
   Serial.println("End read rig");
