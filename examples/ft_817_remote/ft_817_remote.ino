@@ -176,10 +176,8 @@ void read_rig ()
   } while (rig.freq == 0); 
   
 #ifdef DEBUG  
-  Serial.println("Freq: ");
-  Serial.println(rig.freq);
-  Serial.println("Mode:" );
-  Serial.println(rig.mode);
+  Serial.print("Freq: ");  Serial.println(rig.freq);
+  Serial.print("Mode: " ); Serial.println(rig.mode);
   Serial.println("End read rig");
 #endif    
 } 
