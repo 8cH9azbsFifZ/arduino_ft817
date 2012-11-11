@@ -207,16 +207,16 @@ void display_frequency_mode_smeter ()
   long freq = rig.freq * 10; //in Hz
   int mhz = freq / 1000000;
   int khz = (freq % 1000000)/1000;
-  int hz = freq%1000;
+  int hz = freq % 1000;
   char ffreq[12];
   sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
 #ifdef DEBUG
   Serial.print("MHz: "); Serial.print(mhz);
   Serial.print(" kHz: "); Serial.print(khz);
-  Serial.print( "Hz: "); Serial.print(hz);
-  Serial.print(" "); Serial.println(ffreq);
+  Serial.print( "Hz: "); Serial.println(hz);
+  Serial.println(ffreq);
 #endif
-
+return;
 
   get_cur_ch_name(rig.freq);
 #ifdef DEBUG
