@@ -436,7 +436,7 @@ if (millis() - timer > 2000) {
  
 #endif    
     //return;
-    #define JAJA
+   
     #ifdef JAJA
   // display gps time  
   lcd.clear();
