@@ -478,13 +478,6 @@ int watchdog ()
 }
 
 
-
-/*************************************************************************************************/
-float distance_between_points (float lat1, float lon1, float lat2, float lon2)
-{
-  return 0;
-}
-
 void check_ports ()
 {
 #ifdef DEBUG
@@ -504,13 +497,6 @@ uint32_t timer = millis();
 #endif
 void read_gps ()
 {
-  // read everytime
-  //do { serial_gps.listen(); } while (!serial_gps.available());
-  // outdated due to interrupt
-  serial_gps.listen();
-  char c = GPS.read();
-  
-  
 #ifdef TIMER
   if (timer > millis()) timer = millis();
   if (millis() - timer > TIMER) {
@@ -550,7 +536,7 @@ void setup ()
   initialize_screen();
   initialize_gps();
   initialize_ft817();
-
+return;
   modus = M_CHANNELS;
   read_rig();
   cur_ch = find_nearest_channel();
@@ -566,6 +552,7 @@ void loop ()
 #ifdef DEBUG
   Serial.println("loop");
 #endif
+return;
   read_gps(); 
   read_rig(); 
   delay(500); // could also be done using an interrupt?
