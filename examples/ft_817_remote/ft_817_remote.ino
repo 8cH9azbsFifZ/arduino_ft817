@@ -474,9 +474,14 @@ void setup ()
   modus = M_CHANNELS;
 
   read_rig();
+  //serial_ft817.flush();
+  int i = 123;
+  Serial.println(i);
+  int j;
+  find_nearest_channel();
 //return;
-  //cur_ch = find_nearest_channel();
-  //return;
+ // cur_ch = find_nearest_channel();
+  return;
   display_frequency_mode_smeter ();
 }
 
