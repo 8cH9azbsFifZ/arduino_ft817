@@ -27,7 +27,7 @@
 
 /*************************************************************************************************/
 #define DEBUG 1
-#define DEBUG0 1
+//#define DEBUG0 1
 #define DEBUG1 1
 void initialize_debug ()
 {
@@ -508,7 +508,7 @@ void setup ()
 
   read_rig();
   cur_ch = find_nearest_channel();
-  display_frequency_mode_smeter ();
+  //display_frequency_mode_smeter ();
 }
 
 
