@@ -454,18 +454,20 @@ void read_gps ()
   serial_gps.listen();
   
   char c = GPS.read();
-
   if (GPS.newNMEAreceived()) {
     if (!GPS.parse(GPS.lastNMEA())) {
       return;
     } 
   }   
-  #ifdef TIMER
-    if (timer > millis()) timer = millis();
-if (millis() - timer > 2000) {
+  
+#ifdef TIMER
+  if (timer > millis()) timer = millis();
+  if (millis() - timer > 2000) {
     timer = millis(); // reset the timer
-    #endif
+#endif
+
   ncycles++;
+
 #ifdef DEBUG  
   Serial.print(ncycles);
   Serial.print(" Time: ");
@@ -475,22 +477,9 @@ if (millis() - timer > 2000) {
   Serial.println(GPS.milliseconds);
  #endif    
    
-    #ifdef JAJA
-  // display gps time  
-  lcd.clear();
-  //#define TIME 6
-  int pos_time = 0;//LCD_NUM_COL-TIME;
-  //char time[TIME];
-  //sprintf (time, "%02d:%02d", (int)(GPS.hour), (int)(GPS.minute));
-  //lcd.print(time);
-    lcd.print(GPS.hour, DEC); lcd.print(':');
-    lcd.print(GPS.minute, DEC); lcd.print(':');
-    lcd.print(GPS.seconds, DEC); 
-    #endif
-    #ifdef TIMER
-}
+#ifdef TIMER
+  }
 #endif
- //   delay(500);
 }
 
 /*************************************************************************************************/
