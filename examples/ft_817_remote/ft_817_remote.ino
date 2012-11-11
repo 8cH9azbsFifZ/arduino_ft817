@@ -433,6 +433,7 @@ if (millis() - timer > 2000) {
     Serial.print(GPS.minute, DEC); Serial.print(':');
     Serial.print(GPS.seconds, DEC); Serial.print('.');
     Serial.println(GPS.milliseconds);
+    Serial.flush();
 #endif    
     //return;
     #ifdef JAJA
@@ -474,7 +475,7 @@ void setup ()
   modus = M_CHANNELS;
 
   read_rig();
- // cur_ch = find_nearest_channel();
+  cur_ch = find_nearest_channel();
   //display_frequency_mode_smeter ();
 }
 
@@ -485,7 +486,7 @@ void setup ()
 void loop ()
 {  
   read_gps(); 
-  //return;
+  return;
   read_rig(); 
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
