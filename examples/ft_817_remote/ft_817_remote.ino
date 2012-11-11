@@ -50,7 +50,7 @@ uint8_t lcd_key;
 
 /*************************************************************************************************/
 /* Configure the FT 817 stuff */
-#include "FT817.h" 
+#include <FT817.h> 
 
 typedef struct
 {
