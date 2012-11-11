@@ -311,7 +311,7 @@ void set_channel (int ch)
 /*************************************************************************************************/
 int find_nearest_channel ()
 {
-#ifdef DEBUG1  
+#ifdef DEBUG
   Serial.println("Find nearest channel");
 #endif  
   int i;
@@ -320,7 +320,8 @@ int find_nearest_channel ()
   for (i = 0; i < nchannels; i++)
   {
 
-    long delta_freq = channels[i].freq - rig.freq;
+    //long delta_freq = channels[i].freq - rig.freq;
+    long delta_freq = 1234 - rig.freq;
  #ifdef DEBUG
     Serial.println(i);
   //  Serial.print("delta_freq: "); Serial.println(delta_freq);
@@ -334,7 +335,7 @@ int find_nearest_channel ()
     }
   }
   
-#ifdef DEBUG1  
+#ifdef DEBUG
   Serial.print("Frequency of rig: "); Serial.println(rig.freq);
   Serial.print("Nearest channel: ");  Serial.println(nearest_channel);
   Serial.println("End find nearest channel");
