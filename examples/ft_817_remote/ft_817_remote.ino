@@ -323,14 +323,14 @@ int find_nearest_channel ()
     if (delta_freq < 0) { delta_freq = -delta_freq; }
     if (delta_freq < delta_freq_min)
     {
-      nearest_channel = i;
+     // nearest_channel = i;
      /* delta_freq_min = delta_freq;*/
     }
   }
   
 #ifdef DEBUG  
-  Serial.print("Nearest channel: ");
-  Serial.print(nearest_channel);
+  Serial.print("Frequency of rig: "); Serial.println(rig.freq);
+  Serial.print("Nearest channel: ");  Serial.println(nearest_channel);
   Serial.println("End find nearest channel");
 #endif  
   return nearest_channel;
