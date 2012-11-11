@@ -29,7 +29,6 @@
 FT817::FT817(SoftwareSerial *ser)
 {
     rigSoftSerial = ser;
-    //pinMode(FT817_TX_PIN, OUTPUT); 
 }
 
 void FT817::begin(int baud) {
