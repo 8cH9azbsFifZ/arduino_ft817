@@ -549,13 +549,11 @@ void setup ()
 // Main loop
 void loop ()
 {  
-  return;
 #ifdef DEBUG
   Serial.println("loop");
 #endif
-  read_gps(); 
+  //read_gps(); 
   read_rig(); 
-  return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
