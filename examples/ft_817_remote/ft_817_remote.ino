@@ -161,7 +161,7 @@ void initialize_gps ()
 boolean usingInterrupt = false;
 // Interrupt is called once a millisecond, looks for any new GPS data, and stores it
 SIGNAL(TIMER0_COMPA_vect) {
-  serial_gps.listen();
+ // serial_gps.listen(); // too evil?
   char c = GPS.read();
 }
 
@@ -552,9 +552,7 @@ void setup ()
 void loop ()
 {  
   read_gps(); 
-  #define DEBUG1
   read_rig(); 
-  #undef DEBUG1
   delay(500); // could also be done using an interrupt?
   return;
 
