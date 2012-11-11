@@ -361,7 +361,7 @@ int find_nearest_channel ()
     Serial.print(" rig freq: "); Serial.println(rig.freq);
     Serial.print(" delta_freq: "); Serial.println(delta_freq);
 #endif
-delay(10);
+    delay(10);
     if (delta_freq < 0) { delta_freq = -delta_freq; }
     if (delta_freq < delta_freq_min)
     {
@@ -455,6 +455,7 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 
 /*************************************************************************************************/
 int ncycles = 0;
+#define TIMER
 #ifdef TIMER
 uint32_t timer = millis();
 #endif
@@ -508,8 +509,7 @@ void setup ()
   modus = M_CHANNELS;
   read_rig();
   cur_ch = find_nearest_channel();
-#define DEBUG1 1  
-  display_frequency_mode_smeter ();
+  //display_frequency_mode_smeter ();
 }
 
 
