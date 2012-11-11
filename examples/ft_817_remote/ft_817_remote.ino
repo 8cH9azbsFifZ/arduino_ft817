@@ -22,6 +22,7 @@
 #define LONG_MAX 1000000000
 #define TRUE 0
 #define FALSE 1
+#define DEBUG 1
 #include <SoftwareSerial.h>
 
 /*************************************************************************************************/
@@ -70,7 +71,9 @@ FT817 ft817(&serial_ft817);
 
 void initialize_ft817 ()
 {
+#ifdef DEBUG
   Serial.println("Init FT817");
+#endif  
   ft817.begin(FT817_SPEED);
   serial_ft817.listen();
   ft817.getFreqMode(rig.mode);
@@ -117,7 +120,9 @@ Adafruit_GPS GPS(&serial_gps);
 
 void initialize_gps ()
 {
+#ifdef DEBUG  
   Serial.println("Init GPS");
+#endif  
   GPS.begin(GPS_SPEED);
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
@@ -131,7 +136,9 @@ void initialize_gps ()
 // Initialize the screen
 void initialize_screen ()
 {
+#ifdef DEBUG  
   Serial.println("Init screen");
+#endif  
   lcd.begin(LCD_NUM_COL, LCD_NUM_ROW);     // start the library
   lcd.clear();
   lcd.print("FT 817 (DG6FL)"); // print a simple message
@@ -194,8 +201,6 @@ void display_frequency_mode_smeter ()
   lcd.print(upper);
   lcd.setCursor(0,1);
   lcd.print(lower);
-  
-
 }
 
 
@@ -389,6 +394,7 @@ void read_gps ()
 if (millis() - timer > 2000) {
     timer = millis(); // reset the timer
   i++;
+#ifdef DEBUG  
   Serial.print(i);
   
    Serial.print("\nTime: ");
@@ -396,6 +402,7 @@ if (millis() - timer > 2000) {
     Serial.print(GPS.minute, DEC); Serial.print(':');
     Serial.print(GPS.seconds, DEC); Serial.print('.');
     Serial.println(GPS.milliseconds);
+#endif    
     //return;
   // display gps time  
   lcd.clear();
@@ -422,11 +429,13 @@ void initialize_debug ()
 // Global Setup Routing 
 void setup ()
 {
+#ifdef DEBUG
   initialize_debug();
+#endif  
   initialize_screen();
   initialize_gps();
   initialize_ft817();
-return;
+
   modus = M_CHANNELS;
   
   read_rig();
