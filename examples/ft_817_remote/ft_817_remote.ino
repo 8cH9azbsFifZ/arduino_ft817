@@ -23,6 +23,7 @@
 #define TRUE 0
 #define FALSE 1
 #define DEBUG 1
+#define INIT_WAIT_TIME 100
 #include <SoftwareSerial.h>
 
 /*************************************************************************************************/
@@ -80,7 +81,7 @@ void initialize_ft817 ()
   //do { serial_ft817.listen(); } while (!serial_ft817.available());
   serial_ft817.listen();
   ft817.getFreqMode(rig.mode);
-  delay(100);
+  delay(INIT_WAIT_TIME);
   
 #ifdef DEBUG
   Serial.println("End init FT817");
@@ -134,7 +135,7 @@ void initialize_gps ()
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
-  delay(1000);
+  delay(INIT_WAIT_TIME);
   serial_gps.println(PMTK_Q_RELEASE);
 #ifdef DEBUG  
   Serial.println("End init GPS");
@@ -152,7 +153,7 @@ void initialize_screen ()
   lcd.begin(LCD_NUM_COL, LCD_NUM_ROW);     // start the library
   lcd.clear();
   lcd.print("FT 817 (DG6FL)"); // print a simple message
-  //delay(500);
+  //delay(INIT_WAIT_TIME);
 }
 
 
@@ -240,14 +241,11 @@ void display_frequency_mode_smeter ()
 #endif
   
   // LCD output
-#ifdef DEBUG
-  Serial.println("LCD");
-#endif
-return; 
+/* 
   lcd.clear();
   lcd.print(upper);
   lcd.setCursor(0,1);
-  lcd.print(lower);
+  lcd.print(lower);*/
 #ifdef DEBUG
   Serial.println("End display");
 #endif  
