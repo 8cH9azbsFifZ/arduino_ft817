@@ -325,6 +325,7 @@ int find_nearest_channel ()
     {
      // nearest_channel = i;
      /* delta_freq_min = delta_freq;*/
+     nearest_channel = 10;
     }
   }
   
