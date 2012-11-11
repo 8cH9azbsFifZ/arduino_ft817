@@ -22,7 +22,7 @@
 #define LONG_MAX 1000000000
 #define TRUE 0
 #define FALSE 1
-//#define DEBUG 1
+#define DEBUG 1
 #include <SoftwareSerial.h>
 
 /*************************************************************************************************/
@@ -75,9 +75,12 @@ void initialize_ft817 ()
   Serial.println("Init FT817");
 #endif  
   ft817.begin(FT817_SPEED);
-  do { serial_ft817.listen(); } while (!serial_ft817.available());
+  //do { serial_ft817.listen(); } while (!serial_ft817.available());
   ft817.getFreqMode(rig.mode);
   delay(1000);
+#ifdef DEBUG
+  Serial.println("End init FT817");
+#endif    
 }
 
 
@@ -129,6 +132,9 @@ void initialize_gps ()
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
   delay(1000);
   serial_gps.println(PMTK_Q_RELEASE);
+#ifdef DEBUG  
+  Serial.println("End init GPS");
+#endif  
 }
 
 
@@ -142,6 +148,7 @@ void initialize_screen ()
   lcd.begin(LCD_NUM_COL, LCD_NUM_ROW);     // start the library
   lcd.clear();
   lcd.print("FT 817 (DG6FL)"); // print a simple message
+  delay(500);
 }
 
 
@@ -149,6 +156,9 @@ void initialize_screen ()
 /*************************************************************************************************/
 void read_rig ()
 {
+#ifdef DEBUG
+  Serial.println("Read rig");
+#endif
   do { serial_ft817.listen(); } while (!serial_ft817.available());
   
   // save old state
@@ -162,6 +172,9 @@ void read_rig ()
     rig.freq = ft817.getFreqMode(rig.mode);
     rig.smeterbyte = ft817.getRxStatus(rig.smeter);
   } while (rig.freq == 0); 
+#ifdef DEBUG  
+  Serial.println("End read rig");
+#endif    
 } 
 
 /*************************************************************************************************/
@@ -441,6 +454,7 @@ void setup ()
   modus = M_CHANNELS;
 
   read_rig();
+  return;
   cur_ch = find_nearest_channel();
   display_frequency_mode_smeter ();
 }
