@@ -22,9 +22,16 @@
 #define LONG_MAX 1000000000
 #define TRUE 0
 #define FALSE 1
-#define DEBUG 1
 #define INIT_WAIT_TIME 100
 #include <SoftwareSerial.h>
+
+/*************************************************************************************************/
+#define DEBUG 1
+void initialize_debug ()
+{
+  Serial.begin(9600); 
+  Serial.println("Debug output");
+}
 
 /*************************************************************************************************/
 /* Configure the display screen  */
@@ -360,7 +367,7 @@ int find_nearest_channel ()
     }
   }
   
-#ifdef DEBUG1
+#ifdef DEBUG
   Serial.print("Frequency of rig: "); Serial.println(rig.freq);
   Serial.print("Nearest channel: ");  Serial.println(nearest_channel);
   Serial.println("End find nearest channel");
@@ -482,12 +489,7 @@ void read_gps ()
 #endif
 }
 
-/*************************************************************************************************/
-void initialize_debug ()
-{
-  Serial.begin(9600); 
-  Serial.println("Debug output");
-}
+
 
 /*************************************************************************************************/
 // Global Setup Routing 
