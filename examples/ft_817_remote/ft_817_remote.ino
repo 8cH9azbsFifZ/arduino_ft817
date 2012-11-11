@@ -238,7 +238,6 @@ void display_frequency_mode_smeter ()
   Serial.println(upper);
   Serial.println(lower);
 #endif
-  return; 
   
   // LCD output
 #ifdef DEBUG
