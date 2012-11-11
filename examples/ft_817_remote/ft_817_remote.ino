@@ -216,15 +216,19 @@ void display_frequency_mode_smeter ()
   Serial.print( "Hz: "); Serial.println(hz);
   Serial.println(ffreq);
 #endif
-return;
 
   get_cur_ch_name(rig.freq);
+#ifdef DEBUG
+  Serial.print("Channel name: ");
+  Serial.println(cur_ch_name);
+#endif
+  
 #ifdef DEBUG
   Serial.println("LCD");
 #endif
   lcd.clear();
-  char upper[22];
-  char lower[22];
+  char upper[LCD_NUM_COL];
+  char lower[LCD_NUM_COL];
   sprintf(upper, "%s %s",ffreq,rig.mode);
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
   //sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
