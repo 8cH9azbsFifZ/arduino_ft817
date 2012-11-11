@@ -1,0 +1,4 @@
+rsync -avP . ../libraries/FT817/examples/ft_817_remote/.
+cd ../libraries/FT817/examples/ft_817_remote/.
+git commit -a -m "wip"
+
