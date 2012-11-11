@@ -211,8 +211,10 @@ void display_frequency_mode_smeter ()
   char ffreq[12];
   sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
 
-  get_cur_ch_name(rig.freq);
-   
+ // get_cur_ch_name(rig.freq);
+#ifdef DEBUG
+  Serial.println("LCD");
+#endif
   lcd.clear();
   char upper[22];
   char lower[22];
@@ -321,7 +323,6 @@ int find_nearest_channel ()
   {
 
     long delta_freq = channels[i].freq - rig.freq;
-    //long delta_freq = 1234 - rig.freq;
  #ifdef DEBUG1
     Serial.print(i);
     Serial.print(" freq: "); Serial.print(channels[i].freq);
@@ -495,7 +496,7 @@ void setup ()
 
   read_rig();
   cur_ch = find_nearest_channel();
-  //display_frequency_mode_smeter ();
+  display_frequency_mode_smeter ();
 }
 
 
