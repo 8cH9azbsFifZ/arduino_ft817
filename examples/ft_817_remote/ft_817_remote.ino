@@ -320,8 +320,8 @@ int find_nearest_channel ()
   for (i = 0; i < nchannels; i++)
   {
 
-    //long delta_freq = channels[i].freq - rig.freq;
-    long delta_freq = 1234 - rig.freq;
+    long delta_freq = channels[i].freq - rig.freq;
+    //long delta_freq = 1234 - rig.freq;
  #ifdef DEBUG
     Serial.println(i);
   //  Serial.print("delta_freq: "); Serial.println(delta_freq);
