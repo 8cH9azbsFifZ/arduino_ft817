@@ -22,7 +22,7 @@
 #define LONG_MAX 1000000000
 #define TRUE 0
 #define FALSE 1
-#define DEBUG 1
+//#define DEBUG 1
 #include <SoftwareSerial.h>
 
 /*************************************************************************************************/
@@ -197,7 +197,7 @@ void display_frequency_mode_smeter ()
   char lower[22];
   sprintf(upper, "%s %s",ffreq,rig.mode);
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
-  sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
+  //sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
   lcd.print(upper);
   lcd.setCursor(0,1);
   lcd.print(lower);
@@ -404,6 +404,7 @@ if (millis() - timer > 2000) {
     Serial.println(GPS.milliseconds);
 #endif    
     //return;
+    #ifdef JAJA
   // display gps time  
   lcd.clear();
   //#define TIME 6
@@ -414,6 +415,7 @@ if (millis() - timer > 2000) {
     lcd.print(GPS.hour, DEC); lcd.print(':');
     lcd.print(GPS.minute, DEC); lcd.print(':');
     lcd.print(GPS.seconds, DEC); 
+    #endif
 }
  //   delay(500);
 }
@@ -437,9 +439,10 @@ void setup ()
   initialize_ft817();
 
   modus = M_CHANNELS;
-  
+
   read_rig();
   cur_ch = find_nearest_channel();
+  return;
   display_frequency_mode_smeter ();
 }
 
