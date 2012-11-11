@@ -83,7 +83,7 @@ void initialize_ft817 ()
   ft817.getFreqMode(rig.mode);
   delay(INIT_WAIT_TIME);
   
-#ifdef DEBUG
+#ifdef DEBUG1
   Serial.println("End init FT817");
 #endif    
 }
@@ -137,7 +137,7 @@ void initialize_gps ()
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
   delay(INIT_WAIT_TIME);
   serial_gps.println(PMTK_Q_RELEASE);
-#ifdef DEBUG  
+#ifdef DEBUG1
   Serial.println("End init GPS");
 #endif  
 }
@@ -179,7 +179,7 @@ void read_rig ()
     rig.smeterbyte = ft817.getRxStatus(rig.smeter);
   } while (rig.freq == 0); 
   
-#ifdef DEBUG
+#ifdef DEBUG1
   Serial.print("Freq: ");  Serial.println(rig.freq);
   Serial.print("Mode: " ); Serial.println(rig.mode);
   Serial.println("End read rig");
@@ -204,7 +204,7 @@ int rig_state_changed ()
 /*************************************************************************************************/
 void display_frequency_mode_smeter ()
 {
-#ifdef DEBUG
+#ifdef DEBUG0
   Serial.println("Display");
 #endif
   // Frequency
@@ -235,7 +235,7 @@ void display_frequency_mode_smeter ()
   sprintf(upper, "%s %s",ffreq,rig.mode);
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
   //sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
-#ifdef DEBUG
+#ifdef DEBUG1
   Serial.println(upper);
   Serial.println(lower);
 #endif
@@ -246,7 +246,7 @@ void display_frequency_mode_smeter ()
   lcd.print(upper);
   lcd.setCursor(0,1);
   lcd.print(lower);
-#ifdef DEBUG
+#ifdef DEBUG0
   Serial.println("End display");
 #endif  
 }
@@ -360,7 +360,7 @@ int find_nearest_channel ()
     }
   }
   
-#ifdef DEBUG
+#ifdef DEBUG1
   Serial.print("Frequency of rig: "); Serial.println(rig.freq);
   Serial.print("Nearest channel: ");  Serial.println(nearest_channel);
   Serial.println("End find nearest channel");
