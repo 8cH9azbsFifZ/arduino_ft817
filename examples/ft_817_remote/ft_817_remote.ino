@@ -22,7 +22,7 @@
 #define LONG_MAX 1000000000
 #define TRUE 0
 #define FALSE 1
-#define DEBUG 1
+//#define DEBUG 1
 #include <SoftwareSerial.h>
 
 /*************************************************************************************************/
@@ -272,7 +272,8 @@ void freq_plus_minus_mode ()
 /*************************************************************************************************/
 void set_channel (int ch)
 {  
-  do { serial_ft817.listen(); } while (!serial_ft817.available());
+  //do { serial_ft817.listen(); } while (!serial_ft817.available());
+  serial_ft817.listen();
   // setup the internal current channel
   if (ch > nchannels - 1)
   {
@@ -400,10 +401,14 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 
 /*************************************************************************************************/
 int i = 0;
+#ifdef TIMER
 uint32_t timer = millis();
+#endif
 void read_gps ()
 {
-  do { serial_gps.listen(); } while (!serial_gps.available());
+  //do { serial_gps.listen(); } while (!serial_gps.available());
+  serial_gps.listen();
+  
   char c = GPS.read();
 
   if (GPS.newNMEAreceived()) {
@@ -411,9 +416,11 @@ void read_gps ()
       return;
     } 
   }   
+  #ifdef TIMER
     if (timer > millis()) timer = millis();
 if (millis() - timer > 2000) {
     timer = millis(); // reset the timer
+    #endif
   i++;
 #ifdef DEBUG  
   Serial.print(i);
@@ -437,7 +444,9 @@ if (millis() - timer > 2000) {
     lcd.print(GPS.minute, DEC); lcd.print(':');
     lcd.print(GPS.seconds, DEC); 
     #endif
+    #ifdef TIMER
 }
+#endif
  //   delay(500);
 }
 
@@ -458,13 +467,12 @@ void setup ()
   initialize_screen();
   initialize_gps();
   initialize_ft817();
-
+return;
   modus = M_CHANNELS;
 
   read_rig();
 
   cur_ch = find_nearest_channel();
-  return;
   display_frequency_mode_smeter ();
 }
 
@@ -474,9 +482,8 @@ void setup ()
 // Main loop
 void loop ()
 {  
-  //read_gps(); 
-  return;
-  //read_rig(); 
+  read_gps(); 
+  read_rig(); 
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
