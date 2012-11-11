@@ -485,6 +485,17 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
   return 0;
 }
 
+void check_ports ()
+{
+#ifdef DEBUG
+  if (serial_gps.isListening()) { Serial.println("serial_gps is listening"); }
+  else { Serial.println("serial_gps is NOT listening"); }
+  
+  if (serial_ft817.isListening()) { Serial.println("serial_ft817 is listening"); }
+  else { Serial.println("serial_ft817 is NOT listening"); }
+#endif
+}
+
 /*************************************************************************************************/
 int ncycles = 0;
 //#define TIMER 2000 //timer in ms
