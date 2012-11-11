@@ -29,7 +29,7 @@
 /*************************************************************************************************/
 #define DEBUG 1
 //#define DEBUG0 1
-#define DEBUG1 1
+//#define DEBUG1 1
 //#define DEBUG_SERIAL 1 // debugging the serial ports
 //#define DEBUG_GPS 1 // debug gps raw data
 void initialize_debug ()
