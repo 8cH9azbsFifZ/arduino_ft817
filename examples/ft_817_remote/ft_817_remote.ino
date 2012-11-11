@@ -22,7 +22,7 @@
 #define LONG_MAX 1000000000
 #define TRUE 0
 #define FALSE 1
-//#define DEBUG 1
+#define DEBUG 1
 #include <SoftwareSerial.h>
 
 /*************************************************************************************************/
