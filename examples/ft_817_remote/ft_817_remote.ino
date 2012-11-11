@@ -238,7 +238,7 @@ void display_frequency_mode_smeter ()
   Serial.println("LCD");
 #endif
   //sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
-  lcd.clear();
+  lcd.clear();return; 
   lcd.print(upper);
   lcd.setCursor(0,1);
   lcd.print(lower);
