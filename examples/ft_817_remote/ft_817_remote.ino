@@ -403,7 +403,7 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 }
 
 /*************************************************************************************************/
-int iii = 0;
+int cycles = 0;
 #ifdef TIMER
 uint32_t timer = millis();
 #endif
@@ -424,9 +424,9 @@ void read_gps ()
 if (millis() - timer > 2000) {
     timer = millis(); // reset the timer
     #endif
-  iii++;
+  cycles++;
 #ifdef DEBUG  
-  Serial.print(iii);
+  Serial.print(cycles);
   
    Serial.print(" Time: ");
     Serial.print(GPS.hour, DEC); Serial.print(':');
