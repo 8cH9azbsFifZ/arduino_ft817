@@ -364,6 +364,8 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 }
 
 /*************************************************************************************************/
+int i = 0;
+uint32_t timer = millis();
 void read_gps ()
 {
   char c = GPS.read();
@@ -373,12 +375,18 @@ void read_gps ()
       return;
     } 
   }   
+    if (timer > millis()) timer = millis();
+if (millis() - timer > 2000) {
+    timer = millis(); // reset the timer
+  i++;
+  Serial.print(i);
+  
    Serial.print("\nTime: ");
     Serial.print(GPS.hour, DEC); Serial.print(':');
     Serial.print(GPS.minute, DEC); Serial.print(':');
     Serial.print(GPS.seconds, DEC); Serial.print('.');
     Serial.println(GPS.milliseconds);
-    
+    //return;
   // display gps time  
   lcd.clear();
   //#define TIME 6
@@ -388,9 +396,9 @@ void read_gps ()
   //lcd.print(time);
     lcd.print(GPS.hour, DEC); lcd.print(':');
     lcd.print(GPS.minute, DEC); lcd.print(':');
-    lcd.print(GPS.seconds, DEC); lcd.print('.');
-    
-    delay(500);
+    lcd.print(GPS.seconds, DEC); 
+}
+ //   delay(500);
 }
 
 /*************************************************************************************************/
