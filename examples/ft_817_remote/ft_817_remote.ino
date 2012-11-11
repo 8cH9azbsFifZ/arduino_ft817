@@ -478,6 +478,7 @@ int watchdog ()
 }
 
 
+/*************************************************************************************************/
 void check_ports ()
 {
 #ifdef DEBUG
@@ -536,8 +537,9 @@ void setup ()
   initialize_screen();
   initialize_gps();
   initialize_ft817();
-return;
+
   modus = M_CHANNELS;
+  check_ports();
   read_rig();
   cur_ch = find_nearest_channel();
   //display_frequency_mode_smeter ();
