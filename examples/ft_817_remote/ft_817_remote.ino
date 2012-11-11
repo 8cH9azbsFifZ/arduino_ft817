@@ -126,7 +126,6 @@ byte modus;
 
 /*************************************************************************************************/
 #include <Adafruit_GPS.h>
-#include <TimerOne.h> // optional timer lib
 #define GPS_TX_PIN 3
 #define GPS_RX_PIN 2
 #define GPS_SPEED 9600
@@ -151,26 +150,11 @@ void initialize_gps ()
   serial_gps.println(PMTK_Q_RELEASE);
   
   // setup timer
-  // method 1
- // int every_n_sec = 10;
-//  Timer1.initialize(every_n_sec*1000000); 
-//  Timer1.attachInterrupt(read_gps_data);
-//  every_n_sec = 1; // FIXME : ft817 stuff
-//  Timer2.initialize(every_n_sec*1000000); 
- // Timer2.attachInterrupt(read_rig);
-  // method 2
-//  useInterrupt(true);
+  useInterrupt(true);
   
 #ifdef DEBUG1
   Serial.println("End init GPS");
 #endif  
-}
-
-
-void read_gps_data () // for method 1 timer
-{
-  serial_gps.listen();
-  char c = GPS.read();
 }
 
 
