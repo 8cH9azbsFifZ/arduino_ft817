@@ -146,9 +146,33 @@ void initialize_gps ()
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
   delay(INIT_WAIT_TIME);
   serial_gps.println(PMTK_Q_RELEASE);
+  
+  useInterrupt(true);
+
 #ifdef DEBUG1
   Serial.println("End init GPS");
 #endif  
+}
+
+boolean usingInterrupt = false;
+// Interrupt is called once a millisecond, looks for any new GPS data, and stores it
+SIGNAL(TIMER0_COMPA_vect) {
+  char c = GPS.read();
+
+}
+
+void useInterrupt(boolean v) {
+  if (v) {
+    // Timer0 is already used for millis() - we'll just interrupt somewhere
+    // in the middle and call the "Compare A" function above
+    OCR0A = 0xAF;
+    TIMSK0 |= _BV(OCIE0A);
+    usingInterrupt = true;
+  } else {
+    // do not call the interrupt function COMPA anymore
+    TIMSK0 &= ~_BV(OCIE0A);
+    usingInterrupt = false;
+  }
 }
 
 
@@ -461,12 +485,13 @@ uint32_t timer = millis();
 #endif
 void read_gps ()
 {
+  /* outdated due to interrrupt
   // read everytime
-  //do { serial_gps.listen(); } while (!serial_gps.available());
-  serial_gps.listen();
+  do { serial_gps.listen(); } while (!serial_gps.available());
+  //serial_gps.listen();
   
-  char c = GPS.read();
-
+  //char c = GPS.read();
+*/
   
 #ifdef TIMER
   if (timer > millis()) timer = millis();
@@ -521,8 +546,8 @@ void setup ()
 void loop ()
 {  
   read_gps(); 
-  return;
   read_rig(); 
+  delay(500);
   return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
