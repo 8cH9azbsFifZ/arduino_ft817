@@ -31,7 +31,7 @@ FT817::FT817(SoftwareSerial *ser)
     rigSoftSerial = ser;
 }
 
-void FT817::begin(int baud) {
+void FT817::begin(uint16_t baud) {
     rigSoftSerial->begin(baud);
 }
 

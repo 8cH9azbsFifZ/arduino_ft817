@@ -146,7 +146,7 @@ class FT817
     boolean setLockOff();
     void off();
     void on();
-    void begin(int baud);
+    void begin(uint16_t  baud);
 	 int setRPTshift (long offset);
 
 

@@ -59,8 +59,8 @@ typedef struct
   char mode[4], mode_old[4];
   char smeter[4], smeter_old[4];
   byte smeterbyte, smeterbyte_old;
-} t_rig;
-t_rig rig; 
+} t_status;
+t_status rig; 
 
 #define FT817_TX_PIN 13 // defined in header -- FIXME
 #define FT817_RX_PIN 12 
@@ -72,6 +72,7 @@ void initialize_ft817 ()
 {
   Serial.println("Init FT817");
   ft817.begin(FT817_SPEED);
+  delay(1000);
 }
 
 
@@ -110,6 +111,7 @@ SoftwareSerial Serial1(GPS_TX_PIN, GPS_RX_PIN);
 Adafruit_GPS GPS(&Serial1);
 
 #define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" // http://www.hhhh.org/wiml/proj/nmeaxor.html
+
 void initialize_gps ()
 {
   Serial.println("Init GPS");
