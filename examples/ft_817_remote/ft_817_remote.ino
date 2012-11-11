@@ -211,7 +211,7 @@ void display_frequency_mode_smeter ()
 #ifdef DEBUG
   Serial.print("MHz: "); Serial.print(mhz);
   Serial.print("kHz: "); Serial.print(khz);
-  Serial.print("Hz: "); Serial.print(hhz);
+  Serial.print("Hz: "); Serial.print(hz);
 #endif
   char ffreq[12];
   sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
