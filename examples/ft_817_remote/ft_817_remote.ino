@@ -403,7 +403,7 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 }
 
 /*************************************************************************************************/
-int cycles = 0;
+int ncycles = 0;
 #ifdef TIMER
 uint32_t timer = millis();
 #endif
@@ -424,9 +424,9 @@ void read_gps ()
 if (millis() - timer > 2000) {
     timer = millis(); // reset the timer
     #endif
-  cycles++;
+  ncycles++;
 #ifdef DEBUG  
-  Serial.print(cycles);
+  Serial.print(ncycles);
   
    Serial.print(" Time: ");
     Serial.print(GPS.hour, DEC); Serial.print(':');
@@ -476,7 +476,7 @@ void setup ()
   modus = M_CHANNELS;
 
   read_rig();
-  //cur_ch = find_nearest_channel();
+  cur_ch = find_nearest_channel();
   //display_frequency_mode_smeter ();
 }
 
