@@ -205,9 +205,9 @@ void read_rig ()
 #ifdef DEBUG
   Serial.println("Read rig");
 #endif
-  //do { serial_ft817.listen(); } while (!serial_ft817.available());
   serial_ft817.listen();
-  
+  check_ports();
+
   // save old state
   rig.freq_old = rig.freq;
   sprintf(rig.smeter_old, "%s", rig.smeter);
@@ -504,7 +504,7 @@ void read_gps ()
 #ifdef DEBUG
   Serial.println("read_gps");
 #endif
- serial_gps.listen(); // too evil?
+ serial_gps.listen(); // too evil? 
  check_ports();
  char c = GPS.read();  
   
