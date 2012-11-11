@@ -41,11 +41,11 @@ FT817::FT817(SoftwareSerial *ser)
 }
 
 void FT817::begin(int baud) {
-    rigSoftSerial.begin(baud);
+    rigSoftSerial->begin(baud);
 }
 
 boolean FT817::setLockOn() {
-    rigSoftSerial.flush();
+    rigSoftSerial->flush();
     fourBytePreamble();
     sendCATCommandChar(FT817_LOCK_ON);
     byte b = readOneChar();
@@ -64,7 +64,7 @@ boolean FT817::setLockOn() {
 }
 
 boolean FT817::setLockOff() {
-    rigSoftSerial.flush();
+    rigSoftSerial->flush();
     fourBytePreamble();
     sendCATCommandChar(FT817_LOCK_OFF);
     byte b = readOneChar();
@@ -186,7 +186,7 @@ void FT817::setFreq(long freq) {
 
 
 unsigned long FT817::getFreqMode(char *modename) {
-    rigSoftSerial.flush();// not sure why I have to do this.
+    rigSoftSerial->flush();// not sure why I have to do this.
     //check for data after setFreq
     boolean readValid = true;
     fourBytePreamble();
@@ -196,7 +196,7 @@ unsigned long FT817::getFreqMode(char *modename) {
     long elapsed = 0;
 	 sprintf (modename, "");
 
-    while (rigSoftSerial.available() < 5 && elapsed < 2000) {
+    while (rigSoftSerial->available() < 5 && elapsed < 2000) {
         elapsed = millis() - timeout;
     }
     if (elapsed >= 2000) {
@@ -209,10 +209,10 @@ unsigned long FT817::getFreqMode(char *modename) {
             Serial.println(elapsed);
         }
         for (int i = 0; i < 4; i++) {
-            chars[i] = rigSoftSerial.read(); 
+            chars[i] = rigSoftSerial->read(); 
             if (DEBUG) { Serial.println(chars[i]); }
         }
-        mode = rigSoftSerial.read();
+        mode = rigSoftSerial->read();
 		  switch (mode)
 		  {
 			  case FT817_MODE_LSB: sprintf (modename, "LSB"); break;
@@ -247,7 +247,7 @@ char FT817::readOneChar() {
     
     long timeout = millis();
     long elapsed = 0;
-    while (rigSoftSerial.available() < 1 && elapsed < 200) {
+    while (rigSoftSerial->available() < 1 && elapsed < 200) {
          elapsed = millis() - timeout;
     }
     if (elapsed >= 200) {
@@ -257,7 +257,7 @@ char FT817::readOneChar() {
         return 0;
     }
     else {
-        byte b = rigSoftSerial.read();
+        byte b = rigSoftSerial->read();
         if (DEBUG) {
             Serial.print("read char: ");
             Serial.println((int)b);
@@ -270,7 +270,7 @@ void FT817::sendCATCommandChar(int command) {
     if (DEBUG) {
         Serial.print(byte(command));
     }
-    rigSoftSerial.write(byte(command));
+    rigSoftSerial->write(byte(command));
 }
 
 void FT817::sendCATCommandArray(  byte command[], int len) {
@@ -278,7 +278,7 @@ void FT817::sendCATCommandArray(  byte command[], int len) {
         if (DEBUG) {
         Serial.print(byte(command[x]));
     }
-    rigSoftSerial.write(byte(command[x]));
+    rigSoftSerial->write(byte(command[x]));
     }
 }
 
@@ -294,7 +294,7 @@ void FT817::threeBytePreamble() {
 }
 
 void FT817::flush() {
-    rigSoftSerial.flush();
+    rigSoftSerial->flush();
 }
 void FT817::off() {
     simpleCommand(FT817_OFF);
@@ -330,7 +330,7 @@ void FT817::setPTTOn() {
 
 boolean FT817::txMeters() {
     
-    rigSoftSerial.flush();
+    rigSoftSerial->flush();
     fourBytePreamble();
     sendCATCommandChar(FT817_READ_TX_METERS);
     byte b = readOneChar();
