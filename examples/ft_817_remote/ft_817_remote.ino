@@ -94,7 +94,7 @@ void initialize_ft817 ()
 #include "t_bandplan.h"
 
 int cur_ch;
-#define CH_NAME_LEN 10 // NB: must be adjusted in bandplan header creation script, too!
+#define CH_NAME_LEN 5 // NB: must be adjusted in bandplan header creation script, too!
 char cur_ch_name[CH_NAME_LEN];
 #define NO_CHANNEL -1
 #define CHANNEL_FOUND 0
@@ -233,7 +233,6 @@ void display_frequency_mode_smeter ()
   char lower[LCD_NUM_COL+1];
   sprintf(upper, "%s %s",ffreq,rig.mode);
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
-return;
 
 #ifdef DEBUG
   Serial.println("LCD");
