@@ -417,12 +417,12 @@ void setup ()
   initialize_debug();
   initialize_screen();
   initialize_gps();
+  return;
   initialize_ft817();
-
+return;
   modus = M_CHANNELS;
   
   read_rig();
-    return;
   cur_ch = find_nearest_channel();
   display_frequency_mode_smeter ();
 }
