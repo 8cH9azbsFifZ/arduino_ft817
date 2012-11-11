@@ -428,7 +428,7 @@ if (millis() - timer > 2000) {
 #ifdef DEBUG  
   Serial.print(i);
   
-   Serial.print("\nTime: ");
+   Serial.print(" Time: ");
     Serial.print(GPS.hour, DEC); Serial.print(':');
     Serial.print(GPS.minute, DEC); Serial.print(':');
     Serial.print(GPS.seconds, DEC); Serial.print('.');
@@ -486,7 +486,7 @@ void setup ()
 void loop ()
 {  
   read_gps(); 
-  //return;
+  return;
   read_rig(); 
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
