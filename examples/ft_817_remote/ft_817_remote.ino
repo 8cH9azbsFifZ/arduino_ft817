@@ -478,7 +478,7 @@ void setup ()
   int i = 123;
   Serial.println(i);
   int j;
-  find_nearest_channel();
+  //find_nearest_channel();
 //return;
  // cur_ch = find_nearest_channel();
   return;
