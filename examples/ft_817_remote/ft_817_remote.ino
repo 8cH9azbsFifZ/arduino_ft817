@@ -179,8 +179,6 @@ void read_rig ()
   Serial.print("Freq: ");  Serial.println(rig.freq);
   Serial.print("Mode: " ); Serial.println(rig.mode);
   Serial.println("End read rig");
-  Serial.flush();
-  delay(100);
 #endif    
 } 
 
@@ -435,8 +433,7 @@ if (millis() - timer > 2000) {
     Serial.print(GPS.minute, DEC); Serial.print(':');
     Serial.print(GPS.seconds, DEC); Serial.print('.');
     Serial.println(GPS.milliseconds);
-    delay(100);
-    Serial.flush();
+ 
 #endif    
     //return;
     #ifdef JAJA
@@ -460,7 +457,7 @@ if (millis() - timer > 2000) {
 /*************************************************************************************************/
 void initialize_debug ()
 {
-  Serial.begin(57600); 
+  Serial.begin(9600); 
   Serial.println("Debug output");
 }
 
