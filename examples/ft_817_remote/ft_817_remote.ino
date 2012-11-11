@@ -456,7 +456,7 @@ if (millis() - timer > 2000) {
 /*************************************************************************************************/
 void initialize_debug ()
 {
-  Serial.begin(9600); 
+  Serial.begin(57600); 
   Serial.println("Debug output");
 }
 
@@ -485,7 +485,7 @@ void setup ()
 void loop ()
 {  
   read_gps(); 
-  return;
+  //return;
   read_rig(); 
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
