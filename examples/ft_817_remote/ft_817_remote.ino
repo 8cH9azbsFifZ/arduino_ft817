@@ -507,8 +507,7 @@ void read_gps ()
     Serial.print(" Time: ");
     Serial.print(GPS.hour, DEC); Serial.print(':');
     Serial.print(GPS.minute, DEC); Serial.print(':');
-    Serial.print(GPS.seconds, DEC); Serial.print('.');
-    Serial.println(GPS.milliseconds);
+    Serial.println(GPS.seconds, DEC); 
 #endif    
    
   }
