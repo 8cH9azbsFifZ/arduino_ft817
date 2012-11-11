@@ -150,7 +150,6 @@ class FT817
     boolean setLockOff();
     void off();
     void on();
-    void assignSerial(SoftwareSerial *s);
     void begin(int baud);
 	 int setRPTshift (long offset);
 

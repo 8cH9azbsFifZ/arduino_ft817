@@ -34,13 +34,10 @@
 
 //extern SoftwareSerial rigSoftSerial(FT817_RX_PIN,FT817_TX_PIN);
 
-FT817::FT817()
+FT817::FT817(SoftwareSerial *ser)
 {
-    pinMode(FT817_TX_PIN, OUTPUT); 
-}
-
-void FT817::assignSerial(SoftwareSerial *s) {
-    rigSoftSerial = s;
+    rigSoftSerial = ser;
+    //pinMode(FT817_TX_PIN, OUTPUT); 
 }
 
 void FT817::begin(int baud) {

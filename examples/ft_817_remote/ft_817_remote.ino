@@ -54,7 +54,6 @@ uint8_t lcd_key;
 
 typedef struct
 {
-  FT817 serial;
   // current status
   long freq, freq_old;
   char mode[4], mode_old[4];
@@ -67,12 +66,12 @@ t_rig rig;
 #define FT817_RX_PIN 12 
 #define FT817_SPEED 9600
 SoftwareSerial Serial2(FT817_RX_PIN,FT817_TX_PIN);
+FT817 ft817(&Serial2);
 
 void initialize_ft817 ()
 {
   Serial.println("Init FT817");
-  rig.serial.assignSerial(Serial2);
-  rig.serial.begin(FT817_SPEED);
+  ft817.begin(FT817_SPEED);
 }
 
 
@@ -146,8 +145,8 @@ void read_rig ()
   
   do // rig frequency may initially be 0
   {
-    rig.freq = rig.serial.getFreqMode(rig.mode);
-    rig.smeterbyte = rig.serial.getRxStatus(rig.smeter);
+    rig.freq = ft817.getFreqMode(rig.mode);
+    rig.smeterbyte = ft817.getRxStatus(rig.smeter);
   } while (rig.freq == 0); 
 } 
 
@@ -260,14 +259,14 @@ void set_channel (int ch)
   // update the rig 
   do // it may happen, that the frequency is not set correctly during the 1st attempt.
   {
-      rig.serial.setFreq(channels[cur_ch].freq);
+      ft817.setFreq(channels[cur_ch].freq);
       read_rig();
   } while (rig.freq != channels[cur_ch].freq);
   
-  rig.serial.setMode(channels[cur_ch].mode);
+  ft817.setMode(channels[cur_ch].mode);
   if (channels[cur_ch].rpt != 0) 
   { 
-    rig.serial.setRPTshift(channels[cur_ch].rpt); 
+    ft817.setRPTshift(channels[cur_ch].rpt); 
   }
 }
 
@@ -417,7 +416,6 @@ void setup ()
   initialize_debug();
   initialize_screen();
   initialize_gps();
-  return;
   initialize_ft817();
 return;
   modus = M_CHANNELS;
