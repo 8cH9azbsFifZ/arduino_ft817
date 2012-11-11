@@ -30,6 +30,7 @@
 #define DEBUG 1
 //#define DEBUG0 1
 #define DEBUG1 1
+//#define DEBUG_SERIAL 1 // debugging the serial ports
 void initialize_debug ()
 {
   Serial.begin(9600); 
@@ -484,7 +485,7 @@ int watchdog ()
 /*************************************************************************************************/
 void check_ports ()
 {
-#ifdef DEBUG
+#ifdef DEBUG_SERIAL
   if (serial_gps.isListening()) { Serial.println("serial_gps is listening"); }
   //else { Serial.println("serial_gps is NOT listening"); }
   
@@ -504,7 +505,7 @@ void read_gps ()
 #ifdef DEBUG
   Serial.println("read_gps");
 #endif
- serial_gps.listen(); // too evil? 
+ serial_gps.listen();  
  check_ports();
  char c = GPS.read();  
   
