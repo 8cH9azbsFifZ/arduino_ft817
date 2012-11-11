@@ -110,9 +110,11 @@ Adafruit_GPS GPS(&Serial1);
 
 void initialize_gps ()
 {
+  Serial.println("Init GPS");
   GPS.begin(GPS_SPEED);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+  delay(1000);
   Serial1.println(PMTK_Q_RELEASE);
 }
 
@@ -370,7 +372,12 @@ void read_gps ()
       return;
     } 
   }   
-  
+   Serial.print("\nTime: ");
+    Serial.print(GPS.hour, DEC); Serial.print(':');
+    Serial.print(GPS.minute, DEC); Serial.print(':');
+    Serial.print(GPS.seconds, DEC); Serial.print('.');
+    Serial.println(GPS.milliseconds);
+    
   // display gps time  
   lcd.clear();
   //#define TIME 6
