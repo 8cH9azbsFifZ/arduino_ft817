@@ -52,13 +52,13 @@ uint8_t lcd_key;
 /*************************************************************************************************/
 /* Configure the FT 817 stuff */
 #include <FT817.h> 
-
+#define SMETER_LEN 4
 typedef struct
 {
   // current status
   long freq, freq_old;
   char mode[4], mode_old[4];
-  char smeter[4], smeter_old[4];
+  char smeter[SMETER_LEN], smeter_old[SMETER_LEN];
   byte smeterbyte, smeterbyte_old;
 } t_status;
 t_status rig; 
@@ -91,7 +91,7 @@ void initialize_ft817 ()
 #include "t_bandplan.h"
 
 int cur_ch;
-#define CH_NAME_LEN 40
+#define CH_NAME_LEN LCD_NUM_COL-SMETER_LEN
 char cur_ch_name[CH_NAME_LEN];
 #define NO_CHANNEL -1
 #define CHANNEL_FOUND 0
@@ -203,6 +203,7 @@ void display_frequency_mode_smeter ()
 #ifdef DEBUG
   Serial.println("Display");
 #endif
+  // Frequency
   // All of the stuff below only creates a good frequency output - looks chaotic :(
   long freq = rig.freq * 10; //in Hz
   int mhz = freq / 1000000;
@@ -217,14 +218,16 @@ void display_frequency_mode_smeter ()
   Serial.println(ffreq);
 #endif
 
+  // Channel name
   get_cur_ch_name(rig.freq);
 #ifdef DEBUG
   Serial.print("Channel name: ");
   Serial.println(cur_ch_name);
 #endif
 
-  char upper[LCD_NUM_COL];
-  char lower[LCD_NUM_COL];
+  // Formatted output
+  char upper[LCD_NUM_COL+1];
+  char lower[LCD_NUM_COL+1];
   sprintf(upper, "%s %s",ffreq,rig.mode);
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
 return;
