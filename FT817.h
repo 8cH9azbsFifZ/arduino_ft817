@@ -24,20 +24,8 @@
 #ifndef FT817_h
 #define FT817_h
 
-#include "../SoftwareSerial/SoftwareSerial.h"
+#include <SoftwareSerial.h>
 
-// Interfaces have changed with Arduino version 1.0
-#if defined(ARDUINO) && ARDUINO >= 100
-  #include "Arduino.h"
-#else
-  #include "WProgram.h"
-  #include <pins_arduino.h>
-#endif
-
-// FT 817 Features
-// TBD 
-// - (not implemented yet in hamlib: ft817.c lines 32-50)
-//
 // Design note:
 // In contrast to hamlib yaesu_cmd_set_t ncmd structure we use only the
 // relevant bytes, here and do not list the whole sequence, here. 
@@ -135,7 +123,8 @@
 class FT817
 {
   public:
-    FT817();
+    FT817(SoftwareSerial *ser); // Constructor when using SoftwareSerial
+
     boolean txState();
     boolean txState2();
     boolean txMeters();
@@ -161,7 +150,7 @@ class FT817
     boolean setLockOff();
     void off();
     void on();
-    void assignSerial(SoftwareSerial s);
+    void assignSerial(SoftwareSerial *s);
     void begin(int baud);
 	 int setRPTshift (long offset);
 
@@ -188,6 +177,7 @@ class FT817
     unsigned char * out;
     void blink();
     void rigComError(char * string);
+    SoftwareSerial *rigSoftSerial;
 
 };
 
