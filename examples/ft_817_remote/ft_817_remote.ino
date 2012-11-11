@@ -234,7 +234,12 @@ void display_frequency_mode_smeter ()
   sprintf(upper, "%s %s",ffreq,rig.mode);
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
   //sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
-
+#ifdef DEBUG
+  Serial.println(upper);
+  Serial.println(lower);
+#endif
+  return; 
+  
   // LCD output
 #ifdef DEBUG
   Serial.println("LCD");
