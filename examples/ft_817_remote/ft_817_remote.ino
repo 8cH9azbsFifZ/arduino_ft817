@@ -301,6 +301,9 @@ void set_channel (int ch)
 /*************************************************************************************************/
 int find_nearest_channel ()
 {
+#ifdef DEBUG  
+  Serial.println("Find nearest channel");
+#endif  
   int i;
   int nearest_channel = 0;
   long delta_freq_min = LONG_MAX;
@@ -314,6 +317,9 @@ int find_nearest_channel ()
       delta_freq_min = delta_freq;
     }
   }
+#ifdef DEBUG  
+  Serial.println("End find nearest channel");
+#endif  
   return nearest_channel;
 }
 
@@ -456,7 +462,7 @@ void setup ()
   modus = M_CHANNELS;
 
   read_rig();
-  return;
+
   cur_ch = find_nearest_channel();
   display_frequency_mode_smeter ();
 }
