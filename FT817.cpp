@@ -21,18 +21,10 @@
 		Gerolf Ziegenhain, DG6FL
 */
 
-#if defined(ARDUINO) && ARDUINO >= 100
-  #include "Arduino.h"
-#else
-  #include "WProgram.h"
-  #include <pins_arduino.h>
-#endif
-
+#include "Arduino.h"
 #include "FT817.h"
 
 #define DEBUG false
-
-//extern SoftwareSerial rigSoftSerial(FT817_RX_PIN,FT817_TX_PIN);
 
 FT817::FT817(SoftwareSerial *ser)
 {
