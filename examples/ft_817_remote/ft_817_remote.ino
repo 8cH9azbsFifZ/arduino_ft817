@@ -152,11 +152,14 @@ void initialize_gps ()
   
   // setup timer
   // method 1
-  int every_n_sec = 10;
-  Timer1.initialize(every_n_sec*1000000); 
-  Timer1.attachInterrupt(read_gps_data);
+ // int every_n_sec = 10;
+//  Timer1.initialize(every_n_sec*1000000); 
+//  Timer1.attachInterrupt(read_gps_data);
+//  every_n_sec = 1; // FIXME : ft817 stuff
+//  Timer2.initialize(every_n_sec*1000000); 
+ // Timer2.attachInterrupt(read_rig);
   // method 2
-  //useInterrupt(true);
+//  useInterrupt(true);
   
 #ifdef DEBUG1
   Serial.println("End init GPS");
@@ -164,16 +167,16 @@ void initialize_gps ()
 }
 
 
+void read_gps_data () // for method 1 timer
+{
+  serial_gps.listen();
+  char c = GPS.read();
+}
+
 
 boolean usingInterrupt = false;
 // Interrupt is called once a millisecond, looks for any new GPS data, and stores it
 SIGNAL(TIMER0_COMPA_vect) {
-  //serial_gps.listen();
-  char c = GPS.read();
-}
-
-void read_gps_data ()
-{
   serial_gps.listen();
   char c = GPS.read();
 }
@@ -561,7 +564,7 @@ void setup ()
 void loop ()
 {  
   read_gps(); 
-  read_rig(); 
+  //read_rig(); 
   return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
