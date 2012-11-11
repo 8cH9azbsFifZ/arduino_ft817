@@ -152,7 +152,7 @@ void initialize_gps ()
   serial_gps.println(PMTK_Q_RELEASE);
   
   // setup timer
-  useInterrupt(true);
+  useInterrupt(false);
   
 #ifdef DEBUG1
   Serial.println("End init GPS");
@@ -165,7 +165,7 @@ boolean usingInterrupt = false;
 SIGNAL(TIMER0_COMPA_vect) {
  // serial_gps.listen(); // too evil?
  check_ports();
-  char c = GPS.read();
+ char c = GPS.read();
 }
 
 /*************************************************************************************************/
@@ -501,6 +501,13 @@ uint32_t timer = millis();
 #endif
 void read_gps ()
 {
+#ifdef DEBUG
+  Serial.println("read_gps");
+#endif
+ serial_gps.listen(); // too evil?
+ check_ports();
+ char c = GPS.read();  
+  
 #ifdef TIMER
   if (timer > millis()) timer = millis();
   if (millis() - timer > TIMER) {
