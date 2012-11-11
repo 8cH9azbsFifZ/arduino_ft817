@@ -451,7 +451,7 @@ void setup ()
 // Main loop
 void loop ()
 {  
-  read_gps(); 
+  //read_gps(); 
   return;
   //read_rig(); 
 
