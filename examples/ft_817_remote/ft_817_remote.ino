@@ -151,9 +151,11 @@ void initialize_gps ()
   serial_gps.println(PMTK_Q_RELEASE);
   
   // setup timer
+  // method 1
   int every_n_sec = 10;
   Timer1.initialize(every_n_sec*1000000); 
   Timer1.attachInterrupt(read_gps_data);
+  // method 2
   //useInterrupt(true);
   
 #ifdef DEBUG1
@@ -166,6 +168,7 @@ void initialize_gps ()
 boolean usingInterrupt = false;
 // Interrupt is called once a millisecond, looks for any new GPS data, and stores it
 SIGNAL(TIMER0_COMPA_vect) {
+  //serial_gps.listen();
   char c = GPS.read();
 }
 
@@ -499,13 +502,11 @@ uint32_t timer = millis();
 #endif
 void read_gps ()
 {
-  /* outdated due to interrrupt
   // read everytime
-  do { serial_gps.listen(); } while (!serial_gps.available());
-  //serial_gps.listen();
+  //do { serial_gps.listen(); } while (!serial_gps.available());
+  serial_gps.listen();
   
-  //char c = GPS.read();
-*/
+  char c = GPS.read();
   
 #ifdef TIMER
   if (timer > millis()) timer = millis();
@@ -561,7 +562,6 @@ void loop ()
 {  
   read_gps(); 
   read_rig(); 
-  delay(500);
   return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
