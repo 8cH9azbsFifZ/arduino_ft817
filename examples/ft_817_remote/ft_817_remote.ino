@@ -215,7 +215,7 @@ void display_frequency_mode_smeter ()
   int hz = freq % 1000;
   char ffreq[FREQ_LEN];
   sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
-#ifdef DEBUG
+#ifdef DEBUG1
   Serial.print("MHz: "); Serial.print(mhz);
   Serial.print(" kHz: "); Serial.print(khz);
   Serial.print( "Hz: "); Serial.println(hz);
@@ -224,7 +224,7 @@ void display_frequency_mode_smeter ()
 
   // Channel name
   get_cur_ch_name(rig.freq);
-#ifdef DEBUG
+#ifdef DEBUG1
   Serial.print("Channel name: ");
   Serial.println(cur_ch_name);
 #endif
@@ -241,11 +241,11 @@ void display_frequency_mode_smeter ()
 #endif
   
   // LCD output
-/* 
+
   lcd.clear();
   lcd.print(upper);
   lcd.setCursor(0,1);
-  lcd.print(lower);*/
+  lcd.print(lower);
 #ifdef DEBUG
   Serial.println("End display");
 #endif  
