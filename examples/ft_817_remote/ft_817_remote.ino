@@ -129,7 +129,7 @@ byte modus;
 /*************************************************************************************************/
 #include <Adafruit_GPS.h>
 #define GPS_TX_PIN 3
-#define GPS_RX_PIN 2
+#define GPS_RX_PIN 2 
 #define GPS_SPEED 9600
 
 SoftwareSerial serial_gps(GPS_TX_PIN, GPS_RX_PIN);
@@ -497,7 +497,7 @@ void check_ports ()
 
 /*************************************************************************************************/
 int ncycles = 0;
-//#define TIMER 2000 //timer in ms
+#define TIMER 2000 //timer in ms
 #ifdef TIMER
 uint32_t timer = millis();
 #endif
@@ -506,13 +506,7 @@ void read_gps ()
 #ifdef DEBUG
   Serial.println("read_gps");
 #endif
- serial_gps.listen();  
- check_ports();
- char c = GPS.read();  
-#ifdef DEBUG_GPS
- if (c) { Serial.println(c); }
- else { Serial.println("no raw data"); }
-#endif
+
 
 #ifdef TIMER
   if (timer > millis()) timer = millis();
@@ -520,12 +514,28 @@ void read_gps ()
     timer = millis(); // reset the timer
 #endif
 
+ serial_gps.listen();  
+ check_ports();
+ 
+ char c;
+ 
+ do {
+  c = GPS.read();  
+#ifdef DEBUG_GPS
+ if (c) { Serial.println(c); }
+ else { Serial.println("no raw data"); }
+#endif
+
   ncycles++;
   if (GPS.newNMEAreceived()) {
-    if (!GPS.parse(GPS.lastNMEA())) {
-      return;
-    } 
-  }   
+    //if (!GPS.parse(GPS.lastNMEA())) {
+    //  return;
+    //} 
+  }  
+  
+ } while (!GPS.parse(GPS.lastNMEA()));
+
+
   
 #ifdef DEBUG  
   Serial.print(ncycles);
@@ -556,6 +566,8 @@ void setup ()
 
   modus = M_CHANNELS;
   read_rig();
+ //#define GPX_RX_INTERRUPT 0 // 0 == pin2  2 == pin3
+ //attachInterrupt(GPX_RX_INTERRUPT, read_gps, CHANGE);
   //cur_ch = find_nearest_channel();
   //display_frequency_mode_smeter ();
 }
