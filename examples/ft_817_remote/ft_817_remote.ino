@@ -461,15 +461,12 @@ uint32_t timer = millis();
 #endif
 void read_gps ()
 {
+  // read everytime
   //do { serial_gps.listen(); } while (!serial_gps.available());
   serial_gps.listen();
   
   char c = GPS.read();
-  if (GPS.newNMEAreceived()) {
-    if (!GPS.parse(GPS.lastNMEA())) {
-      return;
-    } 
-  }   
+
   
 #ifdef TIMER
   if (timer > millis()) timer = millis();
@@ -478,7 +475,12 @@ void read_gps ()
 #endif
 
   ncycles++;
-
+  if (GPS.newNMEAreceived()) {
+    if (!GPS.parse(GPS.lastNMEA())) {
+      return;
+    } 
+  }   
+  
 #ifdef DEBUG  
   Serial.print(ncycles);
   Serial.print(" Time: ");
@@ -519,6 +521,7 @@ void setup ()
 void loop ()
 {  
   read_gps(); 
+  return;
   read_rig(); 
   return;
 
