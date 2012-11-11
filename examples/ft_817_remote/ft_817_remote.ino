@@ -145,12 +145,14 @@ void initialize_gps ()
 
   // initialize gps module
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
+  //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+
   delay(INIT_WAIT_TIME);
   serial_gps.println(PMTK_Q_RELEASE);
   
   // setup timer
-  useInterrupt(false);
+  useInterrupt(true);
   
 #ifdef DEBUG1
   Serial.println("End init GPS");
@@ -162,6 +164,7 @@ boolean usingInterrupt = false;
 // Interrupt is called once a millisecond, looks for any new GPS data, and stores it
 SIGNAL(TIMER0_COMPA_vect) {
  // serial_gps.listen(); // too evil?
+ check_ports();
   char c = GPS.read();
 }
 
