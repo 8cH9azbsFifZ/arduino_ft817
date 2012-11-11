@@ -216,6 +216,7 @@ void display_frequency_mode_smeter ()
 #ifdef DEBUG
   Serial.println("Display");
 #endif
+
   // Frequency
   // All of the stuff below only creates a good frequency output - looks chaotic :(
   long freq = rig.freq * 10; //in Hz
@@ -248,7 +249,7 @@ void display_frequency_mode_smeter ()
   Serial.println(upper);
   Serial.println(lower);
 #endif
-  
+  return;
   // LCD output
 
   lcd.clear();
@@ -505,10 +506,9 @@ void setup ()
   initialize_ft817();
 
   modus = M_CHANNELS;
-
   read_rig();
   cur_ch = find_nearest_channel();
-  //display_frequency_mode_smeter ();
+  display_frequency_mode_smeter ();
 }
 
 
