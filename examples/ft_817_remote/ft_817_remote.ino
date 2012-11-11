@@ -149,7 +149,7 @@ void initialize_screen ()
   lcd.begin(LCD_NUM_COL, LCD_NUM_ROW);     // start the library
   lcd.clear();
   lcd.print("FT 817 (DG6FL)"); // print a simple message
-  delay(500);
+  //delay(500);
 }
 
 
@@ -483,6 +483,7 @@ return;
 void loop ()
 {  
   read_gps(); 
+  return;
   read_rig(); 
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
