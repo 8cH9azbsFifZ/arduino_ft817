@@ -76,6 +76,7 @@ void initialize_ft817 ()
 #endif  
   ft817.begin(FT817_SPEED);
   //do { serial_ft817.listen(); } while (!serial_ft817.available());
+  serial_ft817.listen();
   ft817.getFreqMode(rig.mode);
   delay(1000);
 #ifdef DEBUG
@@ -159,7 +160,8 @@ void read_rig ()
 #ifdef DEBUG
   Serial.println("Read rig");
 #endif
-  do { serial_ft817.listen(); } while (!serial_ft817.available());
+  //do { serial_ft817.listen(); } while (!serial_ft817.available());
+  serial_ft817.listen();
   
   // save old state
   rig.freq_old = rig.freq;
