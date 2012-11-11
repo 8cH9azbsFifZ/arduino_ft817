@@ -31,7 +31,7 @@
 //#define DEBUG0 1
 #define DEBUG1 1
 //#define DEBUG_SERIAL 1 // debugging the serial ports
-#define DEBUG_GPS 1 // debug gps raw data
+//#define DEBUG_GPS 1 // debug gps raw data
 void initialize_debug ()
 {
   Serial.begin(9600); 
@@ -507,48 +507,40 @@ void read_gps ()
   Serial.println("read_gps");
 #endif
 
-
-#ifdef TIMER
   if (timer > millis()) timer = millis();
+  
   if (millis() - timer > TIMER) {
     timer = millis(); // reset the timer
-#endif
 
- serial_gps.listen();  
- check_ports();
+    serial_gps.listen();  
+    check_ports();
  
- char c;
+    char c;
  
- do {
-  c = GPS.read();  
+    do {
+      c = GPS.read();  
 #ifdef DEBUG_GPS
- if (c) { Serial.println(c); }
- else { Serial.println("no raw data"); }
+      if (c) { Serial.println(c); }
+      else { Serial.println("no raw data"); }
 #endif
 
-  ncycles++;
-  if (GPS.newNMEAreceived()) {
-    //if (!GPS.parse(GPS.lastNMEA())) {
-    //  return;
-    //} 
-  }  
-  
- } while (!GPS.parse(GPS.lastNMEA()));
+      ncycles++;
+      if (GPS.newNMEAreceived()) 
+      {
+        // we will observe this automatically :)
+      }  
+   } while (!GPS.parse(GPS.lastNMEA()));
 
-
-  
 #ifdef DEBUG  
-  Serial.print(ncycles);
-  Serial.print(" Time: ");
-  Serial.print(GPS.hour, DEC); Serial.print(':');
-  Serial.print(GPS.minute, DEC); Serial.print(':');
-  Serial.print(GPS.seconds, DEC); Serial.print('.');
-  Serial.println(GPS.milliseconds);
+    Serial.print(ncycles);
+    Serial.print(" Time: ");
+    Serial.print(GPS.hour, DEC); Serial.print(':');
+    Serial.print(GPS.minute, DEC); Serial.print(':');
+    Serial.print(GPS.seconds, DEC); Serial.print('.');
+    Serial.println(GPS.milliseconds);
 #endif    
    
-#ifdef TIMER
   }
-#endif
 }
 
 
@@ -566,8 +558,6 @@ void setup ()
 
   modus = M_CHANNELS;
   read_rig();
- //#define GPX_RX_INTERRUPT 0 // 0 == pin2  2 == pin3
- //attachInterrupt(GPX_RX_INTERRUPT, read_gps, CHANGE);
   //cur_ch = find_nearest_channel();
   //display_frequency_mode_smeter ();
 }
