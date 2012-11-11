@@ -200,6 +200,9 @@ int rig_state_changed ()
 /*************************************************************************************************/
 void display_frequency_mode_smeter ()
 {
+#ifdef DEBUG
+  Serial.println("Display");
+#endif
   // All of the stuff below only creates a good frequency output - looks chaotic :(
   long freq = rig.freq * 10; //in Hz
   int mhz = freq / 1000000;
@@ -219,6 +222,9 @@ void display_frequency_mode_smeter ()
   lcd.print(upper);
   lcd.setCursor(0,1);
   lcd.print(lower);
+#ifdef DEBUG
+  Serial.println("End display");
+#endif  
 }
 
 
@@ -309,7 +315,7 @@ int find_nearest_channel ()
   Serial.println("Find nearest channel");
 #endif  
   int i;
-  int nearest_channel = 0;
+  int nearest_channel = 0;/*
   long delta_freq_min = LONG_MAX;
   for (i = 0; i < nchannels; i++)
   {
@@ -321,6 +327,7 @@ int find_nearest_channel ()
       delta_freq_min = delta_freq;
     }
   }
+  */
 #ifdef DEBUG  
   Serial.println("End find nearest channel");
 #endif  
@@ -476,8 +483,8 @@ void setup ()
   modus = M_CHANNELS;
 
   read_rig();
-  //cur_ch = find_nearest_channel();
-  display_frequency_mode_smeter ();
+  cur_ch = find_nearest_channel();
+  //display_frequency_mode_smeter ();
 }
 
 
