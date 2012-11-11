@@ -248,7 +248,7 @@ void display_frequency_mode_smeter ()
   Serial.print("Channel name: ");
   Serial.println(cur_ch_name);
 #endif
-return;
+
   // Formatted output
   char upper[LCD_NUM_COL+1];
   char lower[LCD_NUM_COL+1];
@@ -529,7 +529,7 @@ void setup ()
   modus = M_CHANNELS;
   read_rig();
   //cur_ch = find_nearest_channel();
-  //display_frequency_mode_smeter ();
+  display_frequency_mode_smeter ();
 }
 
 
