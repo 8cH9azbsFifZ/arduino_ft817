@@ -150,7 +150,7 @@ void initialize_gps ()
   serial_gps.println(PMTK_Q_RELEASE);
   
   // setup timer
-  useInterrupt(true);
+  useInterrupt(false);
   
 #ifdef DEBUG1
   Serial.println("End init GPS");
@@ -551,7 +551,10 @@ void setup ()
 // Main loop
 void loop ()
 {  
-  read_gps(); 
+#ifdef DEBUG
+  Serial.println("loop");
+#endif
+  //read_gps(); 
   read_rig(); 
   delay(500); // could also be done using an interrupt?
   return;
