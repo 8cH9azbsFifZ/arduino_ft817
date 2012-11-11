@@ -208,11 +208,17 @@ void display_frequency_mode_smeter ()
   int mhz = freq / 1000000;
   int khz = (freq % 1000000)/1000;
   int hz = freq%1000;
+#ifdef DEBUG
+  Serial.print("MHz: "); Serial.print(mhz);
+  Serial.print("kHz: "); Serial.print(khz);
+  Serial.print("Hz: "); Serial.print(hhz);
+#endif
   char ffreq[12];
   sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
 
- // get_cur_ch_name(rig.freq);
+  get_cur_ch_name(rig.freq);
 #ifdef DEBUG
+
   Serial.println("LCD");
 #endif
   lcd.clear();
