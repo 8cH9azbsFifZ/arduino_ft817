@@ -539,7 +539,7 @@ void setup ()
   initialize_ft817();
 
   modus = M_CHANNELS;
-  //cur_ch = find_nearest_channel();
+  cur_ch = find_nearest_channel();
   display_frequency_mode_smeter ();
 }
 
@@ -552,9 +552,10 @@ void loop ()
 #ifdef DEBUG
   Serial.println("loop");
 #endif
-  //read_gps(); 
+  read_gps(); 
   read_rig(); 
-
+  delay(500);
+  
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
   lcd_key = lcd.readButtons();
