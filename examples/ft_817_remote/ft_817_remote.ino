@@ -74,11 +74,13 @@ void initialize_ft817 ()
 #ifdef DEBUG
   Serial.println("Init FT817");
 #endif  
+
   ft817.begin(FT817_SPEED);
   //do { serial_ft817.listen(); } while (!serial_ft817.available());
   serial_ft817.listen();
   ft817.getFreqMode(rig.mode);
-  delay(1000);
+  delay(100);
+  
 #ifdef DEBUG
   Serial.println("End init FT817");
 #endif    
@@ -228,7 +230,7 @@ void display_frequency_mode_smeter ()
   // Formatted output
   char upper[LCD_NUM_COL+1];
   char lower[LCD_NUM_COL+1];
-  sprintf(upper, "%s %s",ffreq,rig.mode);
+  sprintf(upper, "%s %s",ffreq,rig.mode);return;
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
 return;
 
