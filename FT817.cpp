@@ -31,7 +31,7 @@ FT817::FT817(SoftwareSerial *ser)
 }
 
 void FT817::begin(uint16_t baud) {
-    //rigSoftSerial->begin(baud);
+    rigSoftSerial->begin(baud);
 }
 
 boolean FT817::setLockOn() {
