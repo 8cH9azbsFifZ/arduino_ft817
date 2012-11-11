@@ -217,8 +217,8 @@ void read_rig ()
 #ifdef DEBUG
   Serial.println("Read rig");
 #endif
-  //do { serial_ft817.listen(); } while (!serial_ft817.available());
-  serial_ft817.listen();
+  do { serial_ft817.listen(); } while (!serial_ft817.available());
+  //serial_ft817.listen();
   
   // save old state
   rig.freq_old = rig.freq;
@@ -564,7 +564,10 @@ void setup ()
 void loop ()
 {  
   read_gps(); 
-  //read_rig(); 
+  #define DEBUG1
+  read_rig(); 
+  #undef DEBUG1
+  delay(500); // could also be done using an interrupt?
   return;
 
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
