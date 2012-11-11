@@ -27,6 +27,8 @@
 
 /*************************************************************************************************/
 #define DEBUG 1
+#define DEBUG0 1
+#define DEBUG1 1
 void initialize_debug ()
 {
   Serial.begin(9600); 
@@ -211,7 +213,7 @@ int rig_state_changed ()
 /*************************************************************************************************/
 void display_frequency_mode_smeter ()
 {
-#ifdef DEBUG0
+#ifdef DEBUG
   Serial.println("Display");
 #endif
   // Frequency
