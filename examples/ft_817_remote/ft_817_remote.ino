@@ -110,6 +110,8 @@ byte modus;
 
 SoftwareSerial Serial1(GPS_TX_PIN, GPS_RX_PIN);
 Adafruit_GPS GPS(&Serial1);
+SoftwareSerial Serial3(GPS_TX_PIN, GPS_RX_PIN);
+Adafruit_GPS GPS1(&Serial3);
 
 #define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" // http://www.hhhh.org/wiml/proj/nmeaxor.html
 
@@ -117,6 +119,8 @@ void initialize_gps ()
 {
   Serial.println("Init GPS");
   GPS.begin(GPS_SPEED);
+  GPS1.begin(GPS_SPEED);
+
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
   delay(1000);
@@ -372,6 +376,7 @@ int i = 0;
 uint32_t timer = millis();
 void read_gps ()
 {
+  Serial1.listen();
   char c = GPS.read();
 
   if (GPS.newNMEAreceived()) {
@@ -419,6 +424,7 @@ void setup ()
   initialize_debug();
   initialize_screen();
   initialize_gps();
+  return;
   initialize_ft817();
 return;
   modus = M_CHANNELS;
