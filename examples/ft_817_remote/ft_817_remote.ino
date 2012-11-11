@@ -455,7 +455,7 @@ float distance_between_points (float lat1, float lon1, float lat2, float lon2)
 
 /*************************************************************************************************/
 int ncycles = 0;
-#define TIMER
+#define TIMER 2000 //timer in ms
 #ifdef TIMER
 uint32_t timer = millis();
 #endif
@@ -473,7 +473,7 @@ void read_gps ()
   
 #ifdef TIMER
   if (timer > millis()) timer = millis();
-  if (millis() - timer > 2000) {
+  if (millis() - timer > TIMER) {
     timer = millis(); // reset the timer
 #endif
 
@@ -519,7 +519,6 @@ void setup ()
 void loop ()
 {  
   read_gps(); 
-  return;
   read_rig(); 
   return;
 
