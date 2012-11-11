@@ -469,11 +469,9 @@ void check_ports ()
 }
 
 /*************************************************************************************************/
-int ncycles = 0;
 #define TIMER 2000 //timer in ms
-#ifdef TIMER
 uint32_t timer = millis();
-#endif
+int ncycles = 0;
 void read_gps ()
 {
 #ifdef DEBUG
