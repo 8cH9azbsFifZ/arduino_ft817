@@ -72,6 +72,7 @@ void initialize_ft817 ()
 {
   Serial.println("Init FT817");
   ft817.begin(FT817_SPEED);
+  serial_ft817.listen();
   ft817.getFreqMode(rig.mode);
   delay(1000);
 }
@@ -141,6 +142,7 @@ void initialize_screen ()
 /*************************************************************************************************/
 void read_rig ()
 {
+  serial_ft817.listen();
   
   // save old state
   rig.freq_old = rig.freq;
@@ -250,6 +252,7 @@ void freq_plus_minus_mode ()
 /*************************************************************************************************/
 void set_channel (int ch)
 {  
+  serial_ft817.listen();
   // setup the internal current channel
   if (ch > nchannels - 1)
   {
