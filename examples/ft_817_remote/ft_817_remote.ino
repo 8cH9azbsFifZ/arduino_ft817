@@ -1,4 +1,3 @@
-
 /*
     This file is part of the FT817 Arduino Library.
 
@@ -24,6 +23,8 @@
 #define FALSE 1
 #define INIT_WAIT_TIME 1000
 #include <SoftwareSerial.h>
+
+
 
 /*************************************************************************************************/
 #define DEBUG 1
@@ -125,6 +126,7 @@ byte modus;
 
 /*************************************************************************************************/
 #include <Adafruit_GPS.h>
+#include <TimerOne.h> // optional timer lib
 #define GPS_TX_PIN 3
 #define GPS_RX_PIN 2
 #define GPS_SPEED 9600
@@ -142,23 +144,35 @@ void initialize_gps ()
 #endif  
   GPS.begin(GPS_SPEED);
 
+  // initialize gps module
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
   delay(INIT_WAIT_TIME);
   serial_gps.println(PMTK_Q_RELEASE);
   
-  useInterrupt(true);
-
+  // setup timer
+  int every_n_sec = 10;
+  Timer1.initialize(every_n_sec*1000000); 
+  Timer1.attachInterrupt(read_gps_data);
+  //useInterrupt(true);
+  
 #ifdef DEBUG1
   Serial.println("End init GPS");
 #endif  
 }
 
+
+
 boolean usingInterrupt = false;
 // Interrupt is called once a millisecond, looks for any new GPS data, and stores it
 SIGNAL(TIMER0_COMPA_vect) {
   char c = GPS.read();
+}
 
+void read_gps_data ()
+{
+  serial_gps.listen();
+  char c = GPS.read();
 }
 
 void useInterrupt(boolean v) {
