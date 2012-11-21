@@ -40,8 +40,8 @@ void initialize_debug ()
 
 /*************************************************************************************************/
 /* Configure the display screen  */
-#define LCD_NUM_COL 16
-#define LCD_NUM_ROW 2
+#define LCD_NUM_COL 22//16
+#define LCD_NUM_ROW 4//2
 
 #include <Wire.h>
 #include <Adafruit_MCP23017.h>
@@ -59,7 +59,6 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 #define WHITE 0x7
 
 uint8_t lcd_key;
-
 
 
 /*************************************************************************************************/
@@ -82,6 +81,7 @@ t_status rig;
 #define FT817_SPEED 9600
 SoftwareSerial serial_ft817(FT817_RX_PIN,FT817_TX_PIN);
 FT817 ft817(&serial_ft817);
+
 
 void initialize_ft817 ()
 {
