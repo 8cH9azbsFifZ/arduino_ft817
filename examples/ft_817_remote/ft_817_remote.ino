@@ -25,19 +25,6 @@
 #include <SoftwareSerial.h>
 
 
-
-/*************************************************************************************************/
-#define DEBUG 1
-//#define DEBUG0 1
-//#define DEBUG1 1
-//#define DEBUG_SERIAL 1 // debugging the serial ports
-//#define DEBUG_GPS 1 // debug gps raw data
-void initialize_debug ()
-{
-  Serial.begin(9600); 
-  Serial.println("Debug output");
-}
-
 /*************************************************************************************************/
 /* Configure the display screen  */
 #define LCD_NUM_COL 22//16
@@ -78,16 +65,13 @@ t_status rig;
 
 #define FT817_TX_PIN 13 // defined in header -- FIXME
 #define FT817_RX_PIN 12 
-#define FT817_SPEED 9600
+#define FT817_SPEED 38400
 SoftwareSerial serial_ft817(FT817_RX_PIN,FT817_TX_PIN);
 FT817 ft817(&serial_ft817);
 
 
 void initialize_ft817 ()
 {
-#ifdef DEBUG
-  Serial.println("Init FT817");
-#endif  
   lcd.setCursor(0,1);
   lcd.print("Init FT817");
   
@@ -97,11 +81,7 @@ void initialize_ft817 ()
   ft817.getFreqMode(rig.mode);
   delay(INIT_WAIT_TIME);
   
-  read_rig();
-
-#ifdef DEBUG1
-  Serial.println("End init FT817");
-#endif    
+  read_rig();  
 }
 
 
@@ -146,9 +126,7 @@ Adafruit_GPS GPS(&serial_gps);
 
 void initialize_gps ()
 {
-#ifdef DEBUG  
-  Serial.println("Init GPS");
-#endif  
+
   lcd.setCursor(0,1);
   lcd.print("Init GPS");
   
@@ -165,9 +143,6 @@ void initialize_gps ()
   // 1st signal
   read_gps(); 
 
-#ifdef DEBUG1
-  Serial.println("End init GPS");
-#endif  
 }
 #endif // GPS
 
@@ -176,9 +151,6 @@ void initialize_gps ()
 // Initialize the screen
 void initialize_screen ()
 {
-#ifdef DEBUG  
-  Serial.println("Init screen");
-#endif  
   lcd.begin(LCD_NUM_COL, LCD_NUM_ROW);     // start the library
   lcd.clear();
   lcd.print("FT 817 (DG6FL)"); // print a simple message
@@ -190,9 +162,7 @@ void initialize_screen ()
 /*************************************************************************************************/
 void read_rig ()
 {
-#ifdef DEBUG
-  Serial.println("Read rig");
-#endif
+
   serial_ft817.listen();
   check_ports();
 
@@ -206,16 +176,9 @@ void read_rig ()
   {
     rig.freq = ft817.getFreqMode(rig.mode);
     rig.smeterbyte = ft817.getRxStatus(rig.smeter);
-#ifdef DEBUG1
-    Serial.println("Try to read again");
-#endif
+
   } while (rig.freq == 0); 
-  
-#ifdef DEBUG1
-  Serial.print("Freq: ");  Serial.println(rig.freq);
-  Serial.print("Mode: " ); Serial.println(rig.mode);
-  Serial.println("End read rig");
-#endif    
+
 } 
 
 /*************************************************************************************************/
@@ -236,9 +199,7 @@ int rig_state_changed ()
 /*************************************************************************************************/
 void display_frequency_mode_smeter ()
 {
-#ifdef DEBUG
-  Serial.println("Display");
-#endif
+
 
   // Frequency
   // All of the stuff below only creates a good frequency output - looks chaotic :(
@@ -248,19 +209,11 @@ void display_frequency_mode_smeter ()
   int hz = freq % 1000;
   char ffreq[FREQ_LEN];
   sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
-#ifdef DEBUG2
-  Serial.print("MHz: "); Serial.print(mhz);
-  Serial.print(" kHz: "); Serial.print(khz);
-  Serial.print( "Hz: "); Serial.println(hz);
-  Serial.println(ffreq);
-#endif
+
 
   // Channel name
   get_cur_ch_name(rig.freq);
-#ifdef DEBUG1
-  Serial.print("Channel name: ");
-  Serial.println(cur_ch_name);
-#endif
+
 
   // Formatted output
   char upper[LCD_NUM_COL+1];
@@ -271,10 +224,7 @@ void display_frequency_mode_smeter ()
 #else
   sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
 #endif
-#ifdef DEBUG1
-  Serial.println(upper);
-  Serial.println(lower);
-#endif
+
   
   // LCD output
 
@@ -282,9 +232,7 @@ void display_frequency_mode_smeter ()
   lcd.print(upper);
   lcd.setCursor(0,1);
   lcd.print(lower);
-#ifdef DEBUG0
-  Serial.println("End display");
-#endif  
+
 }
 
 
@@ -371,9 +319,7 @@ void set_channel (int ch)
 /*************************************************************************************************/
 int find_nearest_channel ()
 {
-#ifdef DEBUG
-  Serial.println("Find nearest channel");
-#endif  
+
   int i;
   int nearest_channel = 0;
   long delta_freq_min = LONG_MAX;
@@ -381,12 +327,7 @@ int find_nearest_channel ()
   {
 
     long delta_freq = channels[i].freq - rig.freq;
- #ifdef DEBUG1
-    Serial.print(i);
-    Serial.print(" freq: "); Serial.print(channels[i].freq);
-    Serial.print(" rig freq: "); Serial.println(rig.freq);
-    Serial.print(" delta_freq: "); Serial.println(delta_freq);
-#endif
+
     delay(10);
     if (delta_freq < 0) { delta_freq = -delta_freq; }
     if (delta_freq < delta_freq_min)
@@ -396,11 +337,7 @@ int find_nearest_channel ()
     }
   }
   
-#ifdef DEBUG
-  Serial.print("Frequency of rig: "); Serial.println(rig.freq);
-  Serial.print("Nearest channel: ");  Serial.println(nearest_channel);
-  Serial.println("End find nearest channel");
-#endif  
+
   return nearest_channel;
 }
 
@@ -491,9 +428,6 @@ uint32_t timer = millis();
 int ncycles = 0;
 void read_gps ()
 {
-#ifdef DEBUG
-  Serial.println("read_gps");
-#endif
 
   if (timer > millis()) timer = millis();
   
@@ -519,13 +453,7 @@ void read_gps ()
       }  
    } while (!GPS.parse(GPS.lastNMEA()));
 
-#ifdef DEBUG  
-    Serial.print(ncycles);
-    Serial.print(" Time: ");
-    Serial.print(GPS.hour, DEC); Serial.print(':');
-    Serial.print(GPS.minute, DEC); Serial.print(':');
-    Serial.println(GPS.seconds, DEC); 
-#endif    
+
    
   }
 }
@@ -536,9 +464,7 @@ void read_gps ()
 // Global Setup Routing 
 void setup ()
 {
-#ifdef DEBUG
-  initialize_debug();
-#endif  
+
   initialize_screen();
   
 #ifdef GPS  
@@ -548,7 +474,8 @@ void setup ()
   initialize_ft817();
 
   modus = M_CHANNELS;
-  cur_ch = find_nearest_channel();
+  //cur_ch = find_nearest_channel();
+  cur_ch = 0;
   display_frequency_mode_smeter ();
 }
 
@@ -558,9 +485,7 @@ void setup ()
 // Main loop
 void loop ()
 {  
-#ifdef DEBUG
-  Serial.println("loop");
-#endif
+
 #ifdef GPS
   read_gps();
 #endif  
