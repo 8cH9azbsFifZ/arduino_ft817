@@ -123,7 +123,7 @@ Adafruit_GPS GPS(&serial_gps);
 uint32_t timer;
 
 #define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" // http://www.hhhh.org/wiml/proj/nmeaxor.html
-
+// http://www.adafruit.com/datasheets/PMTK_A08.pdf
 void initialize_gps ()
 {
 
@@ -134,8 +134,9 @@ void initialize_gps ()
 
   // initialize gps module
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
-  //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+  //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
+  //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
 
   delay(INIT_WAIT_TIME);
   serial_gps.println(PMTK_Q_RELEASE);
@@ -225,7 +226,7 @@ void display_frequency_mode_smeter ()
   sprintf(line1, "%s %s",ffreq,rig.mode);
   sprintf(line2, "%s",cur_ch_name);
   sprintf(line3, "%s",rig.smeter);
-  sprintf(line4, "GPS Time: %02d:%02d",(int)(GPS.hour), (int)(GPS.minute));
+  sprintf(line4, "%02d:%02d %2.2f %2.2f",(int)(GPS.hour), (int)(GPS.minute), (float)(GPS.lat), (float)(GPS.lon));
 
   
   // LCD output
@@ -432,7 +433,7 @@ void check_ports ()
 //int ncycles = 0;
 void read_gps ()
 {
-
+c = GPS.read();
   if (timer > millis()) timer = millis();
   
   if (millis() - timer > 2000) {
