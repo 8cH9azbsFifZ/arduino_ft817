@@ -227,7 +227,8 @@ void display_frequency_mode_smeter ()
   
   // LCD output
 
-  lcd.clear();
+  //lcd.clear();
+  lcd.setCursor(0,0);
   lcd.print(line1);
   lcd.setCursor(0,1);
   lcd.print(line2);
@@ -426,10 +427,10 @@ void check_ports ()
 /*************************************************************************************************/
 //#define TIMER 2000 //timer in ms
 //uint32_t timer = millis();
-int ncycles = 0;
+//int ncycles = 0;
 void read_gps ()
 {
-/*
+
   //if (timer > millis()) timer = millis();
   
   //if (millis() - timer > TIMER) {
@@ -444,7 +445,7 @@ void read_gps ()
       c = GPS.read();  
       //if (c) { Serial.println(c); }
       //else { Serial.println("no raw data"); }
-      ncycles++;
+      //ncycles++;
       if (GPS.newNMEAreceived()) 
       {
         // we will observe this automatically :)
@@ -454,7 +455,7 @@ void read_gps ()
 
    
   //}
-  */
+  
 }
 
 
@@ -484,7 +485,7 @@ void loop ()
 
   read_gps();
   read_rig(); 
-  delay(500);
+  //delay(50);
   
   if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
   
