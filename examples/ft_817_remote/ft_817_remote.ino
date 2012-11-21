@@ -131,6 +131,8 @@ byte modus;
 
 
 /*************************************************************************************************/
+//#define GPS
+#ifdef GPS
 #include <Adafruit_GPS.h>
 #define GPS_TX_PIN 3
 #define GPS_RX_PIN 2 
@@ -167,6 +169,7 @@ void initialize_gps ()
   Serial.println("End init GPS");
 #endif  
 }
+#endif // GPS
 
 
 /*************************************************************************************************/
@@ -263,8 +266,11 @@ void display_frequency_mode_smeter ()
   char upper[LCD_NUM_COL+1];
   char lower[LCD_NUM_COL+1];
   sprintf(upper, "%s %s",ffreq,rig.mode);
-  //sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
+#ifdef GPS
   sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
+#else
+  sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
+#endif
 #ifdef DEBUG1
   Serial.println(upper);
   Serial.println(lower);
@@ -479,6 +485,7 @@ void check_ports ()
 }
 
 /*************************************************************************************************/
+#ifdef GPS
 #define TIMER 2000 //timer in ms
 uint32_t timer = millis();
 int ncycles = 0;
@@ -522,7 +529,7 @@ void read_gps ()
    
   }
 }
-
+#endif
 
 
 /*************************************************************************************************/
@@ -534,7 +541,9 @@ void setup ()
 #endif  
   initialize_screen();
   
+#ifdef GPS  
   initialize_gps();
+#endif  
   
   initialize_ft817();
 
@@ -552,7 +561,9 @@ void loop ()
 #ifdef DEBUG
   Serial.println("loop");
 #endif
-  read_gps(); 
+#ifdef GPS
+  read_gps();
+#endif  
   read_rig(); 
   delay(500);
   
