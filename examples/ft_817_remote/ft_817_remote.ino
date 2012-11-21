@@ -120,6 +120,7 @@ byte modus;
 SoftwareSerial serial_gps(GPS_TX_PIN, GPS_RX_PIN);
 Adafruit_GPS GPS(&serial_gps);
 
+uint32_t timer;
 
 #define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" // http://www.hhhh.org/wiml/proj/nmeaxor.html
 
@@ -140,6 +141,8 @@ void initialize_gps ()
   serial_gps.println(PMTK_Q_RELEASE);
   
   // 1st signal
+  timer = millis();
+
   read_gps(); 
 
 }
@@ -426,15 +429,14 @@ void check_ports ()
 
 /*************************************************************************************************/
 //#define TIMER 2000 //timer in ms
-//uint32_t timer = millis();
 //int ncycles = 0;
 void read_gps ()
 {
 
-  //if (timer > millis()) timer = millis();
+  if (timer > millis()) timer = millis();
   
-  //if (millis() - timer > TIMER) {
-  //  timer = millis(); // reset the timer
+  if (millis() - timer > 2000) {
+    timer = millis(); // reset the timer
 
     serial_gps.listen();  
     check_ports();
@@ -454,7 +456,7 @@ void read_gps ()
 
 
    
-  //}
+  }
   
 }
 
