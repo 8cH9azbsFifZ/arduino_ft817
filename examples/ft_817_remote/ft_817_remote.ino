@@ -111,8 +111,7 @@ byte modus;
 
 
 /*************************************************************************************************/
-//#define GPS
-#ifdef GPS
+
 #include <Adafruit_GPS.h>
 #define GPS_TX_PIN 3
 #define GPS_RX_PIN 2 
@@ -144,7 +143,6 @@ void initialize_gps ()
   read_gps(); 
 
 }
-#endif // GPS
 
 
 /*************************************************************************************************/
@@ -216,23 +214,23 @@ void display_frequency_mode_smeter ()
 
 
   // Formatted output
-  char upper[LCD_NUM_COL+1];
-  char lower[LCD_NUM_COL+1];
-  sprintf(upper, "%s %s",ffreq,rig.mode);
-#ifdef GPS
-  sprintf(lower, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
-#else
-  sprintf(lower, "%s %s",rig.smeter,cur_ch_name);
-#endif
+  char line1[LCD_NUM_COL+1];
+  char line2[LCD_NUM_COL+1];
+  char line3[LCD_NUM_COL+1];
+  sprintf(line1, "%s %s",ffreq,rig.mode);
+  sprintf(line2, "%s %s",rig.smeter,cur_ch_name);
+  sprintf(line3, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
 
   
   // LCD output
 
   lcd.clear();
-  lcd.print(upper);
+  lcd.print(line1);
   lcd.setCursor(0,1);
-  lcd.print(lower);
-
+  lcd.print(line2);
+  lcd.setCursor(0,2);
+  lcd.print(line3);
+  
 }
 
 
@@ -412,17 +410,16 @@ int watchdog ()
 /*************************************************************************************************/
 void check_ports ()
 {
-#ifdef DEBUG_SERIAL
+/*
   if (serial_gps.isListening()) { Serial.println("serial_gps is listening"); }
   //else { Serial.println("serial_gps is NOT listening"); }
   
   if (serial_ft817.isListening()) { Serial.println("serial_ft817 is listening"); }
   //else { Serial.println("serial_ft817 is NOT listening"); }
-#endif
+*/
 }
 
 /*************************************************************************************************/
-#ifdef GPS
 #define TIMER 2000 //timer in ms
 uint32_t timer = millis();
 int ncycles = 0;
@@ -441,11 +438,10 @@ void read_gps ()
  
     do {
       c = GPS.read();  
-#ifdef DEBUG_GPS
+/* Debug GPS
       if (c) { Serial.println(c); }
       else { Serial.println("no raw data"); }
-#endif
-
+*/
       ncycles++;
       if (GPS.newNMEAreceived()) 
       {
@@ -457,7 +453,6 @@ void read_gps ()
    
   }
 }
-#endif
 
 
 /*************************************************************************************************/
@@ -467,9 +462,7 @@ void setup ()
 
   initialize_screen();
   
-#ifdef GPS  
   initialize_gps();
-#endif  
   
   initialize_ft817();
 
@@ -486,9 +479,7 @@ void setup ()
 void loop ()
 {  
 
-#ifdef GPS
   read_gps();
-#endif  
   read_rig(); 
   delay(500);
   
