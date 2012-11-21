@@ -217,9 +217,12 @@ void display_frequency_mode_smeter ()
   char line1[LCD_NUM_COL+1];
   char line2[LCD_NUM_COL+1];
   char line3[LCD_NUM_COL+1];
+  char line4[LCD_NUM_COL+1];
+
   sprintf(line1, "%s %s",ffreq,rig.mode);
-  sprintf(line2, "%s %s",rig.smeter,cur_ch_name);
-  sprintf(line3, "%s %s %02d:%02d",rig.smeter,cur_ch_name,(int)(GPS.hour), (int)(GPS.minute));
+  sprintf(line2, "%s",cur_ch_name);
+  sprintf(line3, "%s",rig.smeter);
+  sprintf(line4, "GPS Time: %02d:%02d",(int)(GPS.hour), (int)(GPS.minute));
 
   
   // LCD output
@@ -230,7 +233,8 @@ void display_frequency_mode_smeter ()
   lcd.print(line2);
   lcd.setCursor(0,2);
   lcd.print(line3);
-  
+  lcd.setCursor(0,3);
+  lcd.print(line4);
 }
 
 
@@ -420,16 +424,16 @@ void check_ports ()
 }
 
 /*************************************************************************************************/
-#define TIMER 2000 //timer in ms
-uint32_t timer = millis();
+//#define TIMER 2000 //timer in ms
+//uint32_t timer = millis();
 int ncycles = 0;
 void read_gps ()
 {
-
-  if (timer > millis()) timer = millis();
+/*
+  //if (timer > millis()) timer = millis();
   
-  if (millis() - timer > TIMER) {
-    timer = millis(); // reset the timer
+  //if (millis() - timer > TIMER) {
+  //  timer = millis(); // reset the timer
 
     serial_gps.listen();  
     check_ports();
@@ -438,10 +442,8 @@ void read_gps ()
  
     do {
       c = GPS.read();  
-/* Debug GPS
-      if (c) { Serial.println(c); }
-      else { Serial.println("no raw data"); }
-*/
+      //if (c) { Serial.println(c); }
+      //else { Serial.println("no raw data"); }
       ncycles++;
       if (GPS.newNMEAreceived()) 
       {
@@ -451,7 +453,8 @@ void read_gps ()
 
 
    
-  }
+  //}
+  */
 }
 
 
