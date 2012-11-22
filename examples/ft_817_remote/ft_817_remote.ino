@@ -113,12 +113,10 @@ byte modus;
 /*************************************************************************************************/
 
 #include <Adafruit_GPS.h>
-#define GPS_TX_PIN 3
-#define GPS_RX_PIN 2 
+
 #define GPS_SPEED 9600
 
-SoftwareSerial serial_gps(GPS_TX_PIN, GPS_RX_PIN);
-Adafruit_GPS GPS(&serial_gps);
+Adafruit_GPS GPS(&Serial2);
 
 uint32_t timer;
 
@@ -139,8 +137,7 @@ void initialize_gps ()
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
 
   delay(INIT_WAIT_TIME);
-  serial_gps.println(PMTK_Q_RELEASE);
-
+  Serial2.println(PMTK_Q_RELEASE);
   // 1st signal
   timer = millis();
 
@@ -176,11 +173,16 @@ void read_rig ()
     rig.smeterbyte = ft817.getRxStatus(rig.smeter);
   } 
   while (rig.freq == 0); 
+  /*
   Serial.print("rig: ");
   Serial.print(rig.freq);
   Serial.print(" mode ");
   Serial.print(rig.mode);
-  Serial.print("\n");
+  Serial.print("   ");
+   Serial.print(GPS.hour, DEC); Serial.print(':');
+    Serial.print(GPS.minute, DEC); Serial.print(':');
+    Serial.print(GPS.seconds, DEC); Serial.print('.');
+  Serial.print("\n");*/
 } 
 
 /*************************************************************************************************/
@@ -231,7 +233,7 @@ void display_frequency_mode_smeter ()
 
   // LCD output
 
-  //lcd.clear();
+  lcd.clear();
   lcd.setCursor(0,0);
   lcd.print(line1);
   lcd.setCursor(0,1);
@@ -492,31 +494,54 @@ int watchdog ()
 //int ncycles = 0;
 void read_gps ()
 {
+ // read data from the GPS in the 'main loop'
+  char c = GPS.read();
+  // if you want to debug, this is a good time to do it!
+  //if (GPSECHO)
+    //if (c) Serial.print(c);
+  // if a sentence is received, we can check the checksum, parse it...
+  if (GPS.newNMEAreceived()) {
+    // a tricky thing here is if we print the NMEA sentence, or data
+    // we end up not listening and catching other sentences!
+    // so be very wary if using OUTPUT_ALLDATA and trytng to print out data
+    //Serial.println(GPS.lastNMEA()); // this also sets the newNMEAreceived() flag to false
+    if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
+      return; // we can fail to parse a sentence in which case we should just wait for another
+  }
+  // if millis() or timer wraps around, we'll just reset it
   if (timer > millis()) timer = millis();
-
+     
+  // approximately every 2 seconds or so, print out the current stats
   if (millis() - timer > 2000) {
     timer = millis(); // reset the timer
+      display_frequency_mode_smeter ();
 
-    serial_gps.listen();  
-
-    char c;
-
-    do {
-      c = GPS.read();  
-      //if (c) { Serial.println(c); }
-      //else { Serial.println("no raw data"); }
-      //ncycles++;
-      if (GPS.newNMEAreceived()) 
-      {
-        // we will observe this automatically :)
-      }  
-    } 
-    while (!GPS.parse(GPS.lastNMEA()));
-
-
-
+     Serial.print("rig: ");
+  Serial.print(rig.freq);
+  Serial.print(" mode ");
+  Serial.print(rig.mode);
+    Serial.print("\nTime: ");
+    Serial.print(GPS.hour, DEC); Serial.print(':');
+    Serial.print(GPS.minute, DEC); Serial.print(':');
+    Serial.print(GPS.seconds, DEC); Serial.print('.');
+    Serial.println(GPS.milliseconds);
+    Serial.print("Date: ");
+    Serial.print(GPS.day, DEC); Serial.print('/');
+    Serial.print(GPS.month, DEC); Serial.print("/20");
+    Serial.println(GPS.year, DEC);
+    Serial.print("Fix: "); Serial.print((int)GPS.fix);
+    Serial.print(" quality: "); Serial.println((int)GPS.fixquality);
+    if (GPS.fix) {
+      Serial.print("Location: ");
+      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
+      Serial.print(", ");
+      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
+      Serial.print("Speed (knots): "); Serial.println(GPS.speed);
+      Serial.print("Angle: "); Serial.println(GPS.angle);
+      Serial.print("Altitude: "); Serial.println(GPS.altitude);
+      Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
+    }
   }
-
 }
 
 
@@ -525,10 +550,9 @@ void read_gps ()
 void setup ()
 {
   Serial.begin(9600);
-  //initialize_screen();
+  initialize_screen();
 
-  //initialize_gps();
-
+  initialize_gps();
   initialize_ft817();
 
   modus = M_CHANNELS;
@@ -543,9 +567,10 @@ void setup ()
 // Main loop
 void loop ()
 {    
-  //read_gps();
+  read_gps();
   read_rig(); 
-  //delay(50);
+  //delay(50);display_frequency_mode_smeter ();
+  //display_frequency_mode_smeter ();
 return;
   if (rig_state_changed() == CHANGED)  { 
     display_frequency_mode_smeter (); 
