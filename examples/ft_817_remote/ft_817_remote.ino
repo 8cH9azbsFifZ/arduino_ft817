@@ -57,10 +57,10 @@ uint8_t lcd_key;
 typedef struct
 {
   // current status
-  long freq, freq_old;
-  char mode[4], mode_old[4];
-  char smeter[SMETER_LEN], smeter_old[SMETER_LEN];
-  byte smeterbyte, smeterbyte_old;
+  long freq;
+  char mode[4];
+  char smeter[SMETER_LEN];
+  byte smeterbyte;
 } 
 t_status;
 t_status rig; 
@@ -87,14 +87,15 @@ void initialize_ft817 ()
 int cur_ch;
 #define CH_NAME_LEN 5 // NB: must be adjusted in bandplan header creation script, too!
 char cur_ch_name[CH_NAME_LEN];
+char cur_band_name[CH_NAME_LEN];
 #define NO_CHANNEL -1
 #define CHANNEL_FOUND 0
 #define NO_CHANNEL_FOUND -1
 
 // NB: indices as in list above!! 
-const int watchdog_frequencies[] = {
-  43932500, 2706500, 14521250}; // FIXME: can be configured
-const int num_watchdog_frequencies = 3;//FIXME
+const long watchdog_frequencies[] = {
+  43340000, 43932500, 2706500, 14521250}; // FIXME: can be configured
+const int num_watchdog_frequencies = 4;//FIXME
 
 /*************************************************************************************************/
 #define M_NONE 0
@@ -156,12 +157,6 @@ void initialize_screen ()
 /*************************************************************************************************/
 void read_rig ()
 {
-  // save old state
-  rig.freq_old = rig.freq;
-  //sprintf(rig.smeter_old, "%s", rig.smeter);
-  rig.smeterbyte_old = rig.smeterbyte;
-  //sprintf(rig.mode_old, "%s", rig.mode);
-
   do // rig frequency may initially be 0
   {
     rig.freq = ft817.getFreqMode(rig.mode);
@@ -180,20 +175,6 @@ void read_rig ()
   Serial.print("\n");*/
 } 
 
-/*************************************************************************************************/
-#define CHANGED 1
-#define UNCHANGED 0
-int rig_state_changed ()
-{
-  if (rig.freq_old == rig.freq &&   
-    rig.smeterbyte_old == rig.smeterbyte )
-    // rig.smeter_old == rig.smeter &&  // FIXME: string comparison?
-    // rig.mode_old = rig.mode)
-  {
-    return UNCHANGED;
-  }
-  return CHANGED;
-}
 
 /*************************************************************************************************/
 
@@ -218,14 +199,22 @@ void display_frequency ()
 void display_channel ()
 {
   int i = get_cur_ch_name(rig.freq);
+  int j = get_cur_band_name(rig.freq);
   char line2[LCD_NUM_COL+1];
   if (i == 0)
   {
-    sprintf(line2, "%s",cur_ch_name);
+    sprintf(line2, "%20s",cur_ch_name);
   }
   else
   { 
-    sprintf(line2, "No Channel Name.");
+    if (j == 0)
+    {
+      sprintf(line2, "%20s",cur_band_name);
+    }
+    else
+    {
+      sprintf (line2, "No bandplan        ");
+    }
   }
   lcd.setCursor(0,1); lcd.print(line2);
 }
@@ -291,16 +280,35 @@ int get_cur_ch_name (long freq)
 }
 
 
-
+int get_cur_band_name (long freq)
+{
+  int i;
+  for (i = 0; i < nbands; i++)
+  {
+    if (bands[i].low <= freq && freq <= bands[i].high)
+    {
+      /*Serial.print ("Band found: ");
+      Serial.print (bands[i].name);
+      Serial.print ("\n");*/
+      sprintf (cur_band_name, "%s",  bands[i].name);
+      return 0;
+    }
+  }
+  return 1;
+}
 
 /*************************************************************************************************/
 void channels_mode ()
 {
   if (lcd_key & BUTTON_RIGHT)  { 
     set_channel (cur_ch+1); 
+     Serial.print ("Change channel:");
+ Serial.print (" +1\n");
   }
   if (lcd_key & BUTTON_LEFT)   { 
     set_channel (cur_ch-1); 
+      Serial.print ("Change channel:");
+Serial.print (" -1\n");
   }
   if (lcd_key & BUTTON_UP)     { 
     modus = M_SCANNING; 
@@ -488,24 +496,40 @@ int scan_function()
 int watchdog ()
 {
   int i;
+  long oldfreq = rig.freq;
   for (i = 0; i < num_watchdog_frequencies; i++)
   {
-    set_channel (freq_to_channel(watchdog_frequencies[i]));
+    ft817.setFreq(watchdog_frequencies[i]);
+    Serial.print ("Set freq via watchdog: ");
+    Serial.print (watchdog_frequencies[i]);
+    Serial.print("\n");
+    //set_channel (freq_to_channel(watchdog_frequencies[i]));
     delay(SCAN_DELAY);
     read_rig();
-    display_frequency_mode_smeter();
+    display_frequency();
+    display_channel();
     // FIXME: other display for watchdog mode
     if (signal_detected() == TRUE)
     {
-      modus = M_NONE;
+      //modus = M_NONE;
       return CHANNEL_FOUND;
     }
   }
+  ft817.setFreq(oldfreq);
+  read_rig();
+  display_frequency();
+  display_channel();
+  return 1;
 }
 
 
 /*************************************************************************************************/
-#define TIMER 2000 //timer in ms
+#define TIMER 80000 //timer in ms
+#define TIMER_GPS 2000
+#define TIMER_SMETER 500
+#define TIMER_FREQUENCY 4500
+#define TIMER_WATCHDOG 20000
+
 void read_gps ()
 {
   char c = GPS.read();
@@ -520,11 +544,6 @@ void read_gps ()
 
 void show_gps ()
 {
-  if (millis() - timer > TIMER) {
-    timer = millis(); // reset the timer
-    
-    display_frequency_mode_smeter ();
-
     Serial.print("rig: ");
     Serial.print(rig.freq);
     Serial.print(" mode ");
@@ -550,7 +569,6 @@ void show_gps ()
       Serial.print("Altitude: "); Serial.println(GPS.altitude);
       Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
     }
-  }
 }
 
 
@@ -578,47 +596,46 @@ void loop ()
 {    
   int update_display = 0;
   read_gps();
-  read_rig(); 
-  // update display when:
-  //  every 1 minute no action
-  //  smeter updates?
-  //  frequency updates
-  //  mode updates
-  //  gps updates
-  show_gps();
-  //delay(50);display_frequency_mode_smeter ();
-  //display_frequency_mode_smeter ();
-return;
-  if (rig_state_changed() == CHANGED)  { 
-    display_frequency_mode_smeter (); 
+  read_rig();
+  
+  uint32_t curtimer = millis() - timer;
+  if (curtimer > TIMER) {
+    timer = millis(); // reset the timer
   }
+  if (curtimer > TIMER_GPS)  {    display_time();  } //show_gps();}
+  if (curtimer > TIMER_SMETER)  {    display_smeter();  }
+  if (curtimer > TIMER_FREQUENCY)  {    display_frequency(); display_channel(); }
+  if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
+
 
   //lcd_key = lcd.readButtons();
+  //Serial.print ("Read key: ");
+  //Serial.print (lcd_key);
+  //Serial.print ("\n");
+  //modus = M_WATCHDOG;
   switch (modus)
   {
   case M_WATCHDOG: 
     { 
-      watchdog(); 
+      //watchdog(); 
       break; 
     }
   case M_CHANNELS: 
     { 
-      channels_mode(); 
+      //channels_mode(); 
       break; 
     }
   case M_FREQUENCY: 
     { 
-      freq_plus_minus_mode (); 
+      //freq_plus_minus_mode (); 
       break; 
     }
   case M_SCANNING: 
     { 
-      scan_function(); 
+      //scan_function(); 
       break; 
     }
   }
-
-  //if (lcd_key) { display_frequency_mode_smeter (); }
 }
 
 
