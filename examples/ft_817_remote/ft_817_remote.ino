@@ -1,28 +1,29 @@
 /*
     This file is part of the FT817 Arduino Library.
-
-    The FT817 Arduino Library is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    The FT817 Arduino Library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FT817 Arduino Library.  If not, see http://www.gnu.org/licenses/;.	  
-
-    Author: Gerolf Ziegenhain, DG6FL
-
-*/
+ 
+ The FT817 Arduino Library is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ The FT817 Arduino Library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with FT817 Arduino Library.  If not, see http://www.gnu.org/licenses/;.	  
+ 
+ Author: Gerolf Ziegenhain, DG6FL
+ 
+ */
 
 #define LONG_MAX 1000000000
 #define TRUE 0
 #define FALSE 1
 #define INIT_WAIT_TIME 1000
 #include <SoftwareSerial.h>
+#include <HardwareSerial.h>
 
 
 /*************************************************************************************************/
@@ -60,27 +61,25 @@ typedef struct
   char mode[4], mode_old[4];
   char smeter[SMETER_LEN], smeter_old[SMETER_LEN];
   byte smeterbyte, smeterbyte_old;
-} t_status;
+} 
+t_status;
 t_status rig; 
 
-#define FT817_TX_PIN 13 // defined in header -- FIXME
-#define FT817_RX_PIN 12 
+#define FT817_TX_PIN 18 // defined in header -- FIXME
+#define FT817_RX_PIN 17 
 #define FT817_SPEED 38400
-SoftwareSerial serial_ft817(FT817_RX_PIN,FT817_TX_PIN);
-FT817 ft817(&serial_ft817);
+FT817 ft817(&Serial1);
 
 
 void initialize_ft817 ()
 {
-  lcd.setCursor(0,1);
-  lcd.print("Init FT817");
-  
+  //lcd.setCursor(0,1);
+ // lcd.print("Init FT817");
+
+Serial.print("Init 817");
   ft817.begin(FT817_SPEED);
-  //do { serial_ft817.listen(); } while (!serial_ft817.available());
-  serial_ft817.listen();
-  ft817.getFreqMode(rig.mode);
   delay(INIT_WAIT_TIME);
-  
+
   read_rig();  
 }
 
@@ -98,7 +97,8 @@ char cur_ch_name[CH_NAME_LEN];
 #define NO_CHANNEL_FOUND -1
 
 // NB: indices as in list above!! 
-const int watchdog_frequencies[] = {43932500, 2706500, 14521250}; // FIXME: can be configured
+const int watchdog_frequencies[] = {
+  43932500, 2706500, 14521250}; // FIXME: can be configured
 const int num_watchdog_frequencies = 3;//FIXME
 
 /*************************************************************************************************/
@@ -129,7 +129,7 @@ void initialize_gps ()
 
   lcd.setCursor(0,1);
   lcd.print("Init GPS");
-  
+
   GPS.begin(GPS_SPEED);
 
   // initialize gps module
@@ -140,7 +140,7 @@ void initialize_gps ()
 
   delay(INIT_WAIT_TIME);
   serial_gps.println(PMTK_Q_RELEASE);
-  
+
   // 1st signal
   timer = millis();
 
@@ -164,23 +164,23 @@ void initialize_screen ()
 /*************************************************************************************************/
 void read_rig ()
 {
-
-  serial_ft817.listen();
-  check_ports();
-
   // save old state
   rig.freq_old = rig.freq;
-  sprintf(rig.smeter_old, "%s", rig.smeter);
+  //sprintf(rig.smeter_old, "%s", rig.smeter);
   rig.smeterbyte_old = rig.smeterbyte;
-  sprintf(rig.mode_old, "%s", rig.mode);
-  
+  //sprintf(rig.mode_old, "%s", rig.mode);
+
   do // rig frequency may initially be 0
   {
     rig.freq = ft817.getFreqMode(rig.mode);
     rig.smeterbyte = ft817.getRxStatus(rig.smeter);
-
-  } while (rig.freq == 0); 
-
+  } 
+  while (rig.freq == 0); 
+  Serial.print("rig: ");
+  Serial.print(rig.freq);
+  Serial.print(" mode ");
+  Serial.print(rig.mode);
+  Serial.print("\n");
 } 
 
 /*************************************************************************************************/
@@ -189,9 +189,9 @@ void read_rig ()
 int rig_state_changed ()
 {
   if (rig.freq_old == rig.freq &&   
-        rig.smeterbyte_old == rig.smeterbyte )
-       // rig.smeter_old == rig.smeter &&  // FIXME: string comparison?
-       // rig.mode_old = rig.mode)
+    rig.smeterbyte_old == rig.smeterbyte )
+    // rig.smeter_old == rig.smeter &&  // FIXME: string comparison?
+    // rig.mode_old = rig.mode)
   {
     return UNCHANGED;
   }
@@ -228,7 +228,7 @@ void display_frequency_mode_smeter ()
   sprintf(line3, "%s",rig.smeter);
   sprintf(line4, "%02d:%02d %2.2f %2.2f",(int)(GPS.hour), (int)(GPS.minute), (float)(GPS.lat), (float)(GPS.lon));
 
-  
+
   // LCD output
 
   //lcd.clear();
@@ -279,9 +279,15 @@ void get_cur_ch_name (long freq)
 /*************************************************************************************************/
 void channels_mode ()
 {
-  if (lcd_key & BUTTON_RIGHT)  { set_channel (cur_ch+1); }
-  if (lcd_key & BUTTON_LEFT)   { set_channel (cur_ch-1); }
-  if (lcd_key & BUTTON_UP)     { modus = M_SCANNING; }
+  if (lcd_key & BUTTON_RIGHT)  { 
+    set_channel (cur_ch+1); 
+  }
+  if (lcd_key & BUTTON_LEFT)   { 
+    set_channel (cur_ch-1); 
+  }
+  if (lcd_key & BUTTON_UP)     { 
+    modus = M_SCANNING; 
+  }
 }
 
 
@@ -290,14 +296,12 @@ void freq_plus_minus_mode ()
 {
   float delta_freq = 10; // 10 == 100 Hz
 
-     // TBD
+  // TBD
 }
 
 /*************************************************************************************************/
 void set_channel (int ch)
 {  
-  //do { serial_ft817.listen(); } while (!serial_ft817.available());
-  serial_ft817.listen();
   // setup the internal current channel
   if (ch > nchannels - 1)
   {
@@ -312,10 +316,11 @@ void set_channel (int ch)
   // update the rig 
   do // it may happen, that the frequency is not set correctly during the 1st attempt.
   {
-      ft817.setFreq(channels[cur_ch].freq);
-      read_rig();
-  } while (rig.freq != channels[cur_ch].freq);
-  
+    ft817.setFreq(channels[cur_ch].freq);
+    read_rig();
+  } 
+  while (rig.freq != channels[cur_ch].freq);
+
   ft817.setMode(channels[cur_ch].mode);
   if (channels[cur_ch].rpt != 0) 
   { 
@@ -336,14 +341,16 @@ int find_nearest_channel ()
     long delta_freq = channels[i].freq - rig.freq;
 
     delay(10);
-    if (delta_freq < 0) { delta_freq = -delta_freq; }
+    if (delta_freq < 0) { 
+      delta_freq = -delta_freq; 
+    }
     if (delta_freq < delta_freq_min)
     {
       nearest_channel = i;
       delta_freq_min = delta_freq;
     }
   }
-  
+
 
   return nearest_channel;
 }
@@ -353,22 +360,86 @@ byte signal_detected ()
 {
   switch (rig.smeterbyte)
   {
-    case FT817_S0:   { return FALSE; break; }
-    case FT817_S1:   { return TRUE; break; }
-    case FT817_S2:   { return TRUE; break; }
-    case FT817_S3:   { return TRUE; break; }
-    case FT817_S4:   { return TRUE; break; }
-    case FT817_S5:   { return TRUE; break; }
-    case FT817_S6:   { return TRUE; break; }
-    case FT817_S7:   { return TRUE; break; }
-    case FT817_S8:   { return TRUE; break; }
-    case FT817_S10:  { return TRUE; break; }
-    case FT817_S20:  { return TRUE; break; }
-    case FT817_S30:  { return TRUE; break; }
-    case FT817_S40:  { return TRUE; break; }
-    case FT817_S50:  { return TRUE; break; }
-    case FT817_S60:  { return TRUE; break; }
-    default:         { return FALSE; break; }
+  case FT817_S0:   
+    { 
+      return FALSE; 
+      break; 
+    }
+  case FT817_S1:   
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S2:   
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S3:   
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S4:   
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S5:   
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S6:   
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S7:   
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S8:   
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S10:  
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S20:  
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S30:  
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S40:  
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S50:  
+    { 
+      return TRUE; 
+      break; 
+    }
+  case FT817_S60:  
+    { 
+      return TRUE; 
+      break; 
+    }
+  default:         
+    { 
+      return FALSE; 
+      break; 
+    }
   }
 }
 
@@ -417,32 +488,19 @@ int watchdog ()
 
 
 /*************************************************************************************************/
-void check_ports ()
-{
-/*
-  if (serial_gps.isListening()) { Serial.println("serial_gps is listening"); }
-  //else { Serial.println("serial_gps is NOT listening"); }
-  
-  if (serial_ft817.isListening()) { Serial.println("serial_ft817 is listening"); }
-  //else { Serial.println("serial_ft817 is NOT listening"); }
-*/
-}
-
-/*************************************************************************************************/
 //#define TIMER 2000 //timer in ms
 //int ncycles = 0;
 void read_gps ()
 {
   if (timer > millis()) timer = millis();
-  
+
   if (millis() - timer > 2000) {
     timer = millis(); // reset the timer
 
     serial_gps.listen();  
-    check_ports();
- 
+
     char c;
- 
+
     do {
       c = GPS.read();  
       //if (c) { Serial.println(c); }
@@ -452,12 +510,13 @@ void read_gps ()
       {
         // we will observe this automatically :)
       }  
-   } while (!GPS.parse(GPS.lastNMEA()));
+    } 
+    while (!GPS.parse(GPS.lastNMEA()));
 
 
-   
+
   }
-  
+
 }
 
 
@@ -465,17 +524,17 @@ void read_gps ()
 // Global Setup Routing 
 void setup ()
 {
+  Serial.begin(9600);
+  //initialize_screen();
 
-  initialize_screen();
-  
-  initialize_gps();
-  
+  //initialize_gps();
+
   initialize_ft817();
 
   modus = M_CHANNELS;
   //cur_ch = find_nearest_channel();
   cur_ch = 0;
-  display_frequency_mode_smeter ();
+  //display_frequency_mode_smeter ();
 }
 
 
@@ -483,23 +542,41 @@ void setup ()
 /*************************************************************************************************/
 // Main loop
 void loop ()
-{  
-
-  read_gps();
+{    
+  //read_gps();
   read_rig(); 
   //delay(50);
-  
-  if (rig_state_changed() == CHANGED)  { display_frequency_mode_smeter (); }
-  
-  lcd_key = lcd.readButtons();
+return;
+  if (rig_state_changed() == CHANGED)  { 
+    display_frequency_mode_smeter (); 
+  }
+
+  //lcd_key = lcd.readButtons();
   switch (modus)
   {
-    case M_WATCHDOG: { watchdog(); break; }
-    case M_CHANNELS: { channels_mode(); break; }
-    case M_FREQUENCY: { freq_plus_minus_mode (); break; }
-    case M_SCANNING: { scan_function(); break; }
+  case M_WATCHDOG: 
+    { 
+      watchdog(); 
+      break; 
+    }
+  case M_CHANNELS: 
+    { 
+      channels_mode(); 
+      break; 
+    }
+  case M_FREQUENCY: 
+    { 
+      freq_plus_minus_mode (); 
+      break; 
+    }
+  case M_SCANNING: 
+    { 
+      scan_function(); 
+      break; 
+    }
   }
-  
-  if (lcd_key) { display_frequency_mode_smeter (); }
+
+  //if (lcd_key) { display_frequency_mode_smeter (); }
 }
+
 
