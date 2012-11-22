@@ -25,7 +25,13 @@
 
 #define DEBUG false
 
+#ifdef SER
 FT817::FT817(SoftwareSerial *ser)
+{
+    rigSoftSerial = ser;
+}
+#endif
+FT817::FT817(HardwareSerial *ser)
 {
     rigSoftSerial = ser;
 }
@@ -41,12 +47,12 @@ boolean FT817::setLockOn() {
     byte b = readOneChar();
     
     if (b == 240) {
-        if (DEBUG) { Serial.println("Lock was ON"); }
+//        if (DEBUG) { Serial.println("Lock was ON"); }
         was_locked = true;
     }
     
     else {
-        if (DEBUG) { Serial.println("Lock was OFF"); }
+//        if (DEBUG) { Serial.println("Lock was OFF"); }
         was_locked = false;
     }
     
@@ -60,12 +66,12 @@ boolean FT817::setLockOff() {
     byte b = readOneChar();
     
     if (b == 240) {
-        if (DEBUG) { Serial.println("Lock was OFF"); }
+//        if (DEBUG) { Serial.println("Lock was OFF"); }
         was_locked = false;
     }
     
     else {
-        if (DEBUG) { Serial.println("Lock was ON"); }
+//        if (DEBUG) { Serial.println("Lock was ON"); }
         was_locked = true;
     }
     
@@ -110,8 +116,8 @@ void FT817::verifiedSetFreq(unsigned long freq) {
 
 
 void FT817::rigComError(char * string) {
-    Serial.print("Rigcomm error: ");
- 	 Serial.println(string);
+//    Serial.print("Rigcomm error: ");
+// 	 Serial.println(string);
   	 //instead loop the getFreqMode until we get good data
 }
 
@@ -140,10 +146,10 @@ boolean FT817::setFreqTest(unsigned long freq) {
     }
     else { 
         if (DEBUG) {
-            Serial.print("sent in: ");
-            Serial.print(freq);
-            Serial.print("got out: ");
-            Serial.println(freqOut);
+//            Serial.print("sent in: ");
+//            Serial.print(freq);
+//            Serial.print("got out: ");
+//            Serial.println(freqOut);
         }
     //rigComError("failed setfreqtest");
     return false;
@@ -174,17 +180,17 @@ unsigned long FT817::getFreqMode(char *modename) {
         elapsed = millis() - timeout;
     }
     if (elapsed >= 2000) {
-        if (DEBUG) {Serial.println("timeout on getfreqMode");}
+//        if (DEBUG) {Serial.println("timeout on getfreqMode");}
         readValid = false;
     }
     else {
         if (DEBUG) {
-            Serial.print("getfreQMode took: ");
-            Serial.println(elapsed);
+//            Serial.print("getfreQMode took: ");
+//            Serial.println(elapsed);
         }
         for (int i = 0; i < 4; i++) {
             chars[i] = rigSoftSerial->read(); 
-            if (DEBUG) { Serial.println(chars[i]); }
+//            if (DEBUG) { Serial.println(chars[i]); }
         }
         mode = rigSoftSerial->read();
 		  switch (mode)
@@ -210,8 +216,8 @@ unsigned long FT817::getFreqMode(char *modename) {
 
     else {
         freq = from_bcd_be(chars, 4);
-        if (DEBUG) {Serial.print("Final result from getfreqmode: ");}
-        if (DEBUG) {Serial.println(freq);}
+//        if (DEBUG) {Serial.print("Final result from getfreqmode: ");}
+//        if (DEBUG) {Serial.println(freq);}
         return freq;
      }
 }
@@ -226,15 +232,15 @@ char FT817::readOneChar() {
     }
     if (elapsed >= 200) {
         if (DEBUG) {
-            Serial.println("readOneChar timeout");
+//            Serial.println("readOneChar timeout");
         }
         return 0;
     }
     else {
         byte b = rigSoftSerial->read();
         if (DEBUG) {
-            Serial.print("read char: ");
-            Serial.println((int)b);
+//            Serial.print("read char: ");
+//            Serial.println((int)b);
         }
     return b;
     }
@@ -242,7 +248,7 @@ char FT817::readOneChar() {
 
 void FT817::sendCATCommandChar(int command) {
     if (DEBUG) {
-        Serial.print(byte(command));
+//        Serial.print(byte(command));
     }
     rigSoftSerial->write(byte(command));
 }
@@ -250,7 +256,7 @@ void FT817::sendCATCommandChar(int command) {
 void FT817::sendCATCommandArray(  byte command[], int len) {
     for (int x = 0; x < len; x++) {
         if (DEBUG) {
-        Serial.print(byte(command[x]));
+//        Serial.print(byte(command[x]));
     }
     rigSoftSerial->write(byte(command[x]));
     }
@@ -310,12 +316,12 @@ boolean FT817::txMeters() {
     byte b = readOneChar();
     
     if (b == false) {
-        if (DEBUG) { Serial.println("Error"); }
+//        if (DEBUG) { Serial.println("Error"); }
         return false;
     }
     
     else if (b == 255) {
-        if (DEBUG) { Serial.println("RX"); }
+//        if (DEBUG) { Serial.println("RX"); }
         return false;
     }
     
@@ -328,7 +334,7 @@ boolean FT817::txMeters() {
         swr = c / 16;
         mod = c & 15;
         
-        if (DEBUG) {
+/*        if (DEBUG) {
             Serial.println("TX");
             Serial.print("Power: ");
             Serial.println(pwr);
@@ -339,7 +345,7 @@ boolean FT817::txMeters() {
             Serial.print("Mod: ");
             Serial.println(mod);
         }
-        
+ */       
         return true;
         
     }

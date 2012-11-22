@@ -25,7 +25,9 @@
 #define FT817_h
 
 #include "Arduino.h"
+#ifdef SER
 #include <SoftwareSerial.h>
+#endif
 
 // Design note:
 // In contrast to hamlib yaesu_cmd_set_t ncmd structure we use only the
@@ -120,7 +122,10 @@
 class FT817
 {
   public:
+#ifdef SER
     FT817(SoftwareSerial *ser); // Constructor when using SoftwareSerial
+#endif
+	 FT817 (HardwareSerial *ser);	
 
     boolean txState();
     boolean txState2();
@@ -172,8 +177,10 @@ class FT817
     unsigned char foo[4];
     unsigned char * out;
     void rigComError(char * string);
+#ifdef SER	 
     SoftwareSerial *rigSoftSerial;
-
+#endif	 
+	 HardwareSerial *rigSoftSerial;
 };
 
 #endif
