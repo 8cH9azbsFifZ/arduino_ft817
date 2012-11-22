@@ -65,21 +65,16 @@ typedef struct
 t_status;
 t_status rig; 
 
-#define FT817_TX_PIN 18 // defined in header -- FIXME
-#define FT817_RX_PIN 17 
 #define FT817_SPEED 38400
 FT817 ft817(&Serial1);
 
 
 void initialize_ft817 ()
 {
-  //lcd.setCursor(0,1);
- // lcd.print("Init FT817");
-
-Serial.print("Init 817");
+  lcd.setCursor(0,1);
+  lcd.print("Init FT817");
   ft817.begin(FT817_SPEED);
   delay(INIT_WAIT_TIME);
-
   read_rig();  
 }
 
@@ -113,15 +108,15 @@ byte modus;
 /*************************************************************************************************/
 
 #include <Adafruit_GPS.h>
-
 #define GPS_SPEED 9600
-
 Adafruit_GPS GPS(&Serial2);
 
 uint32_t timer;
 
-#define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" // http://www.hhhh.org/wiml/proj/nmeaxor.html
+#define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" 
+// http://www.hhhh.org/wiml/proj/nmeaxor.html
 // http://www.adafruit.com/datasheets/PMTK_A08.pdf
+
 void initialize_gps ()
 {
 
@@ -201,10 +196,9 @@ int rig_state_changed ()
 }
 
 /*************************************************************************************************/
-void display_frequency_mode_smeter ()
+
+void display_frequency ()
 {
-
-
   // Frequency
   // All of the stuff below only creates a good frequency output - looks chaotic :(
   long freq = rig.freq * 10; //in Hz
@@ -213,35 +207,56 @@ void display_frequency_mode_smeter ()
   int hz = freq % 1000;
   char ffreq[FREQ_LEN];
   sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
-
-
-  // Channel name
-  get_cur_ch_name(rig.freq);
-
-
-  // Formatted output
-  char line1[LCD_NUM_COL+1];
-  char line2[LCD_NUM_COL+1];
-  char line3[LCD_NUM_COL+1];
-  char line4[LCD_NUM_COL+1];
-
+  
+  char line1[LCD_NUM_COL+1]; 
   sprintf(line1, "%s %s",ffreq,rig.mode);
-  sprintf(line2, "%s",cur_ch_name);
-  sprintf(line3, "%s",rig.smeter);
-  sprintf(line4, "%02d:%02d %2.2f %2.2f",(int)(GPS.hour), (int)(GPS.minute), (float)(GPS.lat), (float)(GPS.lon));
-
-
-  // LCD output
-
-  lcd.clear();
+  
   lcd.setCursor(0,0);
   lcd.print(line1);
-  lcd.setCursor(0,1);
-  lcd.print(line2);
-  lcd.setCursor(0,2);
-  lcd.print(line3);
-  lcd.setCursor(0,3);
-  lcd.print(line4);
+}
+
+void display_channel ()
+{
+  int i = get_cur_ch_name(rig.freq);
+  char line2[LCD_NUM_COL+1];
+  if (i == 0)
+  {
+    sprintf(line2, "%s",cur_ch_name);
+  }
+  else
+  { 
+    sprintf(line2, "No Channel Name.");
+  }
+  lcd.setCursor(0,1); lcd.print(line2);
+}
+
+void display_smeter ()
+{
+  char line3[LCD_NUM_COL+1];
+  sprintf(line3, "%s",rig.smeter);
+  lcd.setCursor(0,2); lcd.print(line3);
+}
+
+void display_time()
+{
+  char line4[LCD_NUM_COL+1];
+  if (GPS.fix)
+  {
+    sprintf(line4, "%02d:%02d %2.2f %2.2f",(int)(GPS.hour), (int)(GPS.minute), (float)(GPS.lat), (float)(GPS.lon));
+  }
+  else
+  {
+    sprintf(line4, "%02d:%02d No GPS Fix.",(int)(GPS.hour), (int)(GPS.minute));
+  }
+  lcd.setCursor(0,3); lcd.print(line4);
+}
+void display_frequency_mode_smeter ()
+{
+  lcd.clear();
+  display_frequency();
+  display_channel();
+  display_smeter();
+  display_time();
 }
 
 
@@ -259,7 +274,7 @@ int freq_to_channel (long freq)
 
 /*************************************************************************************************/
 // set global variable cur_ch_name to band name or better if possible channel name
-void get_cur_ch_name (long freq)
+int get_cur_ch_name (long freq)
 {
   int i;
   for (i = 0; i < nchannels; i++)
@@ -267,12 +282,12 @@ void get_cur_ch_name (long freq)
     if (freq == channels[i].freq) 
     {
       sprintf (cur_ch_name, "%s", channels[i].name);
-      return;
+      return 0;
     }
   }
 
   sprintf (cur_ch_name, "");
-  return;
+  return 1;
 }
 
 
@@ -490,36 +505,30 @@ int watchdog ()
 
 
 /*************************************************************************************************/
-//#define TIMER 2000 //timer in ms
-//int ncycles = 0;
+#define TIMER 2000 //timer in ms
 void read_gps ()
 {
- // read data from the GPS in the 'main loop'
   char c = GPS.read();
-  // if you want to debug, this is a good time to do it!
-  //if (GPSECHO)
-    //if (c) Serial.print(c);
-  // if a sentence is received, we can check the checksum, parse it...
-  if (GPS.newNMEAreceived()) {
-    // a tricky thing here is if we print the NMEA sentence, or data
-    // we end up not listening and catching other sentences!
-    // so be very wary if using OUTPUT_ALLDATA and trytng to print out data
-    //Serial.println(GPS.lastNMEA()); // this also sets the newNMEAreceived() flag to false
-    if (!GPS.parse(GPS.lastNMEA())) // this also sets the newNMEAreceived() flag to false
-      return; // we can fail to parse a sentence in which case we should just wait for another
-  }
-  // if millis() or timer wraps around, we'll just reset it
-  if (timer > millis()) timer = millis();
-     
-  // approximately every 2 seconds or so, print out the current stats
-  if (millis() - timer > 2000) {
-    timer = millis(); // reset the timer
-      display_frequency_mode_smeter ();
 
-     Serial.print("rig: ");
-  Serial.print(rig.freq);
-  Serial.print(" mode ");
-  Serial.print(rig.mode);
+  if (GPS.newNMEAreceived()) {
+   
+    if (!GPS.parse(GPS.lastNMEA())) 
+      return; 
+  }
+  if (timer > millis()) timer = millis();
+}
+
+void show_gps ()
+{
+  if (millis() - timer > TIMER) {
+    timer = millis(); // reset the timer
+    
+    display_frequency_mode_smeter ();
+
+    Serial.print("rig: ");
+    Serial.print(rig.freq);
+    Serial.print(" mode ");
+    Serial.print(rig.mode);
     Serial.print("\nTime: ");
     Serial.print(GPS.hour, DEC); Serial.print(':');
     Serial.print(GPS.minute, DEC); Serial.print(':');
@@ -556,9 +565,9 @@ void setup ()
   initialize_ft817();
 
   modus = M_CHANNELS;
-  //cur_ch = find_nearest_channel();
-  cur_ch = 0;
-  //display_frequency_mode_smeter ();
+  cur_ch = find_nearest_channel();
+  //cur_ch = 0;
+  display_frequency_mode_smeter ();
 }
 
 
@@ -567,8 +576,16 @@ void setup ()
 // Main loop
 void loop ()
 {    
+  int update_display = 0;
   read_gps();
   read_rig(); 
+  // update display when:
+  //  every 1 minute no action
+  //  smeter updates?
+  //  frequency updates
+  //  mode updates
+  //  gps updates
+  show_gps();
   //delay(50);display_frequency_mode_smeter ();
   //display_frequency_mode_smeter ();
 return;
