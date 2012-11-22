@@ -433,7 +433,6 @@ void check_ports ()
 //int ncycles = 0;
 void read_gps ()
 {
-c = GPS.read();
   if (timer > millis()) timer = millis();
   
   if (millis() - timer > 2000) {
