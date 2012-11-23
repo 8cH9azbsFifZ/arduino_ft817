@@ -86,7 +86,7 @@ void initialize_ft817 ()
 #include "t_bandplan.h"
 
 int cur_ch;
-#define CH_NAME_LEN 16
+#define CH_NAME_LEN 20
 char cur_ch_name[CH_NAME_LEN];
 char cur_band_name[CH_NAME_LEN];
 #define NO_CHANNEL -1
