@@ -54,11 +54,12 @@ uint8_t lcd_key;
 #include <FT817.h> 
 #define SMETER_LEN 4
 #define FREQ_LEN 12 // length of frequency display
+#define MODE_LEN 5
 typedef struct
 {
   // current status
   long freq;
-  char mode[4];
+  char mode[MODE_LEN];
   char smeter[SMETER_LEN];
   byte smeterbyte;
 } 
@@ -85,7 +86,7 @@ void initialize_ft817 ()
 #include "t_bandplan.h"
 
 int cur_ch;
-#define CH_NAME_LEN 5 // NB: must be adjusted in bandplan header creation script, too!
+#define CH_NAME_LEN 16
 char cur_ch_name[CH_NAME_LEN];
 char cur_band_name[CH_NAME_LEN];
 #define NO_CHANNEL -1
@@ -115,8 +116,6 @@ Adafruit_GPS GPS(&Serial2);
 uint32_t timer;
 
 #define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" 
-// http://www.hhhh.org/wiml/proj/nmeaxor.html
-// http://www.adafruit.com/datasheets/PMTK_A08.pdf
 
 void initialize_gps ()
 {
@@ -149,7 +148,6 @@ void initialize_screen ()
   lcd.begin(LCD_NUM_COL, LCD_NUM_ROW);     // start the library
   lcd.clear();
   lcd.print("FT 817 (DG6FL)"); // print a simple message
-  //delay(INIT_WAIT_TIME);
 }
 
 
@@ -163,16 +161,6 @@ void read_rig ()
     rig.smeterbyte = ft817.getRxStatus(rig.smeter);
   } 
   while (rig.freq == 0); 
-  /*
-  Serial.print("rig: ");
-  Serial.print(rig.freq);
-  Serial.print(" mode ");
-  Serial.print(rig.mode);
-  Serial.print("   ");
-   Serial.print(GPS.hour, DEC); Serial.print(':');
-    Serial.print(GPS.minute, DEC); Serial.print(':');
-    Serial.print(GPS.seconds, DEC); Serial.print('.');
-  Serial.print("\n");*/
 } 
 
 
@@ -497,6 +485,12 @@ int watchdog ()
 {
   int i;
   long oldfreq = rig.freq;
+  lcd.setCursor(0,0);
+  lcd.print ("Watchdog            ");
+  lcd.setCursor(0,1);
+  lcd.print ("                    ");
+  lcd.setCursor(0,2);
+  lcd.print ("                    ");
   for (i = 0; i < num_watchdog_frequencies; i++)
   {
     ft817.setFreq(watchdog_frequencies[i]);
@@ -506,11 +500,13 @@ int watchdog ()
     //set_channel (freq_to_channel(watchdog_frequencies[i]));
     delay(SCAN_DELAY);
     read_rig();
-    display_frequency();
-    display_channel();
+
     // FIXME: other display for watchdog mode
     if (signal_detected() == TRUE)
     {
+      lcd.setCursor(0,1);
+      lcd.print ("Signal detected!");
+      display_smeter();
       //modus = M_NONE;
       return CHANNEL_FOUND;
     }
@@ -528,7 +524,7 @@ int watchdog ()
 #define TIMER_GPS 2000
 #define TIMER_SMETER 500
 #define TIMER_FREQUENCY 4500
-#define TIMER_WATCHDOG 20000
+#define TIMER_WATCHDOG 40000
 
 void read_gps ()
 {
