@@ -327,17 +327,20 @@ void set_channel (int ch)
   cur_ch = ch;
 
   // update the rig 
+  long f = channels[cur_ch].freq;
+  if (f < 0) { f = -f; }
+  
   do // it may happen, that the frequency is not set correctly during the 1st attempt.
   {
-    ft817.setFreq(channels[cur_ch].freq);
+    ft817.setFreq(f);
     read_rig();
   } 
-  while (rig.freq != channels[cur_ch].freq);
+  while (rig.freq != f);
 
   ft817.setMode(channels[cur_ch].mode);
-  if (channels[cur_ch].rpt != 0) 
+  if (channels[cur_ch].freq < 0) // negative freq => repeater 
   { 
-    ft817.setRPTshift(channels[cur_ch].rpt); 
+    ft817.setRPTshift(rpt70cm); // FIXME 
   }
 }
 
