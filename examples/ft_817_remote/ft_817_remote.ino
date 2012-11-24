@@ -106,6 +106,55 @@ const int num_watchdog_frequencies = 4;//FIXME
 #define M_SCANNING 4
 byte modus;
 
+#include <math.h>
+char qth[7];
+float mz_lat = 	50.03333, mz_lon = 8.28438;
+
+void wgs_to_maidenhead (float lat, float lon, char *locator)
+{
+	char *m = locator;
+	lon += 180.;
+	lat += 90.;
+
+	m[0] = 0x41+(int)(lon/20.);
+	m[1] = 0x41+(int)(lat/10.);
+	m[2] = 0x30+(int)((fmod(lon,20.))/2.);
+	m[3] = 0x30+(int)((fmod(lat,10.))/1.);
+	m[4] = 0x61+(int)((lon - ((int)(lon/2.)*2.)) / (5./60.));
+	m[5] = 0x61+(int)((lat - ((int)(lat/1.)*1.)) / (2.5/60.));;
+
+}
+void maidenhead_to_wgs (float *lat, float *lon, char *locator)
+{
+	*lon -= 180.;
+	*lat -= 90.;
+	char *m = locator;
+
+	*lon += (m[0]-0x41)*20.;
+	*lat += (m[1]-0x41)*10.;
+	
+	*lon += (m[2]-0x30)*2.;
+	*lat += (m[3]-0x30)*1.;
+
+	*lat += (m[4]-0x61)*(5./60.);
+	*lon += (m[5]-0x61)*(2.5/60.);
+}
+
+float calculate_distance_wgs84 (float lat1, float lon1, float lat2, float lon2)
+{
+	float r = 6378.; //km
+	float fac = 3.1415/180.;
+	float a1 = lat1*fac,
+			b1 = lon1*fac,
+			a2 = lat2*fac,
+			b2 = lon2*fac;
+ 	float dd = 
+		acos(cos(a1)*cos(b1)*cos(a2)*cos(b2) 
+				+ cos(a1)*sin(b1)*cos(a2)*sin(b2) 
+				+ sin(a1)*sin(a2)) * r;
+	return dd;
+}
+
 
 /*************************************************************************************************/
 
@@ -217,15 +266,17 @@ void display_smeter ()
 void display_time()
 {
   char line4[LCD_NUM_COL+1];
-  if (GPS.fix)
-  {
-    sprintf(line4, "%02d:%02d %2.2f %2.2f",(int)(GPS.hour), (int)(GPS.minute), (float)(GPS.lat), (float)(GPS.lon));
-  }
-  else
-  {
-    sprintf(line4, "%02d:%02d No GPS Fix.",(int)(GPS.hour), (int)(GPS.minute));
-  }
+  if (GPS.fix) { wgs_to_maidenhead ((float)(GPS.lat), (float)(GPS.lon), qth); }
+  else { wgs_to_maidenhead (mz_lat, mz_lon, qth); }
+  //char *qth2="JO40bc";
+  float distance = 12.2;
+  //distance = distance_maidenhead (qth,qth2);
+
+  sprintf(line4, "%02d:%02d %s %f km",(int)(GPS.hour), (int)(GPS.minute), qth,distance);
   lcd.setCursor(0,3); lcd.print(line4);
+      sprintf(line4, "%.0f km",distance);
+lcd.setCursor(0,2); lcd.print(line4);
+delay(1000);
 }
 void display_frequency_mode_smeter ()
 {
@@ -604,7 +655,7 @@ void loop ()
   if (curtimer > TIMER_GPS)  {    display_time();  } //show_gps();}
   if (curtimer > TIMER_SMETER)  {    display_smeter();  }
   if (curtimer > TIMER_FREQUENCY)  {    display_frequency(); display_channel(); }
-  if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
+  //if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
 
 
   //lcd_key = lcd.readButtons();
