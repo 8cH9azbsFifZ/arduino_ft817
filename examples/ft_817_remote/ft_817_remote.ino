@@ -282,8 +282,7 @@ void update_curpos ()
 
 void display_time()
 {  
-  update_curpos();
-
+  // time
   lcd.setCursor(0,3); 
   if (GPS.hour < 10) { lcd.print("0"); }
   lcd.print(GPS.hour);
@@ -291,8 +290,12 @@ void display_time()
   if (GPS.minute < 10) { lcd.print("0"); }
   lcd.print(GPS.minute);
   lcd.print(" ");
+  
+  // qth
   lcd.print(curpos.qth);
   lcd.print(" ");
+  
+  // distance to repeater
   if (curpos.dist < 1000) {
     if (curpos.dist < 100) { lcd.print("0"); }
     if (curpos.dist < 10) { lcd.print("0"); }
@@ -632,7 +635,7 @@ void loop ()
   if (curtimer > TIMER) {
     timer = millis(); // reset the timer
   }
-  if (curtimer > TIMER_GPS)  {    display_time();  } //show_gps();}
+  if (curtimer > TIMER_GPS)  {  update_curpos();  display_time();  } //show_gps();}
   if (curtimer > TIMER_SMETER)  {    display_smeter();  }
   if (curtimer > TIMER_FREQUENCY)  {    display_frequency(); display_channel(); }
   //if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
