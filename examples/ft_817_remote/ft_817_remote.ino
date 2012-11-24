@@ -107,7 +107,13 @@ const int num_watchdog_frequencies = 4;//FIXME
 byte modus;
 
 #include <math.h>
-char qth[7];
+typedef struct
+{
+  float lat;
+  float lon;
+  char qth[7];
+} t_position;
+t_position curpos;
 float mz_lat = 	50.03333, mz_lon = 8.28438;
 
 void wgs_to_maidenhead (float lat, float lon, char *locator)
@@ -223,60 +229,76 @@ void display_frequency ()
   int mhz = freq / 1000000;
   int khz = (freq % 1000000)/1000;
   int hz = freq % 1000;
-  char ffreq[FREQ_LEN];
-  sprintf (ffreq, "%03d.%03d.%03d",mhz,khz,hz);
-  
-  char line1[LCD_NUM_COL+1]; 
-  sprintf(line1, "%s %s",ffreq,rig.mode);
-  
+
   lcd.setCursor(0,0);
-  lcd.print(line1);
+  if (mhz < 100) { lcd.print("0"); }
+  if (mhz < 10) { lcd.print("0"); }
+  lcd.print(mhz);
+  lcd.print(".");  
+  if (khz < 100) { lcd.print("0"); }
+  if (khz < 10) { lcd.print("0"); }
+  lcd.print(khz);
+  lcd.print(".");    
+  if (hz < 100) { lcd.print("0"); }
+  if (hz < 10) { lcd.print("0"); }
+  lcd.print(hz);
+  lcd.print(" ");
+  lcd.print(rig.mode);
 }
 
 void display_channel ()
 {
   int i = get_cur_ch_name(rig.freq);
   int j = get_cur_band_name(rig.freq);
-  char line2[LCD_NUM_COL+1];
-  if (i == 0)
+  lcd.setCursor(0,1); 
+  if (i >= 0)
   {
-    sprintf(line2, "%20s",cur_ch_name);
+    lcd.print(channels[i].name);
   }
   else
   { 
-    if (j == 0)
+    if (j >= 0)
     {
-      sprintf(line2, "%20s",cur_band_name);
+      lcd.print(bands[j].name);
     }
     else
     {
-      sprintf (line2, "No bandplan        ");
+      lcd.print("No bandplan        ");
     }
   }
-  lcd.setCursor(0,1); lcd.print(line2);
 }
 
 void display_smeter ()
 {
-  char line3[LCD_NUM_COL+1];
-  sprintf(line3, "%s",rig.smeter);
-  lcd.setCursor(0,2); lcd.print(line3);
+  lcd.setCursor(0,2); 
+  lcd.print(rig.smeter);
 }
 
 void display_time()
-{
-  char line4[LCD_NUM_COL+1];
-  if (GPS.fix) { wgs_to_maidenhead ((float)(GPS.lat), (float)(GPS.lon), qth); }
-  else { wgs_to_maidenhead (mz_lat, mz_lon, qth); }
-  //char *qth2="JO40bc";
-  float distance = 12.2;
-  //distance = distance_maidenhead (qth,qth2);
-
-  sprintf(line4, "%02d:%02d %s %f km",(int)(GPS.hour), (int)(GPS.minute), qth,distance);
-  lcd.setCursor(0,3); lcd.print(line4);
-      sprintf(line4, "%.0f km",distance);
-lcd.setCursor(0,2); lcd.print(line4);
-delay(1000);
+{  
+  if (GPS.fix) { curpos.lat = (float)(GPS.lat); curpos.lon = (float)(GPS.lon); }
+  else { curpos.lat =mz_lat;curpos.lon= mz_lon; } //FIXME
+  wgs_to_maidenhead(curpos.lat,curpos.lon,curpos.qth);
+  char *qth2="JO40da";
+  float lat2,lon2;
+  maidenhead_to_wgs (&lat2,&lon2,qth2);
+  int distance = (int)calculate_distance_wgs84 (curpos.lat,curpos.lon,lat2,lon2);
+  
+  lcd.setCursor(0,3); 
+  if (GPS.hour < 10) { lcd.print("0"); }
+  lcd.print(GPS.hour);
+  lcd.print(":");
+  if (GPS.minute < 10) { lcd.print("0"); }
+  lcd.print(GPS.minute);
+  lcd.print(" ");
+  lcd.print(curpos.qth);
+  lcd.print(" ");
+  if (distance < 1000) {
+    if (distance < 100) { lcd.print("0"); }
+    if (distance < 10) { lcd.print("0"); }
+    lcd.print(distance);
+    lcd.print("km");
+  }
 }
 void display_frequency_mode_smeter ()
 {
@@ -309,13 +331,10 @@ int get_cur_ch_name (long freq)
   {
     if (freq == channels[i].freq) 
     {
-      sprintf (cur_ch_name, "%s", channels[i].name);
-      return 0;
+      return i; 
     }
   }
-
-  sprintf (cur_ch_name, "");
-  return 1;
+  return -1;
 }
 
 
@@ -326,14 +345,10 @@ int get_cur_band_name (long freq)
   {
     if (bands[i].low <= freq && freq <= bands[i].high)
     {
-      /*Serial.print ("Band found: ");
-      Serial.print (bands[i].name);
-      Serial.print ("\n");*/
-      sprintf (cur_band_name, "%s",  bands[i].name);
-      return 0;
+      return i;
     }
   }
-  return 1;
+  return -1;
 }
 
 /*************************************************************************************************/
@@ -341,13 +356,9 @@ void channels_mode ()
 {
   if (lcd_key & BUTTON_RIGHT)  { 
     set_channel (cur_ch+1); 
-     Serial.print ("Change channel:");
- Serial.print (" +1\n");
   }
   if (lcd_key & BUTTON_LEFT)   { 
     set_channel (cur_ch-1); 
-      Serial.print ("Change channel:");
-Serial.print (" -1\n");
   }
   if (lcd_key & BUTTON_UP)     { 
     modus = M_SCANNING; 
@@ -548,9 +559,6 @@ int watchdog ()
   for (i = 0; i < num_watchdog_frequencies; i++)
   {
     ft817.setFreq(watchdog_frequencies[i]);
-    Serial.print ("Set freq via watchdog: ");
-    Serial.print (watchdog_frequencies[i]);
-    Serial.print("\n");
     //set_channel (freq_to_channel(watchdog_frequencies[i]));
     delay(SCAN_DELAY);
     read_rig();
@@ -594,6 +602,7 @@ void read_gps ()
 
 void show_gps ()
 {
+  /*
     Serial.print("rig: ");
     Serial.print(rig.freq);
     Serial.print(" mode ");
@@ -619,6 +628,7 @@ void show_gps ()
       Serial.print("Altitude: "); Serial.println(GPS.altitude);
       Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
     }
+    */
 }
 
 
