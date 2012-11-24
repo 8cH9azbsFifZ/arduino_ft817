@@ -102,14 +102,14 @@ void init_sd()
   lcd.print("Init SD Card");
 
   pinMode(53, OUTPUT);
-   
+  
   if (!SD.begin(53)) {
     lcd.setCursor(0,1);
     lcd.print("initialization failed!");
     return;
   }
   lcd.setCursor(0,1);
-  Serial.println("initialization done.");
+  lcd.println("initialization done.");
   
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
@@ -135,9 +135,9 @@ void sd_write()
 void sd_read()
 {
   // re-open the file for reading:
-  myFile = SD.open("test.txt");
+  myFile = SD.open("ch.txt");
   if (myFile) {
-    Serial.println("test.txt:");
+    Serial.println("ch.txt:");
     
     // read from the file until there's nothing else in it:
     while (myFile.available()) {
@@ -147,7 +147,7 @@ void sd_read()
     myFile.close();
   } else {
   	// if the file didn't open, print an error:
-    Serial.println("error opening test.txt");
+    Serial.println("error opening ch.txt");
   }
 }
 
@@ -402,6 +402,7 @@ int freq_to_channel (long freq)
 /*************************************************************************************************/
 int get_cur_ch_name (long freq)
 {
+  
   int i;
   for (i = 0; i < nchannels; i++)
   {
@@ -688,6 +689,7 @@ void setup ()
   Serial.begin(9600);
   initialize_screen();
 
+  init_sd();
   initialize_gps();
   initialize_ft817();
 
