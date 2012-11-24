@@ -116,49 +116,54 @@ typedef struct
 t_position curpos;
 float mz_lat = 	50.03333, mz_lon = 8.28438;
 
+/*************************************************************************************************/
+
 void wgs_to_maidenhead (float lat, float lon, char *locator)
 {
-	char *m = locator;
-	lon += 180.;
-	lat += 90.;
+  char *m = locator;
+  lon += 180.;
+  lat += 90.;
 
-	m[0] = 0x41+(int)(lon/20.);
-	m[1] = 0x41+(int)(lat/10.);
-	m[2] = 0x30+(int)((fmod(lon,20.))/2.);
-	m[3] = 0x30+(int)((fmod(lat,10.))/1.);
-	m[4] = 0x61+(int)((lon - ((int)(lon/2.)*2.)) / (5./60.));
-	m[5] = 0x61+(int)((lat - ((int)(lat/1.)*1.)) / (2.5/60.));;
-
+  m[0] = 0x41+(int)(lon/20.);
+  m[1] = 0x41+(int)(lat/10.);
+  m[2] = 0x30+(int)((fmod(lon,20.))/2.);
+  m[3] = 0x30+(int)((fmod(lat,10.))/1.);
+  m[4] = 0x61+(int)((lon - ((int)(lon/2.)*2.)) / (5./60.));
+  m[5] = 0x61+(int)((lat - ((int)(lat/1.)*1.)) / (2.5/60.));;
 }
+
+/*************************************************************************************************/
+
 void maidenhead_to_wgs (float *lat, float *lon, char *locator)
 {
-	*lon -= 180.;
-	*lat -= 90.;
-	char *m = locator;
+  *lon -= 180.;
+  *lat -= 90.;
+  char *m = locator;
 
-	*lon += (m[0]-0x41)*20.;
-	*lat += (m[1]-0x41)*10.;
-	
-	*lon += (m[2]-0x30)*2.;
-	*lat += (m[3]-0x30)*1.;
-
-	*lat += (m[4]-0x61)*(5./60.);
-	*lon += (m[5]-0x61)*(2.5/60.);
+  *lon += (m[0]-0x41)*20.;
+  *lat += (m[1]-0x41)*10.;
+  *lon += (m[2]-0x30)*2.;
+  *lat += (m[3]-0x30)*1.;
+  *lat += (m[4]-0x61)*(5./60.);
+  *lon += (m[5]-0x61)*(2.5/60.);
 }
+
+/*************************************************************************************************/
 
 float calculate_distance_wgs84 (float lat1, float lon1, float lat2, float lon2)
 {
-	float r = 6378.; //km
-	float fac = 3.1415/180.;
-	float a1 = lat1*fac,
-			b1 = lon1*fac,
-			a2 = lat2*fac,
-			b2 = lon2*fac;
- 	float dd = 
-		acos(cos(a1)*cos(b1)*cos(a2)*cos(b2) 
-				+ cos(a1)*sin(b1)*cos(a2)*sin(b2) 
-				+ sin(a1)*sin(a2)) * r;
-	return dd;
+  // NB: accuracy: (a) formula (b) 6letter locator: +-32km
+  float r = 6378.; //km
+  float fac = 3.1415/180.;
+  float a1 = lat1*fac,
+	b1 = lon1*fac,
+	a2 = lat2*fac,
+	b2 = lon2*fac;
+  float dd = 
+	  acos(cos(a1)*cos(b1)*cos(a2)*cos(b2) 
+		+ cos(a1)*sin(b1)*cos(a2)*sin(b2) 
+		+ sin(a1)*sin(a2)) * r;
+  return dd;
 }
 
 
@@ -279,7 +284,7 @@ void display_time()
   if (GPS.fix) { curpos.lat = (float)(GPS.lat); curpos.lon = (float)(GPS.lon); }
   else { curpos.lat =mz_lat;curpos.lon= mz_lon; } //FIXME
   wgs_to_maidenhead(curpos.lat,curpos.lon,curpos.qth);
-  char *qth2="JO40da";
+  char *qth2="JO21da";// FIXME: repeater position
   float lat2,lon2;
   maidenhead_to_wgs (&lat2,&lon2,qth2);
   int distance = (int)calculate_distance_wgs84 (curpos.lat,curpos.lon,lat2,lon2);
@@ -599,38 +604,6 @@ void read_gps ()
   }
   if (timer > millis()) timer = millis();
 }
-
-void show_gps ()
-{
-  /*
-    Serial.print("rig: ");
-    Serial.print(rig.freq);
-    Serial.print(" mode ");
-    Serial.print(rig.mode);
-    Serial.print("\nTime: ");
-    Serial.print(GPS.hour, DEC); Serial.print(':');
-    Serial.print(GPS.minute, DEC); Serial.print(':');
-    Serial.print(GPS.seconds, DEC); Serial.print('.');
-    Serial.println(GPS.milliseconds);
-    Serial.print("Date: ");
-    Serial.print(GPS.day, DEC); Serial.print('/');
-    Serial.print(GPS.month, DEC); Serial.print("/20");
-    Serial.println(GPS.year, DEC);
-    Serial.print("Fix: "); Serial.print((int)GPS.fix);
-    Serial.print(" quality: "); Serial.println((int)GPS.fixquality);
-    if (GPS.fix) {
-      Serial.print("Location: ");
-      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
-      Serial.print(", ");
-      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
-      Serial.print("Speed (knots): "); Serial.println(GPS.speed);
-      Serial.print("Angle: "); Serial.println(GPS.angle);
-      Serial.print("Altitude: "); Serial.println(GPS.altitude);
-      Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
-    }
-    */
-}
-
 
 /*************************************************************************************************/
 // Global Setup Routing 
