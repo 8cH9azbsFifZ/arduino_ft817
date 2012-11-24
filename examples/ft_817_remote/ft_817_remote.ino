@@ -130,7 +130,10 @@ void sd_write()
     // if the file didn't open, print an error:
     Serial.println("error opening test.txt");
   }
-  
+}
+
+void sd_read()
+{
   // re-open the file for reading:
   myFile = SD.open("test.txt");
   if (myFile) {
