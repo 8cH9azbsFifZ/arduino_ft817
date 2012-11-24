@@ -24,13 +24,10 @@
 typedef struct 
 {
   char *name; // channel name
-  long freq;  // frequency (Hz/10)  --- negative frequency indicates repeater
+  long freq;  // frequency (Hz/10)  
   byte mode;  // mode
-  // int rpt;   // repeater shift (kHz) --- currently not used due to memory constraint
 } t_channel;
 
-long rpt70cm = 760000; // 7,6 MHz
-long rpt2m   = 60000; // 600 kHz
 
 const t_channel channels[] = {
 						{"WSPR",13600, NULL },
@@ -175,8 +172,6 @@ const t_channel channels[] = {
 {"RTTY CQ",14460000, NULL },
 {"Fax CQ",14470000, NULL },
 {"ATV CQ / Callback",14475000, NULL },
-		{"DB0VA",-43932500,FT817_MODE_FM},
-{"DB0ESW",-43905000,FT817_MODE_FM},
 	{"1",43307500,FT817_MODE_FM},
 {"2",43310000,FT817_MODE_FM},
 {"3",43312500,FT817_MODE_FM},

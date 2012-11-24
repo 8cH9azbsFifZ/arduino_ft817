@@ -83,6 +83,7 @@ void initialize_ft817 ()
 /*************************************************************************************************/
 // Bands configuration
 #include "t_channels.h"
+#include "t_repeaters.h"
 #include "t_bandplan.h"
 
 int cur_ch;
