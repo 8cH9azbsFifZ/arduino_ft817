@@ -79,6 +79,76 @@ void initialize_ft817 ()
   read_rig();  
 }
 
+/*
+  SD card read/write
+ 
+ This example shows how to read and write data to and from an SD card file 	
+ The circuit:
+ * SD card attached to SPI bus as follows:
+ ** MOSI - pin 11
+ ** MISO - pin 12
+ ** CLK - pin 13
+ ** CS - pin 10
+ 	 
+ */
+ 
+#include <SD.h>
+
+File myFile;
+
+void init_sd()
+{
+  lcd.setCursor(0,1);
+  lcd.print("Init SD Card");
+
+  pinMode(53, OUTPUT);
+   
+  if (!SD.begin(53)) {
+    lcd.setCursor(0,1);
+    lcd.print("initialization failed!");
+    return;
+  }
+  lcd.setCursor(0,1);
+  Serial.println("initialization done.");
+  
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+}
+
+void sd_write()
+{
+  myFile = SD.open("test.txt", FILE_WRITE);
+  
+  // if the file opened okay, write to it:
+  if (myFile) {
+    Serial.print("Writing to test.txt...");
+    myFile.println("testing 1, 2, 3.");
+	// close the file:
+    myFile.close();
+    Serial.println("done.");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+  
+  // re-open the file for reading:
+  myFile = SD.open("test.txt");
+  if (myFile) {
+    Serial.println("test.txt:");
+    
+    // read from the file until there's nothing else in it:
+    while (myFile.available()) {
+    	Serial.write(myFile.read());
+    }
+    // close the file:
+    myFile.close();
+  } else {
+  	// if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+}
+
+
 
 /*************************************************************************************************/
 // Bands configuration
@@ -275,7 +345,7 @@ void update_curpos ()
   if (GPS.fix) { curpos.lat = (float)(GPS.lat); curpos.lon = (float)(GPS.lon); }
   else { curpos.lat =mz_lat;curpos.lon= mz_lon; } //FIXME
   wgs_to_maidenhead(curpos.lat,curpos.lon,curpos.qth);
-  char *qth2="JO21da";// FIXME: repeater position
+  char *qth2 = "JO21da";// FIXME: repeater position
   float lat2,lon2;
   maidenhead_to_wgs (&lat2,&lon2,qth2);
   curpos.dist = (int)calculate_distance_wgs84 (curpos.lat,curpos.lon,lat2,lon2);
@@ -327,30 +397,32 @@ int freq_to_channel (long freq)
 }
 
 /*************************************************************************************************/
-// set global variable cur_ch_name to band name or better if possible channel name
 int get_cur_ch_name (long freq)
 {
   int i;
   for (i = 0; i < nchannels; i++)
   {
-    if (freq == channels[i].freq) 
-    {
-      return i; 
-    }
+    if (freq == channels[i].freq) { return i; }
   }
   return -1;
 }
 
+int get_cur_rpt_name (long freq)
+{
+  int i;
+  for (i = 0; i < nrepeaters; i++)
+  {
+    if (freq == repeaters[i].freq) { return i; }
+  }
+  return -1;
+}
 
 int get_cur_band_name (long freq)
 {
   int i;
   for (i = 0; i < nbands; i++)
   {
-    if (bands[i].low <= freq && freq <= bands[i].high)
-    {
-      return i;
-    }
+    if (bands[i].low <= freq && freq <= bands[i].high) { return i; }
   }
   return -1;
 }
