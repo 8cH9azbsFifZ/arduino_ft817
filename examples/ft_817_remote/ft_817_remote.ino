@@ -87,8 +87,6 @@ void initialize_ft817 ()
 
 int cur_ch;
 #define CH_NAME_LEN 20
-char cur_ch_name[CH_NAME_LEN];
-char cur_band_name[CH_NAME_LEN];
 #define NO_CHANNEL -1
 #define CHANNEL_FOUND 0
 #define NO_CHANNEL_FOUND -1
@@ -112,6 +110,7 @@ typedef struct
   float lat;
   float lon;
   char qth[7];
+  int dist; // distance to repeater (km)
 } t_position;
 t_position curpos;
 float mz_lat = 	50.03333, mz_lon = 8.28438;
@@ -256,20 +255,11 @@ void display_channel ()
   int i = get_cur_ch_name(rig.freq);
   int j = get_cur_band_name(rig.freq);
   lcd.setCursor(0,1); 
-  if (i >= 0)
-  {
-    lcd.print(channels[i].name);
-  }
+  if (i >= 0) { lcd.print(channels[i].name); }
   else
   { 
-    if (j >= 0)
-    {
-      lcd.print(bands[j].name);
-    }
-    else
-    {
-      lcd.print("No bandplan        ");
-    }
+    if (j >= 0) { lcd.print(bands[j].name); }
+    else { lcd.print("No bandplan        "); }
   }
 }
 
@@ -279,16 +269,21 @@ void display_smeter ()
   lcd.print(rig.smeter);
 }
 
-void display_time()
-{  
+void update_curpos ()
+{
   if (GPS.fix) { curpos.lat = (float)(GPS.lat); curpos.lon = (float)(GPS.lon); }
   else { curpos.lat =mz_lat;curpos.lon= mz_lon; } //FIXME
   wgs_to_maidenhead(curpos.lat,curpos.lon,curpos.qth);
   char *qth2="JO21da";// FIXME: repeater position
   float lat2,lon2;
   maidenhead_to_wgs (&lat2,&lon2,qth2);
-  int distance = (int)calculate_distance_wgs84 (curpos.lat,curpos.lon,lat2,lon2);
-  
+  curpos.dist = (int)calculate_distance_wgs84 (curpos.lat,curpos.lon,lat2,lon2);
+}
+
+void display_time()
+{  
+  update_curpos();
+
   lcd.setCursor(0,3); 
   if (GPS.hour < 10) { lcd.print("0"); }
   lcd.print(GPS.hour);
@@ -298,10 +293,10 @@ void display_time()
   lcd.print(" ");
   lcd.print(curpos.qth);
   lcd.print(" ");
-  if (distance < 1000) {
-    if (distance < 100) { lcd.print("0"); }
-    if (distance < 10) { lcd.print("0"); }
-    lcd.print(distance);
+  if (curpos.dist < 1000) {
+    if (curpos.dist < 100) { lcd.print("0"); }
+    if (curpos.dist < 10) { lcd.print("0"); }
+    lcd.print(curpos.dist);
     lcd.print("km");
   }
 }
@@ -406,8 +401,10 @@ void set_channel (int ch)
 
   ft817.setMode(channels[cur_ch].mode);
   if (channels[cur_ch].freq < 0) // negative freq => repeater 
-  { 
-    ft817.setRPTshift(rpt70cm); // FIXME 
+  {     
+    // FIXME 
+    if (rig.freq > 20000000) { ft817.setRPTshift(rpt70cm); }
+    else { ft817.setRPTshift(rpt2m); }
   }
 }
 
