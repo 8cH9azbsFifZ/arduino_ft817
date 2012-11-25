@@ -103,6 +103,7 @@ void initialize_ft817 ()
   ft817.begin(FT817_SPEED);
   delay(INIT_WAIT_TIME);
   read_rig();  
+
 }
 
 
@@ -691,7 +692,7 @@ void loop ()
   if (curtimer > TIMER_GPS)  {  update_cur_ch_band(); update_curpos();  display_time();  } //show_gps();}
   if (curtimer > TIMER_SMETER)  {    display_smeter();  }
   if (curtimer > TIMER_FREQUENCY)  {   update_cur_ch_band();  display_frequency(); display_channel(); }
-  if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
+  //if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
 }
 
 
