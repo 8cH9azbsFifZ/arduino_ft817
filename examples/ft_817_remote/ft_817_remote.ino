@@ -402,34 +402,10 @@ int freq_to_channel (long freq)
 /*************************************************************************************************/
 int get_cur_ch_name (long freq)
 {
-  myFile = SD.open("ch.txt");
-  if (!myFile) { return -1; }
-  int buffer[20];
-  int i = 0;
-  while (myFile.available()) 
-  {
-    int c = myFile.read();
-    if (c == 0x2c) {// detect , 
-      Serial.print("\n");
-      for (i=0; i < 20; i++) { buffer[i] = NULL; }
-    }
-    else
-    {
-      buffer[i] = c;
-      i++;
-    }
-  }
-
-  myFile.close();
-  return 0;
-}
-
-int get_cur_rpt_name (long freq)
-{
   int i;
-  for (i = 0; i < nrepeaters; i++)
+  for (i = 0; i < nchannels; i++)
   {
-    if (freq == repeaters[i].freq) { return i; }
+    if (freq == channels[i].freq) { return i; }
   }
   return -1;
 }
@@ -702,9 +678,10 @@ void setup ()
   Serial.begin(9600);
   initialize_screen();
 
-  init_sd();
   initialize_gps();
   initialize_ft817();
+
+Serial.print(channels[22].name);
 
   modus = M_CHANNELS;
   cur_ch = find_nearest_channel();

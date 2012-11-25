@@ -30,8 +30,9 @@ typedef struct
   char *qth;
 } t_channel;
 
+#include <avr/pgmspace.h>
 
-const t_channel channels[] = {
+PROGMEM const t_channel channels[] = {
 						{"WSPR",13600, NULL ,NULL ,NULL},
 	{"WSPR",183660, NULL ,NULL ,NULL},
 {"QRP",183600,FT817_MODE_CW_NARROW,NULL ,NULL},
