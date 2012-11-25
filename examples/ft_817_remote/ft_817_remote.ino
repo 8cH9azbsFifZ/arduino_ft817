@@ -48,6 +48,28 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 
 uint8_t lcd_key;
 
+/*************************************************************************************************/
+#include <Encoder.h>
+Encoder Rotary(2, 3); // NB: connect to interrupt pins
+long RotaryPosition;
+
+void init_rotary ()
+{
+  lcd.setCursor(0,1);
+  lcd.print("Init Rotary");
+  RotaryPosition = 0;
+}
+
+void read_rotary ()
+{
+  long newRotary = Rotary.read();
+  if (newRotary != RotaryPosition)
+  {
+    long diff = newRotary-RotaryPosition;
+    browse_frequency (diff);
+    RotaryPosition = newRotary;
+  }
+}
 
 /*************************************************************************************************/
 /* Configure the FT 817 stuff */
@@ -56,6 +78,10 @@ uint8_t lcd_key;
 #define FREQ_LEN 12 // length of frequency display
 #define MODE_LEN 5
 #define CHANNEL_LEN 20
+#define QTH_LEN 7
+#define NO_CHANNEL -1
+#define CHANNEL_FOUND 0
+#define NO_CHANNEL_FOUND -1
 typedef struct
 {
   // current status
@@ -70,7 +96,6 @@ t_status rig;
 #define FT817_SPEED 38400
 FT817 ft817(&Serial1);
 
-
 void initialize_ft817 ()
 {
   lcd.setCursor(0,1);
@@ -80,101 +105,22 @@ void initialize_ft817 ()
   read_rig();  
 }
 
-/*
-  SD card read/write
- 
- This example shows how to read and write data to and from an SD card file 	
- The circuit:
- * SD card attached to SPI bus as follows:
- ** MOSI - pin 11
- ** MISO - pin 12
- ** CLK - pin 13
- ** CS - pin 10
- 	 
- */
- 
-#include <SD.h>
-
-File myFile;
-
-void init_sd()
-{
-  lcd.setCursor(0,1);
-  lcd.print("Init SD Card");
-
-  pinMode(53, OUTPUT);
-  
-  if (!SD.begin(53)) {
-    lcd.setCursor(0,1);
-    lcd.print("initialization failed!");
-    return;
-  }
-  lcd.setCursor(0,1);
-  lcd.println("initialization done.");
-  
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-}
-
-void sd_write()
-{
-  myFile = SD.open("test.txt", FILE_WRITE);
-  
-  // if the file opened okay, write to it:
-  if (myFile) {
-    Serial.print("Writing to test.txt...");
-    myFile.println("testing 1, 2, 3.");
-	// close the file:
-    myFile.close();
-    Serial.println("done.");
-  } else {
-    // if the file didn't open, print an error:
-    Serial.println("error opening test.txt");
-  }
-}
-
-void sd_read()
-{
-  // re-open the file for reading:
-  myFile = SD.open("ch.txt");
-  if (myFile) {
-    Serial.println("ch.txt:");
-    
-    // read from the file until there's nothing else in it:
-    while (myFile.available()) {
-    	Serial.write(myFile.read());
-    }
-    // close the file:
-    myFile.close();
-  } else {
-  	// if the file didn't open, print an error:
-    Serial.println("error opening ch.txt");
-  }
-}
-
 
 
 /*************************************************************************************************/
 // Bands configuration
 #include "t_channels.h"
-#include "t_repeaters.h"
 #include "t_bandplan.h"
-#define QTH_LEN 7
 t_channel curch;
 char curchname[CHANNEL_LEN];
 char curchqth[QTH_LEN];
-int cur_ch;
-#define CH_NAME_LEN 20
-#define NO_CHANNEL -1
-#define CHANNEL_FOUND 0
-#define NO_CHANNEL_FOUND -1
+int index_curchannel, index_curband;
 
 // NB: indices as in list above!! 
 const long watchdog_frequencies[] = {
   43340000, 43932500, 2706500, 14521250}; // FIXME: can be configured
 const int num_watchdog_frequencies = 4;//FIXME
 
-/*************************************************************************************************/
 #define M_NONE 0
 #define M_WATCHDOG 1
 #define M_CHANNELS 2
@@ -182,6 +128,10 @@ const int num_watchdog_frequencies = 4;//FIXME
 #define M_SCANNING 4
 byte modus;
 
+
+
+/*************************************************************************************************/
+// Position based stuff
 #include <math.h>
 typedef struct
 {
@@ -191,9 +141,7 @@ typedef struct
   int dist; // distance to repeater (km)
 } t_position;
 t_position curpos;
-float mz_lat = 	50.03333, mz_lon = 8.28438;
-
-/*************************************************************************************************/
+float mz_lat, mz_lon;
 
 void wgs_to_maidenhead (float lat, float lon, char *locator)
 {
@@ -209,8 +157,6 @@ void wgs_to_maidenhead (float lat, float lon, char *locator)
   m[5] = 0x61+(int)((lat - ((int)(lat/1.)*1.)) / (2.5/60.));;
 }
 
-/*************************************************************************************************/
-
 void maidenhead_to_wgs (float *lat, float *lon, char *locator)
 {
   *lon -= 180.;
@@ -224,8 +170,6 @@ void maidenhead_to_wgs (float *lat, float *lon, char *locator)
   *lat += (m[4]-0x61)*(5./60.);
   *lon += (m[5]-0x61)*(2.5/60.);
 }
-
-/*************************************************************************************************/
 
 float calculate_distance_wgs84 (float lat1, float lon1, float lat2, float lon2)
 {
@@ -244,19 +188,17 @@ float calculate_distance_wgs84 (float lat1, float lon1, float lat2, float lon2)
 }
 
 
-/*************************************************************************************************/
 
+/*************************************************************************************************/
 #include <Adafruit_GPS.h>
+#define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" 
 #define GPS_SPEED 9600
 Adafruit_GPS GPS(&Serial2);
 
 uint32_t timer;
 
-#define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" 
-
 void initialize_gps ()
 {
-
   lcd.setCursor(0,1);
   lcd.print("Init GPS");
 
@@ -264,8 +206,6 @@ void initialize_gps ()
 
   // initialize gps module
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
-  //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
 
   delay(INIT_WAIT_TIME);
@@ -274,8 +214,14 @@ void initialize_gps ()
   timer = millis();
 
   read_gps(); 
-
+  
+  // default cooridnated MZ
+  mz_lat = 50.03333;
+  mz_lon = 8.28438;
 }
+
+
+
 
 
 /*************************************************************************************************/
@@ -330,8 +276,8 @@ void display_frequency ()
 
 void display_channel ()
 {
-  int i = get_cur_ch_name(rig.freq);
-  int j = get_cur_band_name(rig.freq);
+  int i = index_curchannel;
+  int j = index_curband;
   
   lcd.setCursor(0,1);
   if (i >= 0) { lcd.print(curch.name); for (i=strlen(curch.name);i<CHANNEL_LEN;i++){lcd.print(" ");}}
@@ -342,22 +288,30 @@ void display_channel ()
   }
 }
 
+void update_cur_ch_band ()
+{
+  index_curchannel = get_cur_ch_name(rig.freq);
+  index_curband = get_cur_band_name(rig.freq);
+}
+
 void display_smeter ()
 {
   lcd.setCursor(0,2); 
   lcd.print(rig.smeter);
 }
 
+
 void update_curpos ()
 {
   if (GPS.fix) { curpos.lat = (float)(GPS.lat); curpos.lon = (float)(GPS.lon); }
   else { curpos.lat =mz_lat;curpos.lon= mz_lon; } //FIXME
   wgs_to_maidenhead(curpos.lat,curpos.lon,curpos.qth);
-  char *qth2 = "JO21da";// FIXME: repeater position
+  char *qth2 = curch.qth; //"JO21da";// FIXME: repeater position
   float lat2,lon2;
   maidenhead_to_wgs (&lat2,&lon2,qth2);
   curpos.dist = (int)calculate_distance_wgs84 (curpos.lat,curpos.lon,lat2,lon2);
 }
+
 
 void display_time()
 {  
@@ -382,6 +336,8 @@ void display_time()
     lcd.print("km");
   }
 }
+
+
 void display_frequency_mode_smeter ()
 {
   lcd.clear();
@@ -397,9 +353,9 @@ void display_frequency_mode_smeter ()
 int freq_to_channel (long freq)
 {
   int i;
-  for (i = 0; i < nchannels; i++)
+  for (i = 0; i < nchannels-1; i++)
   {
-    if (freq == channels[i].freq) return i;
+    //FIXME if (freq == channels[i].freq) return i;
   }
   return NO_CHANNEL;
 }
@@ -409,11 +365,11 @@ int get_cur_ch_name (long freq) // FIXME: rename this function
 {
   int i;
   long ff;
-  for (i = 0; i < nchannels; i++)
+  for (i = 0; i < nchannels-1; i++)
   {
     ff = pgm_read_dword_far(&((channels+i)->freq));
     if (freq == ff) { 
-      curch.freq = pgm_read_dword_far(&((channels+i)->freq));
+      curch.freq = ff; //pgm_read_dword_far(&((channels+i)->freq));
       curch.shift = pgm_read_dword_far(&((channels+i)->shift));
       curch.mode = pgm_read_word_far(&((channels+i)->mode));
       strcpy_P(curchname, (char*)pgm_read_word( &((channels+i)->name)) );
@@ -441,26 +397,20 @@ int get_cur_band_name (long freq)
   return -1;
 }
 
-/*************************************************************************************************/
-void channels_mode ()
-{
-  if (lcd_key & BUTTON_RIGHT)  { 
-    set_channel (cur_ch+1); 
-  }
-  if (lcd_key & BUTTON_LEFT)   { 
-    set_channel (cur_ch-1); 
-  }
-  if (lcd_key & BUTTON_UP)     { 
-    modus = M_SCANNING; 
-  }
-}
 
 
 /*************************************************************************************************/
-void freq_plus_minus_mode ()
+float delta_freq;
+void browse_frequency (long delta)
 {
-  float delta_freq = 10; // 10 == 100 Hz
-
+  delta_freq = 0.25*3; // 10 == 100 Hz . 0.25 due to rotary
+  long f = rig.freq + delta*delta_freq;
+  do // it may happen, that the frequency is not set correctly during the 1st attempt.
+  {
+    ft817.setFreq(f);
+    read_rig();
+  } 
+  while (rig.freq != f);
   // TBD
 }
 
@@ -476,12 +426,13 @@ void set_channel (int ch)
   {
     ch =  nchannels-1;
   }
-  cur_ch = ch;
+  index_curchannel = ch;
 
   // update the rig 
-  long f = 0.; //FIXME channels[cur_ch].freq;
-  if (f < 0) { f = -f; }
-  
+  long f = pgm_read_dword_far(&((channels+index_curchannel)->freq));
+  byte mode = pgm_read_word_far(&((channels+index_curchannel)->mode));
+  long shift = pgm_read_dword_far(&((channels+index_curchannel)->shift));
+
   do // it may happen, that the frequency is not set correctly during the 1st attempt.
   {
     ft817.setFreq(f);
@@ -489,12 +440,10 @@ void set_channel (int ch)
   } 
   while (rig.freq != f);
 
-  //FIXME ft817.setMode(channels[cur_ch].mode);
-  if (10>9) //FIXMEchannels[cur_ch].freq < 0) // negative freq => repeater 
-  {     
-    // FIXME 
-    if (rig.freq > 20000000) { ft817.setRPTshift(rpt70cm); }
-    else { ft817.setRPTshift(rpt2m); }
+  ft817.setMode(mode);
+  if (shift) //FIXMEchannels[cur_ch].freq < 0) // negative freq => repeater 
+  {    
+    ft817.setRPTshift(shift); 
   }
 }
 
@@ -700,14 +649,29 @@ void setup ()
   initialize_screen();
 
   initialize_gps();
+  init_rotary();
+
   initialize_ft817();
 
   modus = M_CHANNELS;
-  cur_ch = find_nearest_channel();
+  index_curchannel = find_nearest_channel();
   //cur_ch = 0;
   display_frequency_mode_smeter ();
 }
 
+
+
+void read_buttons ()
+{
+  lcd_key = lcd.readButtons();
+  
+  if (lcd_key & BUTTON_RIGHT)  { 
+    set_channel (index_curchannel+1); 
+  }
+  if (lcd_key & BUTTON_LEFT)   { 
+    set_channel (index_curchannel-1); 
+  }
+}
 
 
 /*************************************************************************************************/
@@ -715,6 +679,8 @@ void setup ()
 void loop ()
 {    
   int update_display = 0;
+  read_rotary();
+  read_buttons();
   read_gps();
   read_rig();
   
@@ -722,40 +688,10 @@ void loop ()
   if (curtimer > TIMER) {
     timer = millis(); // reset the timer
   }
-  if (curtimer > TIMER_GPS)  {  update_curpos();  display_time();  } //show_gps();}
+  if (curtimer > TIMER_GPS)  {  update_cur_ch_band(); update_curpos();  display_time();  } //show_gps();}
   if (curtimer > TIMER_SMETER)  {    display_smeter();  }
-  if (curtimer > TIMER_FREQUENCY)  {    display_frequency(); display_channel(); }
-  //if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
-
-
-  //lcd_key = lcd.readButtons();
-  //Serial.print ("Read key: ");
-  //Serial.print (lcd_key);
-  //Serial.print ("\n");
-  //modus = M_WATCHDOG;
-  switch (modus)
-  {
-  case M_WATCHDOG: 
-    { 
-      //watchdog(); 
-      break; 
-    }
-  case M_CHANNELS: 
-    { 
-      //channels_mode(); 
-      break; 
-    }
-  case M_FREQUENCY: 
-    { 
-      //freq_plus_minus_mode (); 
-      break; 
-    }
-  case M_SCANNING: 
-    { 
-      //scan_function(); 
-      break; 
-    }
-  }
+  if (curtimer > TIMER_FREQUENCY)  {   update_cur_ch_band();  display_frequency(); display_channel(); }
+  if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
 }
 
 
