@@ -57,7 +57,7 @@ void init_rotary ()
 {
   lcd.setCursor(0,1);
   lcd.print("Init Rotary");
-  RotaryPosition = -999;
+  RotaryPosition = 0;
 }
 
 void read_rotary ()
@@ -65,6 +65,8 @@ void read_rotary ()
   long newRotary = Rotary.read();
   if (newRotary != RotaryPosition)
   {
+    long diff = newRotary-RotaryPosition;
+    browse_frequency (diff);
     RotaryPosition = newRotary;
   }
 }
@@ -76,6 +78,10 @@ void read_rotary ()
 #define FREQ_LEN 12 // length of frequency display
 #define MODE_LEN 5
 #define CHANNEL_LEN 20
+#define QTH_LEN 7
+#define NO_CHANNEL -1
+#define CHANNEL_FOUND 0
+#define NO_CHANNEL_FOUND -1
 typedef struct
 {
   // current status
@@ -90,7 +96,6 @@ t_status rig;
 #define FT817_SPEED 38400
 FT817 ft817(&Serial1);
 
-
 void initialize_ft817 ()
 {
   lcd.setCursor(0,1);
@@ -102,27 +107,20 @@ void initialize_ft817 ()
 
 
 
-
 /*************************************************************************************************/
 // Bands configuration
 #include "t_channels.h"
 #include "t_bandplan.h"
-#define QTH_LEN 7
 t_channel curch;
 char curchname[CHANNEL_LEN];
 char curchqth[QTH_LEN];
 int cur_ch;
-#define CH_NAME_LEN 20
-#define NO_CHANNEL -1
-#define CHANNEL_FOUND 0
-#define NO_CHANNEL_FOUND -1
 
 // NB: indices as in list above!! 
 const long watchdog_frequencies[] = {
   43340000, 43932500, 2706500, 14521250}; // FIXME: can be configured
 const int num_watchdog_frequencies = 4;//FIXME
 
-/*************************************************************************************************/
 #define M_NONE 0
 #define M_WATCHDOG 1
 #define M_CHANNELS 2
@@ -130,6 +128,10 @@ const int num_watchdog_frequencies = 4;//FIXME
 #define M_SCANNING 4
 byte modus;
 
+
+
+/*************************************************************************************************/
+// Position based stuff
 #include <math.h>
 typedef struct
 {
@@ -140,8 +142,6 @@ typedef struct
 } t_position;
 t_position curpos;
 float mz_lat, mz_lon;
-
-/*************************************************************************************************/
 
 void wgs_to_maidenhead (float lat, float lon, char *locator)
 {
@@ -157,8 +157,6 @@ void wgs_to_maidenhead (float lat, float lon, char *locator)
   m[5] = 0x61+(int)((lat - ((int)(lat/1.)*1.)) / (2.5/60.));;
 }
 
-/*************************************************************************************************/
-
 void maidenhead_to_wgs (float *lat, float *lon, char *locator)
 {
   *lon -= 180.;
@@ -172,8 +170,6 @@ void maidenhead_to_wgs (float *lat, float *lon, char *locator)
   *lat += (m[4]-0x61)*(5./60.);
   *lon += (m[5]-0x61)*(2.5/60.);
 }
-
-/*************************************************************************************************/
 
 float calculate_distance_wgs84 (float lat1, float lon1, float lat2, float lon2)
 {
@@ -192,8 +188,8 @@ float calculate_distance_wgs84 (float lat1, float lon1, float lat2, float lon2)
 }
 
 
-/*************************************************************************************************/
 
+/*************************************************************************************************/
 #include <Adafruit_GPS.h>
 #define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" 
 #define GPS_SPEED 9600
@@ -223,6 +219,9 @@ void initialize_gps ()
   mz_lat = 50.03333;
   mz_lon = 8.28438;
 }
+
+
+
 
 
 /*************************************************************************************************/
@@ -289,11 +288,13 @@ void display_channel ()
   }
 }
 
+
 void display_smeter ()
 {
   lcd.setCursor(0,2); 
   lcd.print(rig.smeter);
 }
+
 
 void update_curpos ()
 {
@@ -305,6 +306,7 @@ void update_curpos ()
   maidenhead_to_wgs (&lat2,&lon2,qth2);
   curpos.dist = (int)calculate_distance_wgs84 (curpos.lat,curpos.lon,lat2,lon2);
 }
+
 
 void display_time()
 {  
@@ -329,6 +331,8 @@ void display_time()
     lcd.print("km");
   }
 }
+
+
 void display_frequency_mode_smeter ()
 {
   lcd.clear();
@@ -404,10 +408,17 @@ void channels_mode ()
 
 
 /*************************************************************************************************/
-void freq_plus_minus_mode ()
+float delta_freq;
+void browse_frequency (long delta)
 {
-  float delta_freq = 10; // 10 == 100 Hz
-
+  delta_freq = 0.25*3; // 10 == 100 Hz . 0.25 due to rotary
+  long f = rig.freq + delta*delta_freq;
+  do // it may happen, that the frequency is not set correctly during the 1st attempt.
+  {
+    ft817.setFreq(f);
+    read_rig();
+  } 
+  while (rig.freq != f);
   // TBD
 }
 
@@ -664,6 +675,7 @@ void setup ()
 void loop ()
 {    
   int update_display = 0;
+  read_rotary();
   read_gps();
   read_rig();
   
