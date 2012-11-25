@@ -165,6 +165,80 @@ void FT817::setFreq(long freq) {
 }
 
 
+byte FT817::getAnt() 
+{
+  // Algorithm derived by Gerolf Ziegenhain (DG6FL) from Stefano Sinagra (IZ0MJE)
+  // Band
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(0x59);
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(FT817_CONFIG_EEPROM_READ);
+  delay(COMMAND_DELAY);
+
+  byte rxreply[2];
+  rxreply[0] = rigSoftSerial->read();
+  rxreply[1] = rigSoftSerial->read();
+  
+  byte vband[2];
+  vband[1] = rxreply[0] << 4;
+  vband[1] = vband[1] >> 4;
+  vband[0] = rxreply[0] >> 4;
+
+  // VFO
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(0x55);
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(FT817_CONFIG_EEPROM_READ);
+  delay(COMMAND_DELAY);
+  
+  rxreply[0] = rigSoftSerial->read();
+  rxreply[1] = rigSoftSerial->read();
+
+  byte vfo;
+  vfo = rxreply[0] & 1;
+  vfo = ! vfo;
+  
+  // Antenna
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(0x7a);
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(FT817_CONFIG_EEPROM_READ);
+  delay(COMMAND_DELAY);
+
+  rxreply[0] = rigSoftSerial->read();
+  rxreply[1] = rigSoftSerial->read();
+
+  static byte bitshift[15] = {7,7,7,7,7,7,7,7,7,6,5,4,3,2,7};
+
+  byte antenna = antenna << bitshift[vband[vfo]];
+  antenna = antenna >> 7;
+  //if (antenna == 0){lcd.print("F");} else {lcd.print("R");}
+  return antenna;
+}
+
+byte FT817::getPWR()
+{
+  // Algorithm derived by Gerolf Ziegenhain (DG6FL) from Stefano Sinagra (IZ0MJE)
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(0x79);
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(FT817_ANY_BYTE);
+  sendCATCommandChar(FT817_CONFIG_EEPROM_READ);
+  delay(COMMAND_DELAY);
+
+  byte rxreply[2];
+  rxreply[0] = rigSoftSerial->read();
+  rxreply[1] = rigSoftSerial->read();
+  
+  byte power = rxreply[0] << 6 ;
+  power = 4 - (power >> 6) ;
+	
+  return power;
+}
+
 unsigned long FT817::getFreqMode(char *modename) {
     rigSoftSerial->flush();// not sure why I have to do this.
     //check for data after setFreq

@@ -154,6 +154,8 @@ class FT817
     void on();
     void begin(uint16_t  baud);
 	 int setRPTshift (long offset);
+	 byte getPWR();
+	 byte getAnt();
 
 
   private:
