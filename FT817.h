@@ -117,7 +117,7 @@
 
 #define FT817_SERIAL_TIMEOUT_MILLIS 8000
 #define COMMAND_DELAY_FREQ_CHANGE 0
-#define COMMAND_DELAY 0
+#define COMMAND_DELAY 25
 
 class FT817
 {
@@ -154,6 +154,8 @@ class FT817
     void on();
     void begin(uint16_t  baud);
 	 int setRPTshift (long offset);
+	 byte getPWR();
+	 byte getAnt();
 
 
   private:

@@ -369,7 +369,7 @@ int get_cur_ch_name (long freq) // FIXME: rename this function
   {
     ff = pgm_read_dword_far(&((channels+i)->freq));
     if (freq == ff) { 
-      curch.freq = pgm_read_dword_far(&((channels+i)->freq));
+      curch.freq = ff; //pgm_read_dword_far(&((channels+i)->freq));
       curch.shift = pgm_read_dword_far(&((channels+i)->shift));
       curch.mode = pgm_read_word_far(&((channels+i)->mode));
       strcpy_P(curchname, (char*)pgm_read_word( &((channels+i)->name)) );
@@ -395,20 +395,6 @@ int get_cur_band_name (long freq)
     if (bands[i].low <= freq && freq <= bands[i].high) { return i; }
   }
   return -1;
-}
-
-/*************************************************************************************************/
-void channels_mode ()
-{
-  if (lcd_key & BUTTON_RIGHT)  { 
-    set_channel (index_curchannel+1); 
-  }
-  if (lcd_key & BUTTON_LEFT)   { 
-    set_channel (index_curchannel-1); 
-  }
-  if (lcd_key & BUTTON_UP)     { 
-    modus = M_SCANNING; 
-  }
 }
 
 
@@ -442,9 +428,10 @@ void set_channel (int ch)
   index_curchannel = ch;
 
   // update the rig 
-  long f = 0.; //FIXME channels[cur_ch].freq;
-  if (f < 0) { f = -f; }
-  
+  long f = pgm_read_dword_far(&((channels+index_curchannel)->freq));
+  byte mode = pgm_read_word_far(&((channels+index_curchannel)->mode));
+  long shift = pgm_read_dword_far(&((channels+index_curchannel)->shift));
+
   do // it may happen, that the frequency is not set correctly during the 1st attempt.
   {
     ft817.setFreq(f);
@@ -452,12 +439,10 @@ void set_channel (int ch)
   } 
   while (rig.freq != f);
 
-  //FIXME ft817.setMode(channels[cur_ch].mode);
-  if (10>9) //FIXMEchannels[cur_ch].freq < 0) // negative freq => repeater 
-  {     
-    // FIXME 
-//if (rig.freq > 20000000) { ft817.setRPTshift(rpt70cm); }
- //   else { ft817.setRPTshift(rpt2m); }
+  ft817.setMode(mode);
+  if (shift) //FIXMEchannels[cur_ch].freq < 0) // negative freq => repeater 
+  {    
+    ft817.setRPTshift(shift); 
   }
 }
 
@@ -675,12 +660,26 @@ void setup ()
 
 
 
+void read_buttons ()
+{
+  lcd_key = lcd.readButtons();
+  
+  if (lcd_key & BUTTON_RIGHT)  { 
+    set_channel (index_curchannel+1); 
+  }
+  if (lcd_key & BUTTON_LEFT)   { 
+    set_channel (index_curchannel-1); 
+  }
+}
+
+
 /*************************************************************************************************/
 // Main loop
 void loop ()
 {    
   int update_display = 0;
   read_rotary();
+  read_buttons();
   read_gps();
   read_rig();
   
@@ -692,36 +691,6 @@ void loop ()
   if (curtimer > TIMER_SMETER)  {    display_smeter();  }
   if (curtimer > TIMER_FREQUENCY)  {   update_cur_ch_band();  display_frequency(); display_channel(); }
   //if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
-
-
-  //lcd_key = lcd.readButtons();
-  //Serial.print ("Read key: ");
-  //Serial.print (lcd_key);
-  //Serial.print ("\n");
-  //modus = M_WATCHDOG;
-  switch (modus)
-  {
-  case M_WATCHDOG: 
-    { 
-      //watchdog(); 
-      break; 
-    }
-  case M_CHANNELS: 
-    { 
-      //channels_mode(); 
-      break; 
-    }
-  case M_FREQUENCY: 
-    { 
-      //freq_plus_minus_mode (); 
-      break; 
-    }
-  case M_SCANNING: 
-    { 
-      //scan_function(); 
-      break; 
-    }
-  }
 }
 
 
