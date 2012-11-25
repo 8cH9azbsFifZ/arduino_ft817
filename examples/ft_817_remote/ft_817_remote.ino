@@ -48,6 +48,26 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 
 uint8_t lcd_key;
 
+/*************************************************************************************************/
+#include <Encoder.h>
+Encoder Rotary(2, 3); // NB: connect to interrupt pins
+long RotaryPosition;
+
+void init_rotary ()
+{
+  lcd.setCursor(0,1);
+  lcd.print("Init Rotary");
+  RotaryPosition = -999;
+}
+
+void read_rotary ()
+{
+  long newRotary = Rotary.read();
+  if (newRotary != RotaryPosition)
+  {
+    RotaryPosition = newRotary;
+  }
+}
 
 /*************************************************************************************************/
 /* Configure the FT 817 stuff */
@@ -157,7 +177,6 @@ void sd_read()
 /*************************************************************************************************/
 // Bands configuration
 #include "t_channels.h"
-#include "t_repeaters.h"
 #include "t_bandplan.h"
 #define QTH_LEN 7
 t_channel curch;
@@ -191,7 +210,7 @@ typedef struct
   int dist; // distance to repeater (km)
 } t_position;
 t_position curpos;
-float mz_lat = 	50.03333, mz_lon = 8.28438;
+float mz_lat, mz_lon;
 
 /*************************************************************************************************/
 
@@ -247,16 +266,14 @@ float calculate_distance_wgs84 (float lat1, float lon1, float lat2, float lon2)
 /*************************************************************************************************/
 
 #include <Adafruit_GPS.h>
+#define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" 
 #define GPS_SPEED 9600
 Adafruit_GPS GPS(&Serial2);
 
 uint32_t timer;
 
-#define PMTK_SET_NMEA_UPDATE_01HZ  "$PMTK220,10000*2F" 
-
 void initialize_gps ()
 {
-
   lcd.setCursor(0,1);
   lcd.print("Init GPS");
 
@@ -264,8 +281,6 @@ void initialize_gps ()
 
   // initialize gps module
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_01HZ);
-  //GPS.sendCommand(PMTK_SET_NMEA_UPDATE_10HZ);
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
 
   delay(INIT_WAIT_TIME);
@@ -274,7 +289,10 @@ void initialize_gps ()
   timer = millis();
 
   read_gps(); 
-
+  
+  // default cooridnated MZ
+  mz_lat = 50.03333;
+  mz_lon = 8.28438;
 }
 
 
@@ -397,9 +415,9 @@ void display_frequency_mode_smeter ()
 int freq_to_channel (long freq)
 {
   int i;
-  for (i = 0; i < nchannels; i++)
+  for (i = 0; i < nchannels-1; i++)
   {
-    if (freq == channels[i].freq) return i;
+    //FIXME if (freq == channels[i].freq) return i;
   }
   return NO_CHANNEL;
 }
@@ -409,7 +427,7 @@ int get_cur_ch_name (long freq) // FIXME: rename this function
 {
   int i;
   long ff;
-  for (i = 0; i < nchannels; i++)
+  for (i = 0; i < nchannels-1; i++)
   {
     ff = pgm_read_dword_far(&((channels+i)->freq));
     if (freq == ff) { 
@@ -493,8 +511,8 @@ void set_channel (int ch)
   if (10>9) //FIXMEchannels[cur_ch].freq < 0) // negative freq => repeater 
   {     
     // FIXME 
-    if (rig.freq > 20000000) { ft817.setRPTshift(rpt70cm); }
-    else { ft817.setRPTshift(rpt2m); }
+//if (rig.freq > 20000000) { ft817.setRPTshift(rpt70cm); }
+ //   else { ft817.setRPTshift(rpt2m); }
   }
 }
 
@@ -700,6 +718,8 @@ void setup ()
   initialize_screen();
 
   initialize_gps();
+  init_rotary();
+
   initialize_ft817();
 
   modus = M_CHANNELS;
