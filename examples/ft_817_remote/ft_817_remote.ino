@@ -114,7 +114,7 @@ void initialize_ft817 ()
 t_channel curch;
 char curchname[CHANNEL_LEN];
 char curchqth[QTH_LEN];
-int cur_ch;
+int index_curchannel, index_curband;
 
 // NB: indices as in list above!! 
 const long watchdog_frequencies[] = {
@@ -276,8 +276,8 @@ void display_frequency ()
 
 void display_channel ()
 {
-  int i = get_cur_ch_name(rig.freq);
-  int j = get_cur_band_name(rig.freq);
+  int i = index_curchannel;
+  int j = index_curband;
   
   lcd.setCursor(0,1);
   if (i >= 0) { lcd.print(curch.name); for (i=strlen(curch.name);i<CHANNEL_LEN;i++){lcd.print(" ");}}
@@ -288,6 +288,11 @@ void display_channel ()
   }
 }
 
+void update_cur_ch_band ()
+{
+  index_curchannel = get_cur_ch_name(rig.freq);
+  index_curband = get_cur_band_name(rig.freq);
+}
 
 void display_smeter ()
 {
@@ -301,7 +306,7 @@ void update_curpos ()
   if (GPS.fix) { curpos.lat = (float)(GPS.lat); curpos.lon = (float)(GPS.lon); }
   else { curpos.lat =mz_lat;curpos.lon= mz_lon; } //FIXME
   wgs_to_maidenhead(curpos.lat,curpos.lon,curpos.qth);
-  char *qth2 = "JO21da";// FIXME: repeater position
+  char *qth2 = curch.qth; //"JO21da";// FIXME: repeater position
   float lat2,lon2;
   maidenhead_to_wgs (&lat2,&lon2,qth2);
   curpos.dist = (int)calculate_distance_wgs84 (curpos.lat,curpos.lon,lat2,lon2);
@@ -396,10 +401,10 @@ int get_cur_band_name (long freq)
 void channels_mode ()
 {
   if (lcd_key & BUTTON_RIGHT)  { 
-    set_channel (cur_ch+1); 
+    set_channel (index_curchannel+1); 
   }
   if (lcd_key & BUTTON_LEFT)   { 
-    set_channel (cur_ch-1); 
+    set_channel (index_curchannel-1); 
   }
   if (lcd_key & BUTTON_UP)     { 
     modus = M_SCANNING; 
@@ -434,7 +439,7 @@ void set_channel (int ch)
   {
     ch =  nchannels-1;
   }
-  cur_ch = ch;
+  index_curchannel = ch;
 
   // update the rig 
   long f = 0.; //FIXME channels[cur_ch].freq;
@@ -663,7 +668,7 @@ void setup ()
   initialize_ft817();
 
   modus = M_CHANNELS;
-  cur_ch = find_nearest_channel();
+  index_curchannel = find_nearest_channel();
   //cur_ch = 0;
   display_frequency_mode_smeter ();
 }
@@ -683,9 +688,9 @@ void loop ()
   if (curtimer > TIMER) {
     timer = millis(); // reset the timer
   }
-  if (curtimer > TIMER_GPS)  {  update_curpos();  display_time();  } //show_gps();}
+  if (curtimer > TIMER_GPS)  {  update_cur_ch_band(); update_curpos();  display_time();  } //show_gps();}
   if (curtimer > TIMER_SMETER)  {    display_smeter();  }
-  if (curtimer > TIMER_FREQUENCY)  {    display_frequency(); display_channel(); }
+  if (curtimer > TIMER_FREQUENCY)  {   update_cur_ch_band();  display_frequency(); display_channel(); }
   //if (curtimer > TIMER_WATCHDOG)  {  watchdog(); timer = millis(); }
 
 
