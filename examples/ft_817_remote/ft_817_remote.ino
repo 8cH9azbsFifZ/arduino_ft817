@@ -159,6 +159,9 @@ void sd_read()
 #include "t_repeaters.h"
 #include "t_bandplan.h"
 
+t_channel curch;
+char curchname[20];
+char curchqth[7];
 int cur_ch;
 #define CH_NAME_LEN 20
 #define NO_CHANNEL -1
@@ -328,8 +331,9 @@ void display_channel ()
 {
   int i = get_cur_ch_name(rig.freq);
   int j = get_cur_band_name(rig.freq);
+  
   lcd.setCursor(0,1); 
-  if (i >= 0) { lcd.print(channels[i].name); }
+  if (i >= 0) { lcd.print(curch.name); }
   else
   { 
     if (j >= 0) { lcd.print(bands[j].name); }
@@ -403,9 +407,20 @@ int freq_to_channel (long freq)
 int get_cur_ch_name (long freq)
 {
   int i;
+  long ff;
   for (i = 0; i < nchannels; i++)
   {
-    if (freq == channels[i].freq) { return i; }
+    ff = pgm_read_dword_far(&((channels+i)->freq));
+    if (freq == ff) { 
+      curch.freq = pgm_read_dword_far(&((channels+i)->freq));
+      curch.shift = pgm_read_dword_far(&((channels+i)->shift));
+      curch.mode = pgm_read_word_far(&((channels+i)->mode));
+      strcpy_P(curchname, (char*)pgm_read_word( &((channels+i)->name)) );
+      strcpy_P(curchqth, (char*)pgm_read_word( &((channels+i)->qth)) );
+      curch.name=curchname;
+      curch.qth=curchqth;
+      return i;   
+    }
   }
   return -1;
 }
@@ -458,7 +473,7 @@ void set_channel (int ch)
   cur_ch = ch;
 
   // update the rig 
-  long f = channels[cur_ch].freq;
+  long f = 0.; //FIXME channels[cur_ch].freq;
   if (f < 0) { f = -f; }
   
   do // it may happen, that the frequency is not set correctly during the 1st attempt.
@@ -468,8 +483,8 @@ void set_channel (int ch)
   } 
   while (rig.freq != f);
 
-  ft817.setMode(channels[cur_ch].mode);
-  if (channels[cur_ch].freq < 0) // negative freq => repeater 
+  //FIXME ft817.setMode(channels[cur_ch].mode);
+  if (10>9) //FIXMEchannels[cur_ch].freq < 0) // negative freq => repeater 
   {     
     // FIXME 
     if (rig.freq > 20000000) { ft817.setRPTshift(rpt70cm); }
@@ -484,10 +499,10 @@ int find_nearest_channel ()
   int i;
   int nearest_channel = 0;
   long delta_freq_min = LONG_MAX;
-  for (i = 0; i < nchannels; i++)
+  for (i = 0; i < nchannels-1; i++)
   {
 
-    long delta_freq = channels[i].freq - rig.freq;
+    long delta_freq = 0;//FIXMEchannels[i].freq - rig.freq;
 
     delay(10);
     if (delta_freq < 0) { 
@@ -598,7 +613,7 @@ byte signal_detected ()
 int scan_function()
 {
   int i;
-  for (i = 0; i < nchannels; i++)
+  for (i = 0; i < nchannels-1; i++)
   {
     set_channel (i);
     delay(SCAN_DELAY);
@@ -680,8 +695,6 @@ void setup ()
 
   initialize_gps();
   initialize_ft817();
-
-Serial.print(channels[22].name);
 
   modus = M_CHANNELS;
   cur_ch = find_nearest_channel();
