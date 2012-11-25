@@ -404,7 +404,7 @@ int freq_to_channel (long freq)
 }
 
 /*************************************************************************************************/
-int get_cur_ch_name (long freq)
+int get_cur_ch_name (long freq) // FIXME: rename this function
 {
   int i;
   long ff;
