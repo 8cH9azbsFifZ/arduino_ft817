@@ -55,6 +55,7 @@ uint8_t lcd_key;
 #define SMETER_LEN 4
 #define FREQ_LEN 12 // length of frequency display
 #define MODE_LEN 5
+#define CHANNEL_LEN 20
 typedef struct
 {
   // current status
@@ -158,10 +159,10 @@ void sd_read()
 #include "t_channels.h"
 #include "t_repeaters.h"
 #include "t_bandplan.h"
-
+#define QTH_LEN 7
 t_channel curch;
-char curchname[20];
-char curchqth[7];
+char curchname[CHANNEL_LEN];
+char curchqth[QTH_LEN];
 int cur_ch;
 #define CH_NAME_LEN 20
 #define NO_CHANNEL -1
@@ -186,7 +187,7 @@ typedef struct
 {
   float lat;
   float lon;
-  char qth[7];
+  char qth[QTH_LEN];
   int dist; // distance to repeater (km)
 } t_position;
 t_position curpos;
@@ -332,11 +333,11 @@ void display_channel ()
   int i = get_cur_ch_name(rig.freq);
   int j = get_cur_band_name(rig.freq);
   
-  lcd.setCursor(0,1); 
-  if (i >= 0) { lcd.print(curch.name); }
+  lcd.setCursor(0,1);
+  if (i >= 0) { lcd.print(curch.name); for (i=strlen(curch.name);i<CHANNEL_LEN;i++){lcd.print(" ");}}
   else
   { 
-    if (j >= 0) { lcd.print(bands[j].name); }
+    if (j >= 0) { lcd.print(bands[j].name); for (i=strlen(bands[j].name);i<CHANNEL_LEN;i++){lcd.print(" ");}}
     else { lcd.print("No bandplan        "); }
   }
 }
@@ -422,6 +423,11 @@ int get_cur_ch_name (long freq) // FIXME: rename this function
       return i;   
     }
   }
+  curch.freq = -1;
+  curch.shift = -1;
+  curch.mode = NULL;
+  curch.name = NULL;
+  curch.qth = NULL;
   return -1;
 }
 
