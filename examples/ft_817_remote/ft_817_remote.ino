@@ -402,13 +402,26 @@ int freq_to_channel (long freq)
 /*************************************************************************************************/
 int get_cur_ch_name (long freq)
 {
-  
-  int i;
-  for (i = 0; i < nchannels; i++)
+  myFile = SD.open("ch.txt");
+  if (!myFile) { return -1; }
+  int buffer[20];
+  int i = 0;
+  while (myFile.available()) 
   {
-    if (freq == channels[i].freq) { return i; }
+    int c = myFile.read();
+    if (c == 0x2c) {// detect , 
+      Serial.print("\n");
+      for (i=0; i < 20; i++) { buffer[i] = NULL; }
+    }
+    else
+    {
+      buffer[i] = c;
+      i++;
+    }
   }
-  return -1;
+
+  myFile.close();
+  return 0;
 }
 
 int get_cur_rpt_name (long freq)
