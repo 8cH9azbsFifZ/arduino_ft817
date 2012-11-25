@@ -168,7 +168,10 @@ void FT817::setFreq(long freq) {
 byte FT817::getAnt() 
 {
   // Algorithm derived by Gerolf Ziegenhain (DG6FL) from Stefano Sinagra (IZ0MJE)
+  // This does not work in my FT817ND
+  //  - even though the memory map suggest it: http://www.ka7oei.com/ft817_meow.html
   // Band
+  delay(COMMAND_DELAY);
   sendCATCommandChar(FT817_ANY_BYTE);
   sendCATCommandChar(0x59);
   sendCATCommandChar(FT817_ANY_BYTE);
@@ -184,8 +187,10 @@ byte FT817::getAnt()
   vband[1] = rxreply[0] << 4;
   vband[1] = vband[1] >> 4;
   vband[0] = rxreply[0] >> 4;
+  // 5 -- Serial.println(vband[1]);
 
   // VFO
+  delay(COMMAND_DELAY);
   sendCATCommandChar(FT817_ANY_BYTE);
   sendCATCommandChar(0x55);
   sendCATCommandChar(FT817_ANY_BYTE);
@@ -199,8 +204,11 @@ byte FT817::getAnt()
   byte vfo;
   vfo = rxreply[0] & 1;
   vfo = ! vfo;
+  // ==0 -> B   !=0 -> A
+  // 1 => A  Serial.println(vfo);
   
   // Antenna
+  delay(COMMAND_DELAY);
   sendCATCommandChar(FT817_ANY_BYTE);
   sendCATCommandChar(0x7a);
   sendCATCommandChar(FT817_ANY_BYTE);
@@ -213,9 +221,12 @@ byte FT817::getAnt()
 
   static byte bitshift[15] = {7,7,7,7,7,7,7,7,7,6,5,4,3,2,7};
 
-  byte antenna = antenna << bitshift[vband[vfo]];
+  byte antenna = rxreply[0];
+  antenna = antenna << bitshift[vband[vfo]];
   antenna = antenna >> 7;
   //if (antenna == 0){lcd.print("F");} else {lcd.print("R");}
+  // =255 Serial.println(rxreply[0]);
+  // =255 Serial.println(rxreply[1]);
   return antenna;
 }
 
