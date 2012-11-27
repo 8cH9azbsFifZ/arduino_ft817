@@ -1,0 +1,4 @@
+Installation of the Software
+============================
+* Copy this whole current directory to
+  ~/Documents/Arduino/libraries/FT817
