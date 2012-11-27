@@ -5,8 +5,8 @@ using the famous arduino. It also features some examples on what to do.
 
 Released under GPLv3.
 
-Installation Instructions
--------------------------
+http://8ch9azbsfifz.github.com/arduino_ft817/
+
 * Copy this whole current directory to
   ~/Documents/Arduino/libraries/FT817
 
