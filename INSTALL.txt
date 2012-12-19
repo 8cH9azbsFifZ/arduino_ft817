@@ -2,3 +2,8 @@ Installation of the Software
 ============================
 * Copy this whole current directory to
   ~/Documents/Arduino/libraries/FT817
+
+Creation of the header files (in case you don't want to use the ones
+supplied here):
+xmlbandplan.org version tag v0.7.9 works
+https://github.com/8cH9azbsFifZ/bandplan/archive/v0.7.9.zip
