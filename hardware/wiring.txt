@@ -1,8 +1,20 @@
-Wiring Information
+This file contains a list of hardware components used for the experiment and how
+to connect them.
 
-Arduino Mega
-============
-http://arduino.cc/en/Main/ArduinoBoardADK
+Components used
+===============
+* Adafruit GPS 
+	http://www.watterott.com/de/Adafruit-Ultimate-GPS-Breakout-66-channel
+* Arduino Mega 
+	http://arduino.cc/en/Main/ArduinoBoardADK
+* Adafruit I2C LCD 
+	http://www.watterott.com/de/Adafruit-I2C-Controlled-Keypad-Shield-Kit-for-16x2-LCD
+* Rotary Encoders
+* Pushbuttons
+
+
+Wiring Information - Arduino Mega
+=================================
 
 PIN 	Name
 2		Rotary Encoder
