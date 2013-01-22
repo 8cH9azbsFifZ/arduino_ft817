@@ -1,0 +1,16 @@
+Wiring Information
+
+Arduino Mega
+============
+http://arduino.cc/en/Main/ArduinoBoardADK
+
+PIN 	Name
+2		Rotary Encoder
+3		Rotary Encoder
+19		FT817 RX (Serial1)
+18		FT817 TX (Serial1)
+17		GPS RX (Serial2)
+16		GPS TX (Serial2)
+20		LCD Display (I2C)
+21		LCD Display (I2C)
+
