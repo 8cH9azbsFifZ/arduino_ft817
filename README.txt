@@ -9,3 +9,8 @@ http://8ch9azbsfifz.github.com/arduino_ft817/
 
 Released under GPLv3.
 Gerolf Ziegenhain, DG6FL
+
+Code Quality
+============
+This is experimental code.
+
